@@ -147,8 +147,8 @@ mod_02_uploadData_ui <- function(id){
 
 
 mod_02_uploadData_server <- function(id, sfData){
+  ns <- NS(id)
   moduleServer(id, function(input, output, session){
-    ns <- session$ns
     #1.Load Data ===============================================================
     showExample <- reactive({
       as.character(input$showExample)
@@ -178,15 +178,14 @@ mod_02_uploadData_server <- function(id, sfData){
         df$ID <- cleanNames(df$ID)
         df <- df %>% dplyr::relocate(ID)
       }
+      sfData$data <- df
       return(df)
     })
 
-    sfData$data <- reactive({getProcessedData()})
-
     #3. Get Metadata ===========================================================
     getMetaData <- reactive({
-      shiny::req(sfData$data())
-      tem <- MetaboReport::getMeta(DF = sfData$data(), format = input$fileFormat)
+      shiny::req(sfData$data)
+      tem <- getMeta(DF = sfData$data)
       sfData$group <- tem %>%
         `rownames<-`(.$Sample) %>%
         dplyr::select(-Sample)
@@ -205,66 +204,65 @@ mod_02_uploadData_server <- function(id, sfData){
                                      deferRender = TRUE,
                                      scroller = TRUE,
                                      fixedColumns = FALSE
+                                     )
                       )
-        )
-      })
+        })
 
-      ##(2) Meta Info Overview -------------------------------------------------
+      #(2) Meta Info Overview -------------------------------------------------
       output$metaInfo <- renderUI({
         shiny::validate(need(!is.null(getMetaData()), message = "No metadata found"))
         str1 <- p(h4("Here is a summary of the extracted metadata:"))
-        str2 <- p(strong("Number of samples: "), code(nrow(sfData$group())))
-        str3 <- p(strong("Number of groups: "), code(ncol(sfData$group())))
+        str2 <- p(strong("Number of samples: "), code(nrow(sfData$group)))
+        str3 <- p(strong("Number of groups: "), code(ncol(sfData$group)))
         str4 <- '<hr/>'
         HTML(paste(str1, str2, str3, str4, sep = '<br/>'))
       })
 
-      ##(3) Meta table ---------------------------------------------------------
+      #(3) Meta table ---------------------------------------------------------
       output$metaView <- DT::renderDataTable({
         shiny::validate(need(!is.null(getMetaData()), message = "No metadata found"))
-        DT::datatable(sfData$group(),
+        DT::datatable(sfData$group,
                       caption = "Overview of Meta Information",
                       options = list(scrollX = TRUE,
                                      deferRender = TRUE,
                                      scroller = TRUE,
                                      fixedColumns = FALSE
+                                     )
                       )
-        )
-      })
+        })
 
       #(4) Processed Data Overview ---------------------------------------------
       output$processView <- DT::renderDataTable({
         shiny::validate(need(!is.null(getProcessedData()), message = "No input Data"))
-        DT::datatable(sfData$data(),
+        DT::datatable(sfData$data,
                       options = list(scrollX = TRUE,
                                      deferRender = TRUE,
                                      scroller = TRUE,
                                      fixedColumns = FALSE
+                                     )
                       )
-        )
+        })
       })
-    })
 
     #5. Remove Outlier ---------------------------------------------------------
     removecolumn <- function(df, nameofthecolumn){dplyr::select(df, -all_of(nameofthecolumn))}
 
     output$selectColumn <- renderUI({
-      shiny::req(sfData$data())
-      selectInput(inputId = "selectColumn",
+      shiny::req(sfData$data)
+      selectInput(inputId = ns("selectColumn"),
                   label = "Select sample(s) to remove",
                   multiple = TRUE,
-                  choices = names(sfData$data() %>% dplyr::select(-ID))
-      )
-    })
+                  choices = names(sfData$data %>% dplyr::select(-ID))
+                  )
+      })
 
     observeEvent(input$removeCol, {
-      sfData$data <- removecolumn(sfData$data(), input$selectColumn)
-
-    })
+      sfData$data <- removecolumn(sfData$data, input$selectColumn)
+      })
 
     observeEvent(input$undoCol, {
       sfData$data <- getProcessedData()
-    })
+      })
   })
 }
 ## To be copied in the UI

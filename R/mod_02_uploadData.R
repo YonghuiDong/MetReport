@@ -213,7 +213,7 @@ mod_02_uploadData_server <- function(id, sfData){
         shiny::validate(need(!is.null(getMetaData()), message = "No metadata found"))
         str1 <- p(h4("Here is a summary of the extracted metadata:"))
         str2 <- p(strong("Number of samples: "), code(nrow(sfData$group)))
-        str3 <- p(strong("Number of groups: "), code(ncol(sfData$group)))
+        str3 <- p(strong("Number of meta groups: "), code(ncol(sfData$group)))
         str4 <- '<hr/>'
         HTML(paste(str1, str2, str3, str4, sep = '<br/>'))
       })

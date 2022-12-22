@@ -3,14 +3,73 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @importFrom  shinydashboard sidebarMenu menuItem menuSubItem dashboardBody tabItems tabItem
+#' @import shinydashboardPlus
 #' @noRd
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    # Your application UI logic
-    fluidPage(
-      h1("MetReport")
+    dashboardPage(
+
+      ## Header ----------------------------------------------------------------
+      header = dashboardHeader(
+        title = strong("MetReport")
+      ),
+
+      ## Sidebar ---------------------------------------------------------------
+      sidebar = dashboardSidebar(
+
+        sidebarMenu(
+          style = "position: fixed; overflow: visible;",
+          id = "sidebarmenu",
+          menuItem(text = strong("Home"), tabName = "home", icon = icon("home")),
+          hr(),
+          menuItem(text = strong("Upload Data"), tabName = "uploadData", icon = icon("upload")),
+          hr(),
+          menuItem(text = strong("Preprocess Data"), tabName = "preprocessData", icon = icon("adjust")),
+          hr(),
+          menuItem(text = strong("Statistics"), tabName = "viewResult", icon = icon("chart-bar")),
+          hr(),
+          menuItem(text = strong("Download Report"), tabName = "downloadReport", icon = icon("file-text-o")),
+          hr(),
+          menuItem(text = strong("Widgets"), tabName = "widgets", icon = icon("tools"),
+                   menuSubItem(text = strong("Randomizer"), tabName = "randomizer", icon = icon("bolt")),
+                   menuSubItem(text = strong("Solvent"), tabName = "solvent", icon = icon("bolt")),
+                   menuSubItem(text = strong("LC Tool"), tabName = "lcTool", icon = icon("bolt")),
+                   menuSubItem(text = strong("MS Tool"), tabName = "massTool", icon = icon("bolt"))
+          ),
+          hr(),
+          menuItem(text = strong("Contact"), tabName = "contact", icon = icon("envelope-o"))
+        )
+      ),
+
+      ## Body ------------------------------------------------------------------
+      body = dashboardBody(
+        tabItems(
+          tabItem("home", mod_01_home_ui("01_home_1")),
+          tabItem("uploadData", mod_02_uploadData_ui("02_uploadData_1"))
+          # tabItem(tabName = "uploadData",  source("ui-tab-uploadData.R", local = TRUE)$value),
+          # tabItem(tabName = "preprocessData",  source("ui-tab-preprocessData.R", local = TRUE)$value),
+          # tabItem(tabName = "viewResult",  source("ui-tab-viewResult.R", local = TRUE)$value),
+          # tabItem(tabName = "downloadReport",  source("ui-tab-downloadReport.R", local = TRUE)$value),
+          # tabItem(tabName = "randomizer",  source("ui-tab-randomizer.R", local = TRUE)$value),
+          # tabItem(tabName = "solvent",  source("ui-tab-solvent.R", local = TRUE)$value),
+          # tabItem(tabName = "lcTool",  source("ui-tab-lcTool.R", local = TRUE)$value),
+          # tabItem(tabName = "massTool",  source("ui-tab-massTool.R", local = TRUE)$value),
+          # tabItem(tabName = "contact",  source("ui-tab-contact.R", local = TRUE)$value)
+        )
+      ),
+
+      ## Skin ------------------------------------------------------------------
+      controlbar = dashboardControlbar(collapsed = TRUE, skinSelector()),
+
+      ## Footer --------------------------------------------------------------------
+      footer = dashboardFooter(
+        left = "Weizmann Institute of Science",
+        right = "Copyright (C) 2022"
+      )
     )
   )
 }
@@ -23,19 +82,20 @@ app_ui <- function(request) {
 #' @import shiny
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
 #' @noRd
-golem_add_external_resources <- function() {
+golem_add_external_resources <- function(){
+
   add_resource_path(
-    "www",
-    app_sys("app/www")
+    'www', app_sys('app/www')
   )
 
   tags$head(
     favicon(),
     bundle_resources(
-      path = app_sys("app/www"),
-      app_title = "MetReport"
+      path = app_sys('app/www'),
+      app_title = 'MetReport'
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
   )
 }
+

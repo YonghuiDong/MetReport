@@ -49,9 +49,8 @@ app_ui <- function(request) {
       body = dashboardBody(
         tabItems(
           tabItem("home", mod_01_home_ui("01_home_1")),
-          tabItem("uploadData", mod_02_uploadData_ui("02_uploadData_1"))
-          # tabItem(tabName = "uploadData",  source("ui-tab-uploadData.R", local = TRUE)$value),
-          # tabItem(tabName = "preprocessData",  source("ui-tab-preprocessData.R", local = TRUE)$value),
+          tabItem("uploadData", mod_02_uploadData_ui("02_uploadData_1")),
+          tabItem(tabName = "preprocessData", mod_03_preprocess_ui("03_preprocess_1"))
           # tabItem(tabName = "viewResult",  source("ui-tab-viewResult.R", local = TRUE)$value),
           # tabItem(tabName = "downloadReport",  source("ui-tab-downloadReport.R", local = TRUE)$value),
           # tabItem(tabName = "randomizer",  source("ui-tab-randomizer.R", local = TRUE)$value),

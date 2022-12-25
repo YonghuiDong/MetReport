@@ -9,15 +9,20 @@ Imports:
     config (>= 0.3.1),
     dplyr,
     DT,
+    ggplot2,
     golem (>= 0.3.5),
+    grDevices,
     plotly,
     readr,
     readxl,
     shiny (>= 1.7.3),
     shinydashboard,
     shinydashboardPlus,
+    stats,
+    tidyr,
     tools,
-    utils
+    utils,
+    VIM
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

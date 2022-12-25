@@ -22,12 +22,18 @@ attachment::att_amend_desc()
 ## Create a module infrastructure in R/
 golem::add_module(name = "01_home", with_test = FALSE) # Name of the module
 golem::add_module(name = "02_uploadData", with_test = FALSE) # Name of the module
+golem::add_module(name = "03_preprocess", with_test = FALSE) # Name of the module
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct("cleanNames", with_test = FALSE)
 golem::add_fct("formatData", with_test = FALSE)
 golem::add_fct("getMeta", with_test = FALSE)
+golem::add_fct("kNNMissing", with_test = FALSE)
+golem::add_fct("getCV", with_test = FALSE)
+golem::add_fct("normalizeData", with_test = FALSE)
+golem::add_fct("scaleData", with_test = FALSE)
+golem::add_fct("showPCA", with_test = FALSE)
 golem::add_utils("xxx", with_test = FALSE)
 
 ## External resources

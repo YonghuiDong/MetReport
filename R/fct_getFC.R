@@ -32,6 +32,6 @@ getFC <- function(x, Group = NULL){
   rownames(f_change) <- c(paste0("Fold_", j[1,], "_vs_", j[2,]),
                           paste0("Fold_", j[2,], "_vs_", j[1,]))
   ret <- as.data.frame(t(f_change))
-  cat ("\n- FC calculation done!\n")
+  cat(": FC calculation done!\n")
   return(round(ret, 2))
 }

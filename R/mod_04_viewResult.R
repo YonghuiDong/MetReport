@@ -663,11 +663,11 @@ mod_04_viewResult_ui <- function(id){
 #' 04_viewResult Server Functions
 #'
 #' @noRd
-#' @import ggplot2
+#' @importFrom ggplot2 aes
 mod_04_viewResult_server <- function(id, sfData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    #1. General Statistics Panel================================================
+    #1. General Statistics Panel------------------------------------------------
     ##(1) Stat parameters-------------------------------------------------------
     statMethod <- reactive({
       as.character(input$statMethod)
@@ -706,7 +706,6 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(sfData$filter)
       shiny::req(sfData$clean)
       shiny::req(sfData$group)
-
       tFilter <- sfData$filter %>%
         dplyr::select(-ID) %>%
         t()
@@ -872,10 +871,10 @@ mod_04_viewResult_server <- function(id, sfData){
       if(PCAColor() == "Default") {
         p <- p
         } else {
-        p <- p +
-          scale_color_brewer(palette = PCAColor()) +
-          scale_fill_brewer(palette = PCAColor())
-        }
+          p <- p +
+            scale_color_brewer(palette = PCAColor()) +
+            scale_fill_brewer(palette = PCAColor())
+          }
       return(p)
       })
 
@@ -1138,7 +1137,7 @@ mod_04_viewResult_server <- function(id, sfData){
                "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
                "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
                )
-        draw(HMPlot())
+        ComplexHeatmap::draw(HMPlot())
         dev.off()
         })
 
@@ -1279,6 +1278,7 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(KMResultCluster())
       data_with_cust_info <- KMdata() %>%
         dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
+      write.csv(data_with_cust_info, file = "KMT.csv", row.names = F) ## delete later
       })
 
     ###(2.5) K-means trend plot

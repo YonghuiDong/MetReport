@@ -62,7 +62,7 @@ getVIP <- function(x, Group = NULL){
     round(myVIP@vipVn, 2)
   }
   list_VIP <- lapply(mylist, oplsdafun)
-  cat("\n- VIP value calculation done!\n")
+  cat(": VIP value calculation done!\n")
   ## convert result to dataframe and keep the name
   return(data.frame(list_VIP))
 }

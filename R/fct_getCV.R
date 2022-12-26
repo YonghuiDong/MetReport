@@ -27,6 +27,6 @@ getCV <- function(x, Group = NULL){
   cv_int <- sd_int/mean_int * 100
   ret <- round(cv_int, 2)
   colnames(ret) <- paste("CV_", colnames(cv_int), sep = "")
-  cat ("\n- CV calculation done!\n")
+  cat(": CV calculation done!\n")
   return(ret)
 }

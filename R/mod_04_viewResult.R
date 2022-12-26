@@ -7,6 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
+#' @importFrom dplyr n
 mod_04_viewResult_ui <- function(id){
   ns <- NS(id)
   tagList(
@@ -652,7 +653,7 @@ mod_04_viewResult_ui <- function(id){
                                               )
                                )
                         ),
-               shiny::plotOutput("CNPlot")
+               shiny::plotOutput(ns("CNPlot"))
                )
              )
       )
@@ -1278,7 +1279,6 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(KMResultCluster())
       data_with_cust_info <- KMdata() %>%
         dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
-      write.csv(data_with_cust_info, file = "KMT.csv", row.names = F) ## delete later
       })
 
     ###(2.5) K-means trend plot
@@ -1319,7 +1319,7 @@ mod_04_viewResult_server <- function(id, sfData){
       mygraph <- igraph::graph_from_data_frame(edges, vertices = vertices )
       p <- ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
         ggraph::geom_edge_diagonal(colour="grey") +
-        ggraph::scale_edge_colour_distiller(palette = "RdPu") +
+        ##ggraph::scale_edge_colour_distiller(palette = "RdPu") +
         ggraph::geom_node_point(aes(filter = leaf, x = x * 1.07, y = y*1.07, colour = group), size = 4) +
         ggplot2::scale_colour_manual(name = "Cluster", values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
         ggplot2::scale_size_continuous(range = c(0.1,10) ) +

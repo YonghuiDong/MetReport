@@ -23,6 +23,7 @@ attachment::att_amend_desc()
 golem::add_module(name = "01_home", with_test = FALSE) # Name of the module
 golem::add_module(name = "02_uploadData", with_test = FALSE) # Name of the module
 golem::add_module(name = "03_preprocess", with_test = FALSE) # Name of the module
+golem::add_module(name = "04_viewResult", with_test = FALSE) # Name of the module
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
@@ -34,6 +35,12 @@ golem::add_fct("getCV", with_test = FALSE)
 golem::add_fct("normalizeData", with_test = FALSE)
 golem::add_fct("scaleData", with_test = FALSE)
 golem::add_fct("showPCA", with_test = FALSE)
+golem::add_fct("getFC", with_test = FALSE)
+golem::add_fct("getP", with_test = FALSE)
+golem::add_fct("getVIP", with_test = FALSE)
+golem::add_fct("showSplot", with_test = FALSE)
+golem::add_fct("showVolcano", with_test = FALSE)
+golem::add_fct("showOPLSDA", with_test = FALSE)
 golem::add_utils("xxx", with_test = FALSE)
 
 ## External resources

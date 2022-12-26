@@ -21,4 +21,5 @@ app_server <- function(input, output, session) {
   mod_01_home_server("01_home_1")
   mod_02_uploadData_server("02_uploadData_1", sfData = global)
   mod_03_preprocess_server("03_preprocess_1", sfData = global)
+  mod_04_viewResult_server("04_viewResult_1", sfData = global)
 }

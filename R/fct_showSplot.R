@@ -1,0 +1,62 @@
+#' @title Show PLSDA score plot
+#' @description perform PLSDA and show the score plot
+#' @author Yonghui Dong
+#' @param DF data matrix used for oplsda
+#' @param oplsda oplsda result from r package ropls
+#' @param size point size
+#' @param interactive should the plot be interactive? default is FALSE
+#' @importFrom stats cov sd
+#' @importFrom ropls getVipVn
+#' @importFrom ggplot2 aes
+#' @importFrom dplyr %>%
+#' @importFrom plotly ggplotly
+#' @noRd
+#' @export
+#' @examples
+#' library(ropls)
+#' data(sacurine)
+#' genderFc = sacurine$sampleMetadata[, "gender"]
+#' oplsda = opls(sacurine$dataMatrix, genderFc, predI = 1, orthoI = NA, fig.pdfC = "none")
+#' showSplot(sacurine$dataMatrix, oplsda, interactive = TRUE)
+
+showSplot <- function(DF, oplsda, size = 3, interactive = FALSE) {
+  #(1) Suppress no visible binding for global variable notes
+  sd <- Cov <- Corr <- NULL
+  #(2) check input
+  if(class(oplsda)[1] != "opls") {stop("Wrong oplsda object detected")}
+  #(3) prepare the data
+  T <- as.matrix(oplsda@scoreMN)
+  p1 <- c()
+  for (i in 1:ncol(DF)) {
+    scov <- cov(DF[,i], T)
+    p1 <- matrix(c(p1, scov), ncol = 1)
+    }
+
+  pcorr1 <- c()
+  for (i in 1:nrow(p1)) {
+    den <- apply(T, 2, sd) * sd(DF[,i])
+    corr1 <- p1[i,]/den
+    pcorr1 <- matrix(c(pcorr1, corr1), ncol = 1)
+    }
+
+  datasplot <- data.frame(Cov = p1, Corr = pcorr1)
+  rownames(datasplot) <- colnames(DF)
+  VIP <- getVipVn(oplsda)
+  df2 <- cbind.data.frame(datasplot, VIP = VIP)
+  df3 <- df2 %>%
+    dplyr::mutate(VIP = ifelse(VIP >= 1, "VIP >= 1", "VIP < 1"))
+
+  p <- ggplot2::ggplot(df3, aes(x = Cov, y = Corr, color = VIP, text = colnames(DF))) +
+    ggplot2::geom_point(size = size) +
+    ggplot2::geom_hline(yintercept = 0,linetype = 2) +
+    ggplot2::geom_vline(xintercept = 0,linetype = 2) +
+    ggplot2::scale_color_manual(values = c("#a1d76a","#e9a3c9")) +
+    ggplot2::xlab("Covariance") +
+    ggplot2::ylab("Correlation") +
+    ggplot2::ggtitle("S-plot") +
+    ggplot2::theme_bw()
+  if(isTRUE(interactive)){
+    p <- plotly::ggplotly(p)
+    }
+  return(p)
+}

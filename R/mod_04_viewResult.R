@@ -664,7 +664,7 @@ mod_04_viewResult_ui <- function(id){
 #' 04_viewResult Server Functions
 #'
 #' @noRd
-#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 aes scale_color_brewer scale_fill_brewer
 mod_04_viewResult_server <- function(id, sfData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns

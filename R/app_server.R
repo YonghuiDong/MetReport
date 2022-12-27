@@ -10,11 +10,13 @@ app_server <- function(input, output, session) {
   ##(1) data: raw data
   ##(2) group: metadata
   ##(3) filter: QC filtered data without any transformation
+  ##(4) normalize: normalized data
   ##(4) clean: QC filtered and transformed data
   global <- reactiveValues(
     data = NULL,
     group = NULL,
     filter = NULL,
+    normalize = NULL,
     clean = NULL
     )
   # Your application server logic

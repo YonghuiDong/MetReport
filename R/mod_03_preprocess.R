@@ -177,7 +177,7 @@ mod_03_preprocess_ui <- function(id){
              ##(2) Feature Panel -----------------------------------------------
              box(
                width = 12,
-               inputId = "RawData_card",
+               inputId = "Feature_card",
                title = strong("Feature Panel"),
                status = "success",
                solidHeader = FALSE,
@@ -199,6 +199,18 @@ mod_03_preprocess_ui <- function(id){
 
              box(
                width = 12,
+               inputId = ns("TIC_card"),
+               title = strong("TIC Plot Panel: TEST"),
+               status = "success",
+               solidHeader = FALSE,
+               collapsible = TRUE,
+               collapsed = FALSE,
+               closable = FALSE,
+               shiny::plotOutput(ns("TICPlot"))
+               ),
+
+             box(
+               width = 12,
                inputId = ns("RawData_card"),
                title = strong("Preprocessed Data Panel"),
                status = "success",
@@ -207,7 +219,7 @@ mod_03_preprocess_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                DT::dataTableOutput(ns("preprocessedDataTable"))
-               ),
+               )
              )
       )
     )
@@ -331,6 +343,12 @@ mod_03_preprocess_server <- function(id, sfData){
       shiny::req(QCFilteredData())
       normalizedData <- normalizeData(QCFilteredData() %>% dplyr::select(-ID),
                                       Method = normalizeMethod())
+
+      sfData$normalize <- normalizedData %>%
+        as.data.frame() %>%
+        dplyr::mutate(ID = QCFilteredData()$ID) %>%
+        dplyr::relocate(ID)
+
       transformedData <- switch(transformMethod(),
                                 "None" = normalizedData,
                                 "Log10" = log10(normalizedData),
@@ -432,7 +450,12 @@ mod_03_preprocess_server <- function(id, sfData){
       featureBoxPlot()
       })
 
-    ##(3) preprocessed Data Table---------------------------------------------------
+    ##(3) TIC Plot--------------------------------------------------------------
+    output$TICPlot <- shiny::renderPlot({
+      showTIC(df = sfData$normalize, Group = sfData$group[, prePCAGroup()])
+    })
+
+    ##(4) preprocessed Data Table-----------------------------------------------
     output$preprocessedDataTable <- DT::renderDataTable({
       shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
       DT::datatable(sfData$clean,

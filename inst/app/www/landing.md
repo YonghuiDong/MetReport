@@ -1,5 +1,5 @@
 
-# Welcome to MetStat &nbsp;<img src='logo.png' align="right" height="200"/>
+# Welcome to MetStat &nbsp;<img src='www/logo.png' align="right" height="200"/>
 
 <b><span style="color:#F17F42">MetaboReport</span></b> provides users a flexible and efficient way to generate a typical metabolomics report.
 
@@ -43,4 +43,4 @@ MetaboReport accepts a variety of data formats:
 Please contact [Yonghui Dong](mailto:yonghui.dong@gmail.com).
 
 ---
-<a href= 'https://www.weizmann.ac.il'><img src='WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>
+<a href= 'https://www.weizmann.ac.il'><img src='www/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>

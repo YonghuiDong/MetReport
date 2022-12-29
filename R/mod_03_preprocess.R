@@ -97,8 +97,10 @@ mod_03_preprocess_ui <- function(id){
                radioButtons(inputId = ns("normalizeMethod"),
                             label = "Sample Normalization",
                             choices = c("None" = "None",
-                                        "Sum" = "Sum",
-                                        "Median" = "Median"
+                                        "Linear baseline normalization based on mean values" = "LBME",
+                                        "Linear baseline normalization based on median values" = "LBMD",
+                                        "Probabilistic quotient normalization" = "PQN",
+                                        "Quantile normalization" = "QT"
                                         ),
                             selected = "None"
                             ),
@@ -341,7 +343,7 @@ mod_03_preprocess_server <- function(id, sfData){
     ##(3) Data treatment--------------------------------------------------------
     treatedData <- reactive({
       shiny::req(QCFilteredData())
-      normalizedData <- normalizeData(QCFilteredData() %>% dplyr::select(-ID),
+      normalizedData <- doNormalization(QCFilteredData() %>% dplyr::select(-ID),
                                       Method = normalizeMethod())
 
       sfData$normalize <- normalizedData %>%

@@ -1,0 +1,627 @@
+---
+title: '`r paste("Report for Project:", params$projectName, sep = " ")`'
+date: '`r format(Sys.Date(),  "%d, %B, %Y")`'
+author: '`r params$authorName`'
+output: 
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    number_sections: true
+    css: style.css
+runtime: shiny
+params:
+  myRawData: NA
+  sampleGroup: NA
+  dataGlobal3PCA: NA
+  OPLSDAGroup: NA
+  statTable: NA
+  VCGroup: NA
+  myStat: NA
+  myMetaData: NA
+  mySamplePrep: NA
+  myPCAPlot: NA
+  myHMPlot: NA
+  dataGlobal3Transform: NA
+  BPGroup: NA
+  BPTransform: NA,
+  KMDG: NA,
+  KMTrendPlot: NA,
+  KMTable: NA,
+  projectName: NA,
+  authorName: NA
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label = setup, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE
+
+#(1) prepare parameters---------------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+
+## prepare and clean them
+myRawData <- params$myRawData
+dataGlobal3PCA <- params$dataGlobal3PCA
+OPLSDAGroup <- params$OPLSDAGroup
+statTable <- params$statTable
+VCGroup <- params$VCGroup
+myStat <- params$myStat
+myMetaData <- params$myMetaData
+mySamplePrep <- params$mySamplePrep
+dataGlobal3Transform <- params$dataGlobal3Transform
+BPGroup <- params$BPGroup
+```
+
+<img src = "logo.png" height = "150" style = "position: absolute; top: 90px; right: 10px;"/>
+
+<br>
+
+# Introduction
+
+Metabolomics is the systematic study of low molecular weight molecules (i.e., metabolites) in a given biological system. Depending on the research question or specific application, there are three common metabolomics strategies [1]:
+
+`Untargeted Assay`: (or frequently referred to as untargeted metabolomics or global metabolomics). Its objective is to reproducibly measure as many metabolites as feasible, and provide semi-quantitative data (chromatographic peak areas are reported, not concentrations). The chemical identity of metabolites is not necessarily known prior to data acquisition.
+
+`Targeted Assay`: (or sometimes referred to as targeted metabolomics). This approach focuses on a small number of metabolites of interest whose chemical identity is known prior to data acquisition, and an absolute concentration of each metabolite is typically reported.
+
+`Semi-targeted Assay`: (or frequently referred to as metabolic profiling). It acts as an intermediate between untargeted and targeted analyses, where typically hundreds of metabolites are targeted, whose chemical identity is known prior to data acquisition. Semi-quantification information is reported in this type of approach.
+
+This report is an overview of your data analysis results. Brief explanations are provided in each section to help you better understand the report. Below are few tips on how to use the report.
+
+> <span style = "color : #FF8300">**Tips:**</span>
+>
+> (1) Most figures in this report are interative, which means you can zoom and pan the figures, and hover over them to get more detailed information. Don't download figures from this report, and use them for publication purpose. The figure resolution is too low (72 dpi).
+>
+> (2) High resolution (600 dpi) static figures are provided along with this report. You can also download them in `Statistics` tab if you are using **MetaboReport** by yourself to generate this report. 
+>
+> (3) If you want to perform additional statistics and/or re-analyse you data by yourself, you can use either Table 1 (raw data) or Table 2 (data with different statistical information). You can click `Download` button above the table to download it in `cvs` or `excel` format.
+
+
+# Materials and Methods
+
+> <span style = "color : #FF8300">**Note:**</span>
+> 
+> (1) If Materials and Methods section is missing (or blank), please ask your collaborators. 
+>
+> (2) To avoid plagiarism, please do not copy-paste this whole section in your publication. 
+
+## Sample Preparation Method
+
+`r mySamplePrep` 
+
+## Data Analysis Method
+
+
+# Results
+
+## Quality Control
+
+Robust and reproducible data is essential to ensure high-quality analytical results and is particularly important for large-scale metabolomics studies where detector sensitivity drifts, retention time and mass accuracy shifts frequently occur. Therefore, raw data need to be inspected before data processing to detect measurement bias and verify system consistency [2].
+
+The use of quality control (QC) is now routine to monitor, evaluate and correct system variations in metabolomics studies. Different types of QC samples are used in metabolomics, such as pooled QC samples, reference materials, standard reference materials and long term reference (LTR) samples.
+
+> <span style = "color : #FF8300">**Note:**</span>
+> 
+> If your project does not contain QC samples, you can skip this section.
+
+
+### PCA-based QC Evaluation
+
+A rapid systematic check of data quality can be made by performing principal components analysis (PCA) on the complete data set (For explanation of PCA, please refer to **section 3.2.1**). By plotting the first two principal components scores, and labeling the data points as either QC samples or biological samples, the difference in multivariate dispersion can be visually assessed. 
+
+Ideally, QC samples should be clustered tightly in comparison to the total variance in the projection. If you used `pooled QC samples` in your study, the QCs should cluster at the center the PCA scores plot. Any deviation from the origin is usually due to unavoidable pipetting errors or sample weight discrepancies, or when the pooled QC is not generated from sub-aliquots of all the biological test samples. 
+
+As long as the QCs cluster tightly, relative to the observed dispersion of biological samples, then these data can be deemed as of high quality [1].
+
+
+```{r}
+#| label = QCPCA, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = "100%"
+#(1) show PCA plot--------------------------------------------------------------
+
+plotly::ggplotly(params$myPCAPlot, tooltip = "label")
+```
+
+### Comprehensive QC Report
+
+In addition, you may receive an HTML format QC report. It was generated using R package `RawHummus`, which was designed for quick and comprehensive evaluation of the metabolomics data quality based on QC samples. `RawHummus` adopts 12 quality metrics which are closely related to liquid chromatography (LC) peak shape, retention time (RT), mass accuracy, detector sensitivity and fragmentation to to comprehensively evaluate the raw data quality [2].  
+
+> <span style = "color : #FF8300">**Note:**</span>
+> 
+> Detailed evaluation of the data quality can be found in the RawHummus report. 
+>
+> This RawHummus report can be direcrly used as a supplementary metarial in your publication.
+
+
+## Statistical Result 
+
+### PCA
+
+Principal Component Analysis (PCA) is an unsupervised data analysis method, which transforms a set of correlated variables into a set of linearly uncorrelated variables. The uncorrelated variables are ordered in such a way that the first one accounts for as much of the variability in the data as possible and each succeeding one has the highest variance possible in the remaining variables. These ordered uncorrelated variables are called `principle components`. By discarding low-variance variables, PCA helps reduce data dimension and visualize the data.
+
+The PCA scores represent the new location of the samples in each principal component. A typical way to look at these is to plot the scores values in two dimensions, corresponding to pairs of components (usually PC1 vs PC2). Each point in a scores plot therefore represents a sample, with samples close together being more similar to each other, and those further apart being more dissimilar. By coloring by sample type, we can check, firstly, the consistency of the QC samples (as discussed above in section **3.1.1**), and secondly, for the presence of any sample outliers (any samples which are very different to the others).
+
+
+```{r}
+#| label = PCA, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = "100%"
+#(2) show PCA plot--------------------------------------------------------------
+
+plotly::ggplotly(params$myPCAPlot, tooltip = "label")
+```
+> <span style = "color : #FF8300">**Note:**</span>
+> 
+> The PCA score plot is identifical as shown in section 3.1.1. The plot in section 3.1.1 is mainly used for data quanlity check, while here it is used to get an overview of the data and detect any sample outliers.
+
+### Clustered Heatmap
+
+A clustered heatmap is a representation where values are represented on a color scale. One can cluster samples and mass features to identify groups of mass features that show a coordinated behavior.The rows of the heatmap below represent samples, and the columns represent mass features. 
+
+
+```{r}
+#| label = CompleteHeatmap, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = "130%"
+#(2) show heatmap plot----------------------------------------------------------
+
+params$myHMPlot
+```
+
+
+> <span style = "color : #FF8300">**Note:**</span>
+>
+> Depending on the parameter settings in the **MetaboReport** data analysis work, heatmap can be made from either all the mass features detected in the samples or only statistically significant mass features.
+>
+> 1. Heatmap constructed with all the mass features (or metabolites) gives an overview of the data structure.
+>
+> 2. Heatmap constructed with only statistically significant mass features (or metabolites) allows better visualization of the sample group differences.
+
+
+### Data Overview
+
+**Table 1** presents an overview of the metabolomics result. If you want to perform statistical analysis from scratch by yourself, you can use Table 1. You can click the **Download** button to download the data in excel or csv format. 
+
+
+**Table 1**: Feature table.
+
+```{r}
+#| label = rawData, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = "100%"
+
+#(2) show raw data table--------------------------------------------------------
+DT::datatable(myRawData,
+              extensions = 'Buttons',
+              options = list(scrollX = TRUE,
+                             deferRender = TRUE,
+                             scroller = TRUE,
+                             fixedColumns = FALSE,
+                             ## add download options
+                             dom = 'Bfrtip',
+                             buttons = list('print', 
+                                             list(extend = 'collection', 
+                                                  buttons = c('csv', 'excel'), 
+                                                  text = 'Download')
+                                             ),
+                             ## customize header
+                             initComplete = JS(
+                                 "function(settings, json) {",
+                                 "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
+                                "}"),
+                             ## use scientific notation (This is only applied to numeric columns)
+                              rowCallback = JS(
+                                "function(row, data) {",
+                                "for (i = 1; i < data.length; i++) {",
+                                "if (data[i]>0 | data[i]<0){",
+                                "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
+                                "}",
+                                "}",
+                                "}")
+                              )
+               ) %>%
+   DT::formatStyle(names(myRawData),
+                   fontSize = "90%"
+                   )
+```
+
+
+> <span style = "color : #FF8300">**How to interpret Table 1?**</span>
+>
+> Because metabolomics data can be acquired from various platforms and/or pre-processed with different software tools, the resulting peak table can be very different. Here we highlight few common terms that may appear in the table.
+>
+> `m/z`: the mass-to-charge ratio of an ion is the number obtained by dividing the mass of the ion (m) by the number of electrical charges (z). It is closely related to the identity of a metabolite. Note that m/z is different from molecular weight.
+>
+> `RT`: retention time is the amount of time a metabolite spends on the column after it has been injected. It is a parameters that related to metabilite identity.
+>
+> `Peak Area`: the area under a peak. It is a measure of the concentration/abundance of the metabolite it represents.
+
+--------------------------------------------------------------------------------
+
+
+**Table 2. Data table with statistical information**
+
+```{r}
+#| label = statistics, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = "100%"
+
+#(3) show statistical result table----------------------------------------------
+DT::datatable(myStat,
+              extensions = 'Buttons',
+              options = list(scrollX = TRUE,
+                             deferRender = TRUE,
+                             scroller = TRUE,
+                             fixedColumns = FALSE,
+                             ## add download options
+                             dom = 'Bfrtip',
+                             buttons = list('print', 
+                                            list(extend = 'collection', 
+                                                 buttons = c('csv', 'excel'), 
+                                                 text = 'Download')
+                                             ),
+                             ## customize header
+                               initComplete = JS(
+                                 "function(settings, json) {",
+                                 "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
+                                "}"),
+                             ## use scientific notation (This is only applied to numeric columns)
+                              rowCallback = JS(
+                                "function(row, data) {",
+                                "for (i = 1; i < data.length; i++) {",
+                                "if (data[i]>0 | data[i]<0){",
+                                "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
+                                "}",
+                                "}",
+                                "}")
+                              )
+               ) %>%
+   DT::formatStyle(names(myStat),
+                   fontSize = "90%"
+                   )
+```
+
+> <span style = "color : #FF8300">**How to interpret Table 2?**</span>
+>
+> **(1) Parameters in Table 2 **
+>
+> `Fold_X_vs_Y`: Fold change (FC) between Group X and Y. FC is a measure describing how much a metabolite (or mass feature) changes between Group X and Y. It is defined as the ratio between X and Y, i.e., X/Y.
+>
+> `AdjPvalue_X_vs_Y`: Adjusted P-value between Group X and Y. The adjusted p-value gives information on statistical significance between Group X and Y. 
+>
+> `VIP_X_vs_Y`: Variable importance in projection between Group X and Y. It is a metric produced by Partial Least-Squares Discriminant Analysis (OPLS-DA). (for more information on OPLS-DA can be found in Figure 3).
+>
+> **(2) How to perform feature selection?**
+> 
+> In metabolomics, feature selection is closely related to putative biomarker assessment, i.e., finding metabolites that are most relevant in discriminating group X and Y (for instance, wild type and mutant). 
+> 
+> You can use a multi-factor approach (i.e., `FC`, `adjusted p-value`, and `VIP`) to select potential biomarkers in your study based on the statistical results in Table 2. 
+> 
+> Our suggested values are: mass features with adjusted p-value < 0.05 and VIP >= 1 are considered as statistically signinificantly different, and FC >= 2 as increase and FC <= 0.05 as decrease. See **Table 3** below.
+
+--------------------------------------------------------------------------------
+
+**Table 3. Summary of Statistical Result**
+
+```{r}
+#| label = summary, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = "100%"
+library(dplyr)
+library(rlang)
+## extract group information
+GroupInfo <- myStat %>%
+  dplyr::select(starts_with("AdjPvalue")) %>%
+  colnames() %>%
+  gsub(pattern = "AdjPvalue_", replacement = "")
+
+## prepare the table
+statSummary <- data.frame(matrix(0, ncol = 3, nrow = length(GroupInfo))) %>%
+  dplyr::rename("Increase (FC >= 2)" = X1, "Decrease (FC <= 0.5)" = X2, "Total" = X3) %>%
+  dplyr::mutate(Group = GroupInfo) %>%
+  dplyr::relocate(Group)
+
+## get summary
+for(i in 1: length(GroupInfo)){
+  dfIndex <- statSummary$Group[i]
+  filteredStat <- myStat %>%
+    dplyr::select(contains(dfIndex)) %>%
+    dplyr::filter(!!sym(paste0("AdjPvalue_", dfIndex)) < 0.05) %>%
+    dplyr::filter(!!sym(paste0("VIP_", dfIndex)) >=1) 
+  statSummary[i, 2] <- filteredStat %>%
+    dplyr::filter(!!sym(paste0("Fold_", dfIndex)) >= 2) %>%
+    dplyr::count() %>%
+    as.numeric()
+  statSummary[i, 3] <- filteredStat %>%
+    dplyr::filter(!!sym(paste0("Fold_", dfIndex)) <= 0.5) %>%
+    dplyr::count() %>%
+    as.numeric()
+  statSummary[i, 4] <- statSummary[i, 2] + statSummary[i, 3]
+  }
+
+DT::datatable(statSummary,
+              extensions = 'Buttons',
+              options = list(scrollX = TRUE,
+                             deferRender = TRUE,
+                             scroller = TRUE,
+                             fixedColumns = FALSE,
+                             ## add download options
+                             dom = 'Bfrtip',
+                             buttons = list('print', 
+                                            list(extend = 'collection', 
+                                                 buttons = c('csv', 'excel'), 
+                                                 text = 'Download')
+                                             ),
+                             ## customize header
+                               initComplete = JS(
+                                 "function(settings, json) {",
+                                 "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
+                                "}")
+                              )
+               )
+```
+
+### PLS-DA
+
+PLS-DA is a supervised method in which prior knowledge of grouping in the data set is incorporated into the principal component calculations in order to maximize group separation. This approach is excellent in finding differential metabolites between two groups, but it has the caveat of over-fitting the data, which will produce good looking plots with nonsensical data. Therefore, PLS-DA data have to be thoroughly tested for over-fitting by cross-validation and permutation tests.
+
+PLS-DA data are generally reliable when R2Y values are close to, but not equal or above, 1 and the Q2Y value above 0.4. Also, the results for the
+permutation tests (pR2Y and pQ2Y) should be below 0.05 [3].
+
+The `S-plot` is a visualization method that combines the modeled covariance (X-axis) and modeled correlation (Y-axis) from the PLS-DA on a scatter plot, allowing for pinpointing of interesting variables. The variables showing the highest covariance and correlation values with variable influence
+on projection (VIP) >= 1 are considered the most relevant variables for the classification between samples. 
+
+```{r}
+#| label = OPLSDA,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = '100%'
+#(6) show OPLSDA result---------------------------------------------------------
+
+## prepare data
+OPLSDALevel <- sfData$group[, OPLSDAGroup]
+OPLSDALevel <- data.frame(Group = OPLSDALevel) %>% 
+  dplyr::filter(Group != "QC")
+n <- levels(as.factor(OPLSDALevel$Group))
+listnames <- combn(n, 2, simplify = FALSE)
+OPLSDAList <- htmltools::tagList()
+
+## plot
+for (i in seq_along(listnames)){
+  dfOPLSDA <- cbind.data.frame(dataGlobal3PCA, Group = sfData$group[, OPLSDAGroup]) %>%
+    dplyr::filter(Group %in% listnames[[i]])
+  matrixOPLSDA <- dplyr::select(dfOPLSDA, -Group)
+  groupOPLSDA <- as.factor(dfOPLSDA$Group)
+  
+  ## perform OPLSDA
+  resultOPLSDA <- tryCatch({
+    ropls::opls(matrixOPLSDA,
+                groupOPLSDA,
+                log10L = FALSE,
+                scaleC = "none",
+                predI = 1,
+                permI = 20,
+                orthoI = 1, # see bug #25
+                crossvalI = min(length(groupOPLSDA), 7),
+                fig.pdfC = "none",
+                info.txtC = "none"
+                )
+    },
+  # For the following error:
+  # Error: No model was built because the first predictive component was already not significant;
+  # Select a number of predictive components of 1 if you want the algorithm to compute a model despite this.
+  error = function(e){
+    ropls::opls(matrixOPLSDA,
+                groupOPLSDA,
+                log10L = FALSE,
+                scaleC = "none",
+                predI = 1,
+                permI = 20,
+                orthoI = 1,
+                crossvalI = min(length(groupOPLSDA), 7),
+                fig.pdfC = "none",
+                info.txtC = "none"
+                )
+    }
+  )
+
+  p1 <- MetaboReport::showOPLSDA(resultOPLSDA, Group = groupOPLSDA, size = 1, interactive = TRUE)
+  p2 <- MetaboReport::showSplot(matrixOPLSDA, resultOPLSDA, size = 1, interactive = TRUE)
+  OPLSDAList[[i]] <- plotly::subplot(p1, p2, nrows = 1, margin = 0.05, which_layout = 1)
+}
+
+OPLSDAList
+```
+
+### Volcano Plot
+
+```{r}
+#| label = volcanoPlot,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE
+#(6) show volcano plot result---------------------------------------------------
+
+## The code is used to generate a list of volcano plots
+VCGroupLevel <- sfData$group[, VCGroup]
+VCGroupLevel <- data.frame(Group = VCGroupLevel) %>% 
+  dplyr::filter(Group != "QC")
+n <- levels(as.factor(VCGroupLevel$Group))
+listnames <- combn(n, 2, simplify = FALSE)
+volcanoList <- htmltools::tagList()
+for (i in seq_along(listnames)){
+    volcanoList[[i]] <- plotly::as_widget(
+      MetaboReport::showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, p = 0.05)
+      )
+    }
+
+volcanoList
+```
+
+### K-Means Cluster Analysis
+
+K-Means Cluster Analysis can be used to reveal the main subsets of mass features that displayed differential profiles across different sample groups.
+
+The `Circular Dendrogram` gives an overview of the number of mass features in each subset (subgroup).
+
+The `Cluster Plot` shows the trend of the metabolic profiles in each subset (subgroup)
+
+The `Table` provides more details information of each metabolite, such as metabolite name (if exit), standardized peak area and the group information.
+
+**Circular Dendrogram** 
+
+```{r}
+#| label = KMDG,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = '100%'
+#(8.1) show K-Means result------------------------------------------------------
+
+params$KMDG
+```
+
+**Metabolic Profile Clustering**
+```{r}
+#| label = KMTrendPlot,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = '100%'
+#(8.2) show K-Means result------------------------------------------------------
+
+params$KMTrendPlot
+```
+
+
+```{r}
+#| label = KMTable,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = '100%'
+#(8.3) show K-Means result------------------------------------------------------
+
+DT::datatable(params$KMTable,
+              extensions = 'Buttons',
+              options = list(scrollX = TRUE,
+                             deferRender = TRUE,
+                             scroller = TRUE,
+                             fixedColumns = FALSE,
+                             dom = 'Bfrtip',
+                             buttons = list('print', 
+                                            list(extend = 'collection', 
+                                                 buttons = c('csv', 'excel'), 
+                                                 text = 'Download')
+                                             )
+                             ),
+              rownames = FALSE
+              )
+```
+
+
+### Barplot
+
+The bar (violin or box) plot shows the quantitative information of each metabolite in different sample group.
+
+> <span style = "color : #FF8300">**Note**</span>
+>
+> Depending on the setting in **MetaboReport** workflow, barplot, violin or box plot is displayed below for each metabolite.
+>
+> In the selection box, you can choose the metabolite to display the plot for this metabolite. The corresponding table information of this selected metabolite will be displayed as well.
+
+
+```{r}
+#| label = BoxPlot,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = '100%'
+#(8) show box plot result-------------------------------------------------------
+
+BPData <- dataGlobal3Transform %>%
+  dplyr::mutate(Group = sfData$group[, BPGroup]) %>%
+  dplyr::filter(Group != "QC") %>%
+  tidyr::pivot_longer(!Group, names_to = "Metabolite", values_to = "Area") %>%
+  dplyr::mutate(Area = round(Area, 2))
+
+BPData <- crosstalk::SharedData$new(BPData)
+metaboliteFilter <- crosstalk::filter_select(id = "Metabolite", 
+                                             label = "Select a metabolite", 
+                                             sharedData = BPData, 
+                                             group = ~ Metabolite, 
+                                             multiple = F
+                                             )
+yText <- switch(params$BPTransform,
+               none = "Raw Peak Area",
+               log2 = "Log2 Transformed Peak Area",
+               log10 = "Log10 Transformed Peak Area"
+               )
+
+BPPlot <- ggplot2::ggplot(data = BPData, 
+                          aes(x = Group, 
+                              y = Area, 
+                              group = interaction(Metabolite, Group)
+                              )
+                          ) +
+  ggplot2:: geom_boxplot(aes(fill = Group)) +
+  ggplot2::theme_bw() +
+  ggplot2::ylab(yText)
+
+filter <- crosstalk::bscols(
+  metaboliteFilter,
+  plotly::ggplotly(BPPlot, tooltip = NULL),
+  widths = 12
+  )
+
+crosstalk::bscols(filter)
+```
+
+**Table 4: Metabolic information of selected metabolite**
+
+```{r}
+#| label = BarPlotTable,
+#| echo = FALSE,
+#| warning = FALSE, 
+#| message = FALSE,
+#| out.width = '100%'
+#(8) show box plot table -------------------------------------------------------
+
+DT::datatable(BPData,
+              options = list(scrollX = TRUE,
+                             deferRender = TRUE,
+                             scroller = TRUE,
+                             fixedColumns = FALSE
+                             ),
+              rownames = FALSE
+              )
+```
+
+
+
+# Reference
+
+[1] Broadhurst, D., Goodacre, R., Reinke, S.N., Kuligowski, J., Wilson, I.D., Lewis, M.R. and Dunn, W.B., 2018. Guidelines and considerations for the use of system suitability and quality control samples in mass spectrometry assays applied in untargeted clinical metabolomic studies. Metabolomics, 14(6), pp.1-17.
+
+[2] Dong, Y., Kazachkova, Y., Gou, M., Morgan, L., Wachsman, T., Gazit, E. and Birkler, R.I.D., 2022. RawHummus: an R Shiny app for automated raw data quality control in metabolomics. Bioinformatics, 38(7), pp.2072-2074.
+
+[3] Westerhuis, J.A., Hoefsloot, H.C., Smit, S., Vis, D.J., Smilde, A.K., van Velzen, E.J., van Duijnhoven, J.P. and van Dorsten, F.A., 2008. Assessment of PLSDA cross validation. Metabolomics, 4(1), pp.81-89.

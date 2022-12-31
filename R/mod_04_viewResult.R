@@ -29,7 +29,7 @@ mod_04_viewResult_ui <- function(id){
       column(width = 4,
              box(
                width = 12,
-               inputId = "input_card",
+               inputId = ns("input_card"),
                title = strong("Perform Statistics"),
                status = "primary",
                solidHeader = TRUE,
@@ -96,6 +96,10 @@ mod_04_viewResult_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
+               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value filled and filtered data."),
+               p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
+               p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
                fluidRow(width = 12,
                         column(width = 12,
                                varSelectInput(inputId = ns("StatGroup"),
@@ -705,13 +709,20 @@ mod_04_viewResult_server <- function(id, sfData){
 
     statTable <- reactive({
       shiny::req(sfData$filter)
+      shiny::req(sfData$filterNormTransform)
       shiny::req(sfData$clean)
       shiny::req(sfData$group)
+      ###(1) transpose filtered data
       tFilter <- sfData$filter %>%
         dplyr::select(-ID) %>%
         t()
       colnames(tFilter) <- sfData$filter$ID
-
+      ###(2) transpose filtered, normalized and transformed data
+      tFilterNormTransform <- sfData$filterNormTransform %>%
+        dplyr::select(-ID) %>%
+        t()
+      colnames(tFilterNormTransform) <- sfData$filterNormTransform$ID
+      ###(3) transpose filtered, normalized, transformed and scaled data
       tClean <- sfData$clean %>%
         dplyr::select(-ID) %>%
         t()
@@ -723,6 +734,10 @@ mod_04_viewResult_server <- function(id, sfData){
       tFilter <- tFilterTem %>% dplyr::select(-Group)
       Group <- tFilterTem %>% dplyr::select(Group) %>% dplyr::pull()
       checkPair <- as.data.frame(table(Group)) # to valid paired test
+
+      tFilterNormTransformTem <- cbind.data.frame(tFilterNormTransform, Group = sfData$group[, StatGroup()]) %>%
+        dplyr::filter(Group != "QC")
+      tFilterNormTransform <- tFilterNormTransformTem %>% dplyr::select(-Group)
 
       tCleanTem <- cbind.data.frame(tClean, Group = sfData$group[, StatGroup()]) %>%
         dplyr::filter(Group != "QC")
@@ -738,7 +753,7 @@ mod_04_viewResult_server <- function(id, sfData){
           if(statMethod() == "ptTest" & var(checkPair$Freq) != 0) {return(NULL)}
           if(statMethod() == "anovaRM" & var(checkPair$Freq) != 0) {return(NULL)}
           statFC <- getFC(tFilter, Group = Group)
-          statP <- getP(tClean, Group = Group, Method = statMethod())
+          statP <- getP(tFilterNormTransform, Group = Group, Method = statMethod())
           statP <- statP %>% dplyr::mutate_all(~ p.adjust(., method = pAdjMethod(), n = length(.)))
           statVIP <- getVIP(tClean, Group = Group)
           statTable <- cbind.data.frame(statFC, statP, statVIP)
@@ -746,7 +761,7 @@ mod_04_viewResult_server <- function(id, sfData){
           return(statTable)
           })
       }) %>%
-      shiny::bindCache(statMethod(), StatGroup(), pAdjMethod()) %>%
+      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, statMethod(), StatGroup(), pAdjMethod()) %>%
       shiny::bindEvent(input$viewStat)
 
     ### On click, both only QC-filtered (rawArea) and QC-filtered & transformed peak areas (processedAREA) are included

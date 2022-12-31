@@ -16,7 +16,7 @@ showTIC <- function(df, Group = NULL){
   tem <- tidyr::pivot_longer(tem, cols = !c(Group, Sample), names_to = "name", values_to = "Area")
 
   #(2) ploy
-  ggplot2::ggplot(tem, aes(x = Sample, y = log10(Area), fill = Group)) +
+  ggplot2::ggplot(tem, aes(x = Sample, y = Area, fill = Group)) +
     ggplot2::geom_boxplot(alpha = 0.7) +
     ggplot2::ylab("Peak Area") +
     ggplot2::theme_bw() +

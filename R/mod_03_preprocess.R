@@ -292,7 +292,8 @@ mod_03_preprocess_server <- function(id, sfData){
         selectizeInput(inputId = ns("selectIS"),
                        label = "Input row numbers of your internal standard(s)",
                        multiple = TRUE,
-                       choices = 1:nrow(sfData$data)
+                       choices = 1:nrow(sfData$data),
+                       selected = 1
                        )
         })
     })

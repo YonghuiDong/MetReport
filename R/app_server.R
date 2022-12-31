@@ -9,14 +9,14 @@ app_server <- function(input, output, session) {
   ## sdData: sample-feature data
   ##(1) data: raw data
   ##(2) group: metadata
-  ##(3) filter: QC filtered data without any transformation
-  ##(4) normalize: normalized data
-  ##(4) clean: QC filtered and transformed data
+  ##(3) filter: QC filtered data
+  ##(4) filterNormTransform: filtered, normalized and transformed data
+  ##(5) clean: QC filtered, normalized, transformed and scaled data
   global <- reactiveValues(
     data = NULL,
     group = NULL,
     filter = NULL,
-    normalize = NULL,
+    filterNormTransform = NULL,
     clean = NULL
     )
   # Your application server logic
@@ -24,4 +24,5 @@ app_server <- function(input, output, session) {
   mod_02_uploadData_server("02_uploadData_1", sfData = global)
   mod_03_preprocess_server("03_preprocess_1", sfData = global)
   mod_04_viewResult_server("04_viewResult_1", sfData = global)
+  mod_05_downloadReport_server("05_downloadReport_1", sfData = global)
 }

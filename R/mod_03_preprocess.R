@@ -97,6 +97,7 @@ mod_03_preprocess_ui <- function(id){
                radioButtons(inputId = ns("normalizeMethod"),
                             label = "Sample Normalization",
                             choices = c("None" = "None",
+                                        "Internal standard" = "IS",
                                         "Linear baseline normalization based on mean values" = "LBME",
                                         "Linear baseline normalization based on median values" = "LBMD",
                                         "Probabilistic quotient normalization" = "PQN",
@@ -104,6 +105,10 @@ mod_03_preprocess_ui <- function(id){
                                         ),
                             selected = "None"
                             ),
+
+               uiOutput(outputId = ns("selectIS"),
+                        label = "Please select the row No. of your internal standard(s)"
+                        ),
 
                radioButtons(inputId = ns("transformMethod"),
                             label = "Feature Transformation",
@@ -227,6 +232,7 @@ mod_03_preprocess_ui <- function(id){
 #' @importFrom ggplot2 aes element_text position_jitter
 
 mod_03_preprocess_server <- function(id, sfData){
+  ns <- NS(id)
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     #1. Pre-processing Parameters ==============================================
@@ -276,6 +282,19 @@ mod_03_preprocess_server <- function(id, sfData){
 
     prePCAFrame <- reactive({
       as.character(input$prePCAFrame)
+    })
+
+
+    observeEvent(input$normalizeMethod, {
+      req(input$normalizeMethod == "IS")
+      output$selectIS <- renderUI({
+        shiny::req(sfData$data)
+        selectizeInput(inputId = ns("selectIS"),
+                       label = "Input row numbers of your internal standard(s)",
+                       multiple = TRUE,
+                       choices = 1:nrow(sfData$data)
+                       )
+        })
     })
 
     #2. Data Pre-processing ====================================================
@@ -337,7 +356,9 @@ mod_03_preprocess_server <- function(id, sfData){
     treatedData <- reactive({
       shiny::req(QCFilteredData())
       normalizedData <- doNormalization(QCFilteredData() %>% dplyr::select(-ID),
-                                      Method = normalizeMethod())
+                                      Method = normalizeMethod(),
+                                      Inx = as.numeric(input$selectIS)
+                                      )
 
       transformedData <- switch(transformMethod(),
                                 "None" = normalizedData,

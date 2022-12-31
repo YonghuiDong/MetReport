@@ -51,8 +51,8 @@ app_ui <- function(request) {
           tabItem("home", mod_01_home_ui("01_home_1")),
           tabItem("uploadData", mod_02_uploadData_ui("02_uploadData_1")),
           tabItem(tabName = "preprocessData", mod_03_preprocess_ui("03_preprocess_1")),
-          tabItem(tabName = "viewResult", mod_04_viewResult_ui("04_viewResult_1"))
-          # tabItem(tabName = "downloadReport",  source("ui-tab-downloadReport.R", local = TRUE)$value),
+          tabItem(tabName = "viewResult", mod_04_viewResult_ui("04_viewResult_1")),
+          tabItem(tabName = "downloadReport",  mod_05_downloadReport_ui("05_downloadReport_1"))
           # tabItem(tabName = "randomizer",  source("ui-tab-randomizer.R", local = TRUE)$value),
           # tabItem(tabName = "solvent",  source("ui-tab-solvent.R", local = TRUE)$value),
           # tabItem(tabName = "lcTool",  source("ui-tab-lcTool.R", local = TRUE)$value),

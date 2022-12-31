@@ -106,11 +106,9 @@ mod_03_preprocess_ui <- function(id){
                             ),
 
                radioButtons(inputId = ns("transformMethod"),
-                            label = "Feature Transform",
+                            label = "Feature Transformation",
                             choices = c("None" = "None",
-                                        "Log10" = "Log10",
-                                        "Square Root" = "squareRoot",
-                                        "Cubic Root" = "cubicRoot"
+                                        "Log10" = "Log10"
                                         ),
                             selected = "Log10"
                             ),
@@ -132,7 +130,30 @@ mod_03_preprocess_ui <- function(id){
 
       #3.Result Panel ==========================================================
       column(width = 8,
-             ##(1) PCA Panel ---------------------------------------------------
+             ##(1) Boxplot Panel -----------------------------------------------
+             box(
+               width = 12,
+               inputId = ns("Boxplot_card"),
+               title = strong("Feature Boxplot Panel"),
+               status = "success",
+               solidHeader = FALSE,
+               collapsible = TRUE,
+               collapsed = FALSE,
+               closable = FALSE,
+               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", "1. The Boxplot shows you how the feature distributions change upon
+                 using different sample normalization methods."),
+               p(style = "color:#C70039;", "2. The Boxplot can be used to select sample normalization method."),
+               p(style = "color:#C70039;", "3. Scaling is not applied here, therefore change of scaling method will not
+                 affect Boxplot."),
+               varSelectInput(inputId = ns("prePCAGroup"),
+                              label = "1. Select MetaData (Sample Groups) for Sample Coloring",
+                              data = ""
+                              ),
+               shiny::plotOutput(ns("TICPlot"))
+               ),
+
+             ##(2) PCA Panel ---------------------------------------------------
              box(
                width = 12,
                inputId = "RawData_card",
@@ -142,10 +163,6 @@ mod_03_preprocess_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               varSelectInput(inputId = ns("prePCAGroup"),
-                              label = "1. Select MetaData (Sample Groups) for Sample Coloring",
-                              data = ""
-                              ),
                fluidRow(width = 12,
                         column(width = 6,
                                selectInput(inputId = ns("prePCAX"),
@@ -176,7 +193,7 @@ mod_03_preprocess_ui <- function(id){
                plotly::plotlyOutput(ns("prePCAPlot"))
              ),
 
-             ##(2) Feature Panel -----------------------------------------------
+             ##(3) Feature Panel -----------------------------------------------
              box(
                width = 12,
                inputId = "Feature_card",
@@ -187,8 +204,8 @@ mod_03_preprocess_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
-               p(style = "color:#C70039;", "You can click this button to view the results for 30 randomly selected features"),
-               p(style = "color:#C70039;", "You can click this button many times to view different features"),
+               p(style = "color:#C70039;", "1. You can click this button to view the results for 30 randomly selected features"),
+               p(style = "color:#C70039;", "2. You can click this button many times to view different features"),
 
                actionButton(inputId = ns("featureSampling"),
                             label = "Sampling",
@@ -197,30 +214,6 @@ mod_03_preprocess_ui <- function(id){
                             ),
                shiny::plotOutput(ns("featureDensityPlot")),
                shiny::plotOutput(ns("featureBoxPlot"))
-               ),
-
-             box(
-               width = 12,
-               inputId = ns("TIC_card"),
-               title = strong("TIC Plot Panel: TEST"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               shiny::plotOutput(ns("TICPlot"))
-               ),
-
-             box(
-               width = 12,
-               inputId = ns("RawData_card"),
-               title = strong("Preprocessed Data Panel"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               DT::dataTableOutput(ns("preprocessedDataTable"))
                )
              )
       )
@@ -346,17 +339,16 @@ mod_03_preprocess_server <- function(id, sfData){
       normalizedData <- doNormalization(QCFilteredData() %>% dplyr::select(-ID),
                                       Method = normalizeMethod())
 
-      sfData$normalize <- normalizedData %>%
+      transformedData <- switch(transformMethod(),
+                                "None" = normalizedData,
+                                "Log10" = log10(normalizedData)
+                                )
+
+      sfData$filterNormTransform <- transformedData %>%
         as.data.frame() %>%
         dplyr::mutate(ID = QCFilteredData()$ID) %>%
         dplyr::relocate(ID)
 
-      transformedData <- switch(transformMethod(),
-                                "None" = normalizedData,
-                                "Log10" = log10(normalizedData),
-                                "squareRoot" = sqrt(normalizedData),
-                                "cubicRoot" = normalizedData ^ (1/3)
-                                )
       scaledData <- scaleData(transformedData, Method = scaleMethod()) %>%
         as.data.frame() %>%
         dplyr::mutate(ID = QCFilteredData()$ID) %>%
@@ -366,7 +358,13 @@ mod_03_preprocess_server <- function(id, sfData){
       })
 
     #3.Output Plot and Table ---------------------------------------------------
-    ##(1) prePCA ---------------------------------------------------------------
+    ##(1) Feature Box Plot------------------------------------------------------
+    output$TICPlot <- shiny::renderPlot({
+      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+      showTIC(df = sfData$filterNormTransform, Group = sfData$group[, prePCAGroup()])
+    })
+
+    ##(2) prePCA ---------------------------------------------------------------
     prePCAPlot <- reactive({
       shiny::req(treatedData())
       shiny::req(sfData$group)
@@ -389,7 +387,7 @@ mod_03_preprocess_server <- function(id, sfData){
       prePCAPlot()
       })
 
-    ##(2) Plot Features --------------------------------------------------------
+    ##(3) Plot Features --------------------------------------------------------
     ## assign initial values for nFeature
     nFeature <- reactiveValues()
     nFeature$n <- 1:30
@@ -452,22 +450,6 @@ mod_03_preprocess_server <- function(id, sfData){
       featureBoxPlot()
       })
 
-    ##(3) TIC Plot--------------------------------------------------------------
-    output$TICPlot <- shiny::renderPlot({
-      showTIC(df = sfData$normalize, Group = sfData$group[, prePCAGroup()])
-    })
-
-    ##(4) preprocessed Data Table-----------------------------------------------
-    output$preprocessedDataTable <- DT::renderDataTable({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      DT::datatable(sfData$clean,
-                    options = list(scrollX = TRUE,
-                                   deferRender = TRUE,
-                                   scroller = TRUE,
-                                   fixedColumns = FALSE
-                                   )
-                    )
-      })
   })
 }
 

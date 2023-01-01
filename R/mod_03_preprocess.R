@@ -7,6 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
+#' @importFrom DT dataTableOutput
 #' @importFrom plotly plotlyOutput
 
 mod_03_preprocess_ui <- function(id){
@@ -135,7 +136,28 @@ mod_03_preprocess_ui <- function(id){
 
       #3.Result Panel ==========================================================
       column(width = 8,
-             ##(1) Boxplot Panel -----------------------------------------------
+             ##(1) Sample Table Panel ------------------------------------------
+             box(
+               width = 12,
+               inputId = ns("Table_card"),
+               title = strong("Sample Table Panel"),
+               status = "success",
+               solidHeader = FALSE,
+               collapsible = TRUE,
+               collapsed = FALSE,
+               closable = FALSE,
+               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", "1. If you plan to use internal standard-based normalization,
+                 you can use this table to check the row numbers of your internal standard(s)."),
+               p(style = "color:#C70039;", "2. You can use more than 1 internal standard for IS-based normalization.
+                 The mean peak area will be used for normalization"),
+               p(style = "color:#C70039;", "3. If only 1 internal standard is used, a random noise will be added
+                 to the internal standard peak areas after normalization so as to avoid any possible errors in the
+                 following multivariate analyses."),
+               DT::dataTableOutput(ns("filteredTable"))
+             ),
+
+             ##(2) Boxplot Panel -----------------------------------------------
              box(
                width = 12,
                inputId = ns("Boxplot_card"),
@@ -158,7 +180,7 @@ mod_03_preprocess_ui <- function(id){
                shiny::plotOutput(ns("TICPlot"))
                ),
 
-             ##(2) PCA Panel ---------------------------------------------------
+             ##(3) PCA Panel ---------------------------------------------------
              box(
                width = 12,
                inputId = "RawData_card",
@@ -198,7 +220,7 @@ mod_03_preprocess_ui <- function(id){
                plotly::plotlyOutput(ns("prePCAPlot"))
              ),
 
-             ##(3) Feature Panel -----------------------------------------------
+             ##(4) Feature Panel -----------------------------------------------
              box(
                width = 12,
                inputId = "Feature_card",
@@ -380,13 +402,25 @@ mod_03_preprocess_server <- function(id, sfData){
       })
 
     #3.Output Plot and Table ---------------------------------------------------
-    ##(1) Feature Box Plot------------------------------------------------------
+    ##(1) Sample Data Table-----------------------------------------------------
+    output$filteredTable <- DT::renderDataTable({
+      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+      DT::datatable(sfData$filterNormTransform,
+                    options = list(scrollX = TRUE,
+                                   deferRender = TRUE,
+                                   scroller = TRUE,
+                                   fixedColumns = FALSE
+                                   )
+                    )
+      })
+
+    ##(2) Feature Box Plot------------------------------------------------------
     output$TICPlot <- shiny::renderPlot({
       shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
       showTIC(df = sfData$filterNormTransform, Group = sfData$group[, prePCAGroup()])
     })
 
-    ##(2) prePCA ---------------------------------------------------------------
+    ##(3) prePCA ---------------------------------------------------------------
     prePCAPlot <- reactive({
       shiny::req(treatedData())
       shiny::req(sfData$group)
@@ -409,7 +443,7 @@ mod_03_preprocess_server <- function(id, sfData){
       prePCAPlot()
       })
 
-    ##(3) Plot Features --------------------------------------------------------
+    ##(4) Plot Features --------------------------------------------------------
     ## assign initial values for nFeature
     nFeature <- reactiveValues()
     nFeature$n <- 1:30

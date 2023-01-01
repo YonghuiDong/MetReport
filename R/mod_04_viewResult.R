@@ -8,6 +8,7 @@
 #'
 #' @importFrom shiny NS tagList
 #' @importFrom dplyr n
+#' @importFrom DT dataTableOutput
 mod_04_viewResult_ui <- function(id){
   ns <- NS(id)
   tagList(

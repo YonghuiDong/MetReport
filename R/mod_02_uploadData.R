@@ -155,7 +155,7 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     inputData <- reactive({
-      #if(showExample() == "Yes") {return(MetaboReport::cd)}
+      if(showExample() == "Yes") {return(cancerCell)}
       inFile <- input$rawFile
       if(is.null(inFile)){return(NULL)}
       extension <- tools::file_ext(inFile$name)

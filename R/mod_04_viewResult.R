@@ -1622,6 +1622,22 @@ mod_04_viewResult_server <- function(id, sfData){
               dev.off()
               }
         })
+    resultList <- list(
+      dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
+      OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
+      statTable = statTable, # data matrix for volcano plot
+      VCGroup = VCGroup, # group information for volcano plot
+      combinedTable = combinedTable,
+      PCAPlot = PCAPlot,
+      HMPlot = HMPlot,
+      dataGlobal3Transform = dataGlobal3Transform, # data for boxplot
+      BPGroup = BPGroup, # group information for boxplot
+      BPTransform = BPTransform, # data transformation for boxplot
+      KMDG = KMDG,
+      KMTrendPlot = KMTrendPlot,
+      KMTable = KMTable
+      )
+    return(resultList)
   })
 }
 

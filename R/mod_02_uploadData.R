@@ -263,6 +263,7 @@ mod_02_uploadData_server <- function(id, sfData){
     observeEvent(input$undoCol, {
       sfData$data <- getProcessedData()
       })
+    return(inputData)
   })
 }
 ## To be copied in the UI

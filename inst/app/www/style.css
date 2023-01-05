@@ -1,7 +1,7 @@
 /* Whole document: */
 body{
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   text-align: justify;
 }
 
@@ -16,6 +16,6 @@ blockquote{
 /* Code text  */
 
 code {
-  background: #ffcccc.
+  background: #ffcccc;
   word-wrap: break-word;
 }

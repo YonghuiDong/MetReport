@@ -171,7 +171,7 @@ mod_05_downloadReport_server <- function(id, sfData = global, inputData, resultL
             tempCSS <- file.path(tempdir(), "style.css")
             tempLogo <- file.path(tempdir(), "logo.png")
             file.copy(app_sys("app/www/Report.Rmd"), tempReport, overwrite = TRUE)
-            file.copy(app_sys("app/www/style.css"), tempCSS)
+            file.copy(app_sys("app/www/reportCSS/style.css"), tempCSS)
             file.copy(app_sys("app/www/logo.png"), tempLogo)
             params <- list(
               myRawData = inputData(), # raw data

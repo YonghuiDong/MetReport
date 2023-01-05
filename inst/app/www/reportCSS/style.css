@@ -1,0 +1,20 @@
+/* Whole document: */
+body{
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  text-align: justify !important;
+}
+
+/* Quoted text  */
+blockquote{
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important;
+  background: white !important;
+  border-left: 0.2em solid #76D7C4 !important;
+  font-size: 14px !important;
+}
+
+/* Code text  */
+code {
+  background: #ffcccc !important;
+  word-wrap: break-word !important;
+}

@@ -18,7 +18,6 @@ params:
   statTable: NA
   VCGroup: NA
   myStat: NA
-  myMetaData: NA
   mySamplePrep: NA
   myPCAPlot: NA
   myHMPlot: NA
@@ -42,7 +41,8 @@ editor_options:
 
 #(1) prepare parameters---------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
-options(scipen = 999)
+library(DT)
+library(plotly)
 
 ## prepare and clean them
 myRawData <- params$myRawData
@@ -51,7 +51,8 @@ OPLSDAGroup <- params$OPLSDAGroup
 statTable <- params$statTable
 VCGroup <- params$VCGroup
 myStat <- params$myStat
-myMetaData <- params$myMetaData
+sampleGroup <- params$sampleGroup
+#myMetaData <- params$myMetaData
 mySamplePrep <- params$mySamplePrep
 dataGlobal3Transform <- params$dataGlobal3Transform
 BPGroup <- params$BPGroup
@@ -390,7 +391,7 @@ The `S-plot` is a visualization method that combines the modeled covariance (X-a
 on projection (VIP) >= 1 are considered the most relevant variables for the classification between samples. 
 
 ```{r}
-#| label = OPLSDA,
+#| label = PLSDA,
 #| echo = FALSE,
 #| warning = FALSE, 
 #| message = FALSE,
@@ -398,7 +399,7 @@ on projection (VIP) >= 1 are considered the most relevant variables for the clas
 #(6) show OPLSDA result---------------------------------------------------------
 
 ## prepare data
-OPLSDALevel <- sfData$group[, OPLSDAGroup]
+OPLSDALevel <- sampleGroup[, OPLSDAGroup]
 OPLSDALevel <- data.frame(Group = OPLSDALevel) %>% 
   dplyr::filter(Group != "QC")
 n <- levels(as.factor(OPLSDALevel$Group))
@@ -407,7 +408,7 @@ OPLSDAList <- htmltools::tagList()
 
 ## plot
 for (i in seq_along(listnames)){
-  dfOPLSDA <- cbind.data.frame(dataGlobal3PCA, Group = sfData$group[, OPLSDAGroup]) %>%
+  dfOPLSDA <- cbind.data.frame(dataGlobal3PCA, Group = sampleGroup[, OPLSDAGroup]) %>%
     dplyr::filter(Group %in% listnames[[i]])
   matrixOPLSDA <- dplyr::select(dfOPLSDA, -Group)
   groupOPLSDA <- as.factor(dfOPLSDA$Group)
@@ -462,7 +463,7 @@ OPLSDAList
 #(6) show volcano plot result---------------------------------------------------
 
 ## The code is used to generate a list of volcano plots
-VCGroupLevel <- sfData$group[, VCGroup]
+VCGroupLevel <- sampleGroup[, VCGroup]
 VCGroupLevel <- data.frame(Group = VCGroupLevel) %>% 
   dplyr::filter(Group != "QC")
 n <- levels(as.factor(VCGroupLevel$Group))
@@ -559,7 +560,7 @@ The bar (violin or box) plot shows the quantitative information of each metaboli
 #(8) show box plot result-------------------------------------------------------
 
 BPData <- dataGlobal3Transform %>%
-  dplyr::mutate(Group = sfData$group[, BPGroup]) %>%
+  dplyr::mutate(Group = sampleGroup[, BPGroup]) %>%
   dplyr::filter(Group != "QC") %>%
   tidyr::pivot_longer(!Group, names_to = "Metabolite", values_to = "Area") %>%
   dplyr::mutate(Area = round(Area, 2))

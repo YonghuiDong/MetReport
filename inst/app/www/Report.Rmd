@@ -223,15 +223,6 @@ DT::datatable(myRawData,
                              initComplete = JS(
                                  "function(settings, json) {",
                                  "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
-                                "}"),
-                             ## use scientific notation (This is only applied to numeric columns)
-                              rowCallback = JS(
-                                "function(row, data) {",
-                                "for (i = 1; i < data.length; i++) {",
-                                "if (data[i]>0 | data[i]<0){",
-                                "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
-                                "}",
-                                "}",
                                 "}")
                               )
                ) %>%
@@ -281,15 +272,6 @@ DT::datatable(myStat,
                                initComplete = JS(
                                  "function(settings, json) {",
                                  "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
-                                "}"),
-                             ## use scientific notation (This is only applied to numeric columns)
-                              rowCallback = JS(
-                                "function(row, data) {",
-                                "for (i = 1; i < data.length; i++) {",
-                                "if (data[i]>0 | data[i]<0){",
-                                "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
-                                "}",
-                                "}",
                                 "}")
                               )
                ) %>%

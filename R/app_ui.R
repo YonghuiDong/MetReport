@@ -32,7 +32,7 @@ app_ui <- function(request) {
           hr(),
           menuItem(text = strong("Statistics"), tabName = "viewResult", icon = icon("chart-bar")),
           hr(),
-          menuItem(text = strong("Download Report"), tabName = "downloadReport", icon = icon("file-text-o")),
+          menuItem(text = strong("Download Report"), tabName = "downloadReport", icon = icon("download")),
           hr(),
           menuItem(text = strong("Widgets"), tabName = "widgets", icon = icon("tools"),
                    menuSubItem(text = strong("Randomizer"), tabName = "randomizer", icon = icon("bolt")),
@@ -41,7 +41,7 @@ app_ui <- function(request) {
                    menuSubItem(text = strong("MS Tool"), tabName = "massTool", icon = icon("bolt"))
           ),
           hr(),
-          menuItem(text = strong("Contact"), tabName = "contact", icon = icon("envelope-o"))
+          menuItem(text = strong("Contact"), tabName = "contact", icon = icon("envelope"))
         )
       ),
 
@@ -52,12 +52,12 @@ app_ui <- function(request) {
           tabItem("uploadData", mod_02_uploadData_ui("02_uploadData_1")),
           tabItem(tabName = "preprocessData", mod_03_preprocess_ui("03_preprocess_1")),
           tabItem(tabName = "viewResult", mod_04_viewResult_ui("04_viewResult_1")),
-          tabItem(tabName = "downloadReport",  mod_05_downloadReport_ui("05_downloadReport_1"))
+          tabItem(tabName = "downloadReport",  mod_05_downloadReport_ui("05_downloadReport_1")),
           # tabItem(tabName = "randomizer",  source("ui-tab-randomizer.R", local = TRUE)$value),
           # tabItem(tabName = "solvent",  source("ui-tab-solvent.R", local = TRUE)$value),
           # tabItem(tabName = "lcTool",  source("ui-tab-lcTool.R", local = TRUE)$value),
           # tabItem(tabName = "massTool",  source("ui-tab-massTool.R", local = TRUE)$value),
-          # tabItem(tabName = "contact",  source("ui-tab-contact.R", local = TRUE)$value)
+          tabItem(tabName = "contact",  mod_10_contact_ui("10_contact_1"))
         )
       ),
 

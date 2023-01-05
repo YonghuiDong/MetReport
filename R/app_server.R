@@ -25,4 +25,5 @@ app_server <- function(input, output, session) {
   mod_03_preprocess_server("03_preprocess_1", sfData = global)
   viewResult <- mod_04_viewResult_server("04_viewResult_1", sfData = global)
   mod_05_downloadReport_server("05_downloadReport_1", sfData = global, inputData = uploadData, resultList = viewResult)
+  mod_10_contact_server("10_contact_1")
 }

@@ -78,9 +78,9 @@ mod_02_uploadData_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
 
-               p(style = "color:#b2182b;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#b2182b;", "Do not delete any of your samples unless they are outliers"),
-               p(style = "color:#2166ac;", shiny::icon("lightbulb-o"), strong("Tips: ")),
+               p(style = "color:#2166ac;", shiny::icon("lightbulb"), strong("Tips: ")),
                p(style = "color:#2166ac;", "1. Continue with your analysis without deleting any samples"),
                p(style = "color:#2166ac;", "2. If you find any outliers, then come back and delete them"),
 

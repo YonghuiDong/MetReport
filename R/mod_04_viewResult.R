@@ -64,7 +64,7 @@ mod_04_viewResult_ui <- function(id){
                             selected = 0
                             ),
 
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Notes:")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Notes:")),
                p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
                p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
 
@@ -97,7 +97,7 @@ mod_04_viewResult_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value filled and filtered data."),
                p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
                p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),

@@ -39,7 +39,7 @@ mod_03_preprocess_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note:")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note:")),
                p(style = "color:#C70039;", "This step will be auto-skipped if no missing values are detected"),
                p(strong("Select (a) or (b):")),
                p(style = "color:#C70039;", "(a) Missing Not At Random (MNAR)"),
@@ -73,7 +73,7 @@ mod_03_preprocess_ui <- function(id){
                             selected = "1"
                             ),
 
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#C70039;", "Features with CV value > the threshold will be filtered out"),
 
                sliderInput(inputId = ns("QCCV"),
@@ -146,7 +146,7 @@ mod_03_preprocess_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#C70039;", "1. If you plan to use internal standard-based normalization,
                  you can use this table to check the row numbers of your internal standard(s)."),
                p(style = "color:#C70039;", "2. You can use more than 1 internal standard for IS-based normalization.
@@ -167,7 +167,7 @@ mod_03_preprocess_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#C70039;", "1. The Boxplot shows you how the feature distributions change upon
                  using different sample normalization methods."),
                p(style = "color:#C70039;", "2. The Boxplot can be used to select sample normalization method."),
@@ -230,7 +230,7 @@ mod_03_preprocess_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell-o"), strong("Note: ")),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#C70039;", "1. You can click this button to view the results for 30 randomly selected features"),
                p(style = "color:#C70039;", "2. You can click this button many times to view different features"),
 

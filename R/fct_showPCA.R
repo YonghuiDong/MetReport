@@ -17,7 +17,7 @@
 #' @examples
 #' dat <-  iris[1:4]
 #' Group <- iris$Species
-#' showPCA(dat, Group, showFrame = "polygon", interactive = T)
+#' showPCA(dat, Group, showFrame = "norm", interactive = T)
 
 showPCA <- function(dat,
                     Group,
@@ -44,14 +44,13 @@ showPCA <- function(dat,
   y <- nms[iny]
 
   Sample_Name <- rownames(df_pcs) # rename
-  p <- ggplot2::ggplot(df_pcs, aes(x = !!ensym(x), y = !!ensym(y), color = Group, label = Sample_Name)) +
-    ggplot2::xlab(percentage[inx]) +
-    ggplot2::ylab(percentage[iny]) +
-    ggplot2::theme_bw()
 
   if(showFrame == "none"){
-    p2 <- p +
-      ggplot2::geom_point(size = 3)
+    p1 <- ggplot2::ggplot(df_pcs, aes(x = !!ensym(x), y = !!ensym(y), color = Group, text = Sample_Name)) +
+      ggplot2::geom_point(size = 3) +
+      ggplot2::xlab(percentage[inx]) +
+      ggplot2::ylab(percentage[iny]) +
+      ggplot2::theme_bw()
   }
 
   if(showFrame == "polygon"){
@@ -59,22 +58,25 @@ showPCA <- function(dat,
       dplyr::mutate(Sample_Name = Sample_Name) %>%
       dplyr::group_by(Group) %>%
       dplyr::slice(chull(!!ensym(x), !!ensym(y)))
-    p2 <- ggplot2::ggplot() +
-      ggplot2::geom_polygon(data = hull_group, mapping =  aes(x = !!ensym(x), y = !!ensym(y), fill = Group, group = Group), alpha = 0.2) +
-      ggplot2::geom_point(data = df_pcs, mapping = aes(x = !!ensym(x), y = !!ensym(y), color = Group, label = Sample_Name), size = 3) +
+    p1 <- ggplot2::ggplot(data = hull_group, mapping = aes(text = Sample_Name)) +
+      ggplot2::geom_polygon(mapping =  aes(x = !!ensym(x), y = !!ensym(y), fill = Group, group = Group), alpha = 0.2, inherit.aes = FALSE) +
+      ggplot2::geom_point(data = df_pcs, mapping = aes(x = !!ensym(x), y = !!ensym(y), color = Group), size = 3) +
       ggplot2::xlab(percentage[inx]) +
       ggplot2::ylab(percentage[iny]) +
       ggplot2::theme_bw()
   }
 
   if(showFrame == "norm"){
-    p2 <- p +
-      ggplot2::stat_ellipse(aes(fill = Group), geom = "polygon", level = 0.95, alpha = 0.1, show.legend = F) +
-      ggplot2::geom_point(size = 3)
+    p1 <- ggplot2::ggplot(df_pcs, aes(text = Sample_Name)) +
+      ggplot2::stat_ellipse(aes(x = !!ensym(x), y = !!ensym(y), color = Group, fill = Group), geom = "polygon", level = 0.95, alpha = 0.1, show.legend = F, inherit.aes = FALSE) +
+      ggplot2::geom_point(data = df_pcs, mapping = aes(x = !!ensym(x), y = !!ensym(y), color = Group), size = 3) +
+      ggplot2::xlab(percentage[inx]) +
+      ggplot2::ylab(percentage[iny]) +
+      ggplot2::theme_bw()
   }
 
   if(interactive){
-    p2 <- ggplotly(p2, tooltip = "label")
+    p2 <- ggplotly(p1, tooltip = "text")
   }
 
   return(p2)

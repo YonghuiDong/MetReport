@@ -251,7 +251,7 @@ mod_03_preprocess_ui <- function(id){
 #' 03_preprocess Server Functions
 #'
 #' @noRd
-#' @importFrom ggplot2 aes element_text position_jitter
+#' @importFrom ggplot2 aes element_text position_jitter after_stat
 
 mod_03_preprocess_server <- function(id, sfData){
   ns <- NS(id)

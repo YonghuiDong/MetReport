@@ -469,7 +469,7 @@ mod_03_preprocess_server <- function(id, sfData){
       })
 
     featureDensityPlot <- reactive({
-      p <- ggplot2::ggplot(combinedData(), aes(x = Area, y=..scaled.., fill = Treatment)) +
+      p <- ggplot2::ggplot(combinedData(), aes(x = Area, y = after_stat(scaled), fill = Treatment)) +
         ggplot2::geom_density(alpha = 0.8) +
         ggplot2::scale_fill_manual(values = c("#e9a3c9", "#a1d76a"), guide = 'none') +
         ggplot2::facet_wrap(~ Treatment, scales = "free") +

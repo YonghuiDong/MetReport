@@ -41,8 +41,10 @@ editor_options:
 
 #(1) prepare parameters---------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
 library(DT)
 library(plotly)
+library(htmltools)
 
 ## prepare and clean them
 myRawData <- params$myRawData
@@ -52,7 +54,6 @@ statTable <- params$statTable
 VCGroup <- params$VCGroup
 myStat <- params$myStat
 sampleGroup <- params$sampleGroup
-#myMetaData <- params$myMetaData
 mySamplePrep <- params$mySamplePrep
 dataGlobal3Transform <- params$dataGlobal3Transform
 BPGroup <- params$BPGroup
@@ -72,15 +73,15 @@ Metabolomics is the systematic study of low molecular weight molecules (i.e., me
 
 `Semi-targeted Assay`: (or frequently referred to as metabolic profiling). It acts as an intermediate between untargeted and targeted analyses, where typically hundreds of metabolites are targeted, whose chemical identity is known prior to data acquisition. Semi-quantification information is reported in this type of approach.
 
-This report is an overview of your data analysis results. Brief explanations are provided in each section to help you better understand the report. Below are few tips on how to use the report.
+This report is an overview of your data analysis results. Brief explanations are provided in each section to help you understand the report. Below are few tips on how to use this report.
 
 > <span style = "color : #FF8300">**Tips:**</span>
 >
 > (1) Most figures in this report are interative, which means you can zoom and pan the figures, and hover over them to get more detailed information. Don't download figures from this report, and use them for publication purpose. The figure resolution is too low (72 dpi).
 >
-> (2) High resolution (600 dpi) static figures are provided along with this report. You can also download them in `Statistics` tab if you are using **MetaboReport** by yourself to generate this report. 
+> (2) High resolution (600 dpi) static figures are provided along with this report. You can also download them in `Statistics` tab if you are using **MetaboReport** software by yourself to generate this report. 
 >
-> (3) If you want to perform additional statistics and/or re-analyse you data by yourself, you can use either Table 1 (raw data) or Table 2 (data with different statistical information). You can click `Download` button above the table to download it in `cvs` or `excel` format.
+> (3) If you want to perform additional statistics and/or re-analyse you data by yourself, you can use either Table 1 (raw data) or Table 2 (data with different statistical information). You can click `Download` button above the table to download it in **cvs** or **excel** format.
 
 
 # Materials and Methods
@@ -102,14 +103,13 @@ This report is an overview of your data analysis results. Brief explanations are
 
 ## Quality Control
 
-Robust and reproducible data is essential to ensure high-quality analytical results and is particularly important for large-scale metabolomics studies where detector sensitivity drifts, retention time and mass accuracy shifts frequently occur. Therefore, raw data need to be inspected before data processing to detect measurement bias and verify system consistency [2].
-
-The use of quality control (QC) is now routine to monitor, evaluate and correct system variations in metabolomics studies. Different types of QC samples are used in metabolomics, such as pooled QC samples, reference materials, standard reference materials and long term reference (LTR) samples.
-
 > <span style = "color : #FF8300">**Note:**</span>
 > 
 > If your project does not contain QC samples, you can skip this section.
 
+Robust and reproducible data is essential to ensure high-quality analytical results, and is particularly important for large-scale metabolomics studies where detector sensitivity drifts, retention time and mass accuracy shifts frequently occur. Therefore, raw data need to be inspected before data processing to detect measurement bias and verify system consistency [2].
+
+The use of quality control (QC) is now routine to monitor, evaluate and correct system variations in metabolomics studies. Different types of QC samples are used in metabolomics, such as pooled QC samples, reference materials, standard reference materials and long term reference (LTR) samples.
 
 ### PCA-based QC Evaluation
 
@@ -133,13 +133,15 @@ plotly::ggplotly(params$myPCAPlot, tooltip = "text")
 
 ### Comprehensive QC Report
 
-In addition, you may receive an HTML format QC report. It was generated using R package `RawHummus`, which was designed for quick and comprehensive evaluation of the metabolomics data quality based on QC samples. `RawHummus` adopts 12 quality metrics which are closely related to liquid chromatography (LC) peak shape, retention time (RT), mass accuracy, detector sensitivity and fragmentation to to comprehensively evaluate the raw data quality [2].  
+In addition, you may receive an HTML format QC report. It was generated using R package **RawHummus**, which was designed for quick and comprehensive evaluation of the metabolomics data quality based on QC samples. `RawHummus` adopts 12 quality metrics which are closely related to liquid chromatography (LC) peak shape, retention time (RT), mass accuracy, detector sensitivity and fragmentation to to comprehensively evaluate the raw data quality [2].  
 
 > <span style = "color : #FF8300">**Note:**</span>
 > 
 > Detailed evaluation of the data quality can be found in the RawHummus report. 
 >
 > This RawHummus report can be direcrly used as a supplementary metarial in your publication.
+>
+> Please cite RawHummus publication in your manuscript [2].
 
 
 ## Statistical Result 
@@ -148,7 +150,7 @@ In addition, you may receive an HTML format QC report. It was generated using R 
 
 Principal Component Analysis (PCA) is an unsupervised data analysis method, which transforms a set of correlated variables into a set of linearly uncorrelated variables. The uncorrelated variables are ordered in such a way that the first one accounts for as much of the variability in the data as possible and each succeeding one has the highest variance possible in the remaining variables. These ordered uncorrelated variables are called `principle components`. By discarding low-variance variables, PCA helps reduce data dimension and visualize the data.
 
-The PCA scores represent the new location of the samples in each principal component. A typical way to look at these is to plot the scores values in two dimensions, corresponding to pairs of components (usually PC1 vs PC2). Each point in a scores plot therefore represents a sample, with samples close together being more similar to each other, and those further apart being more dissimilar. By coloring by sample type, we can check, firstly, the consistency of the QC samples (as discussed above in section **3.1.1**), and secondly, for the presence of any sample outliers (any samples which are very different to the others).
+The PCA scores represent the new location of the samples in each principal component. A typical way to look at these is to plot the scores values in two dimensions, corresponding to pairs of components (usually PC1 vs PC2). Each point in a scores plot therefore represents a sample, with samples close together being more similar to each other, and those further apart being more dissimilar. By coloring by sample type, we can check, (i) the consistency of the QC samples (as discussed above in section **3.1.1**), and (ii) the presence of any sample outliers (any samples which are very different to the others).
 
 
 ```{r}
@@ -175,19 +177,17 @@ A clustered heatmap is a representation where values are represented on a color 
 #| echo = FALSE, 
 #| warning = FALSE, 
 #| message = FALSE,
-#| out.width = "130%"
+#| out.width = "100%"
 #(2) show heatmap plot----------------------------------------------------------
 
 params$myHMPlot
 ```
-
-
 > <span style = "color : #FF8300">**Note:**</span>
->
+> 
 > Depending on the parameter settings in the **MetaboReport** data analysis work, heatmap can be made from either all the mass features detected in the samples or only statistically significant mass features.
->
+> 
 > 1. Heatmap constructed with all the mass features (or metabolites) gives an overview of the data structure.
->
+> 
 > 2. Heatmap constructed with only statistically significant mass features (or metabolites) allows better visualization of the sample group differences.
 
 
@@ -195,8 +195,7 @@ params$myHMPlot
 
 **Table 1** presents an overview of the metabolomics result. If you want to perform statistical analysis from scratch by yourself, you can use Table 1. You can click the **Download** button to download the data in excel or csv format. 
 
-
-**Table 1**: Feature table.
+**Table 1**: Raw data feature table.
 
 ```{r}
 #| label = rawData, 
@@ -206,6 +205,9 @@ params$myHMPlot
 #| out.width = "100%"
 
 #(2) show raw data table--------------------------------------------------------
+myRawData <- myRawData %>%
+  dplyr::mutate(ID = paste0("ID", row.names(.))) %>%
+  dplyr::relocate(ID)
 DT::datatable(myRawData,
               extensions = 'Buttons',
               options = list(scrollX = TRUE,
@@ -234,13 +236,13 @@ DT::datatable(myRawData,
 
 > <span style = "color : #FF8300">**How to interpret Table 1?**</span>
 >
-> Because metabolomics data can be acquired from various platforms and/or pre-processed with different software tools, the resulting peak table can be very different. Here we highlight few common terms that may appear in the table.
+> Because metabolomics data can be acquired from various platforms and/or pre-processed with different software tools, the resulting peak table can be very different from one another. Here we highlight few common terms that may appear in the table.
 >
-> `m/z`: the mass-to-charge ratio of an ion is the number obtained by dividing the mass of the ion (m) by the number of electrical charges (z). It is closely related to the identity of a metabolite. Note that m/z is different from molecular weight.
+> `m/z`: Mass-to-charge ratio. It is the number obtained by dividing the mass of the ion (m) by the number of electrical charges (z). It is closely related to the identity of a metabolite. Note that m/z is different from molecular weight.
 >
-> `RT`: retention time is the amount of time a metabolite spends on the column after it has been injected. It is a parameters that related to metabilite identity.
+> `RT`: Retention time. It is the amount of time a metabolite spends on the column after it has been injected. It is a parameters that related to metabilite identity.
 >
-> `Peak Area`: the area under a peak. It is a measure of the concentration/abundance of the metabolite it represents.
+> `Peak Area`: The area under a peak. It is a measure of the concentration/abundance of the metabolite it represents.
 
 --------------------------------------------------------------------------------
 
@@ -296,11 +298,15 @@ DT::datatable(myStat,
 > 
 > You can use a multi-factor approach (i.e., `FC`, `adjusted p-value`, and `VIP`) to select potential biomarkers in your study based on the statistical results in Table 2. 
 > 
-> Our suggested values are: mass features with adjusted p-value < 0.05 and VIP >= 1 are considered as statistically signinificantly different, and FC >= 2 as increase and FC <= 0.05 as decrease. See **Table 3** below.
+> Our suggested values are: mass features with adjusted p-value < 0.05 and VIP > 1 are considered as statistically significantly different, and FC >= 2 as increase and FC <= 0.05 as decrease. See **Table 3** below.
 
 --------------------------------------------------------------------------------
 
 **Table 3. Summary of Statistical Result**
+
+The following criteria are used to select statistically significantly different mass features (or metabolites):
+
+The mass features with adjusted **p-value < 0.05** and **VIP > 1** are considered as statistically significantly different, and **FC >= 2** as increase and **FC <= 0.05** as decrease.
 
 ```{r}
 #| label = summary, 
@@ -309,7 +315,6 @@ DT::datatable(myStat,
 #| message = FALSE,
 #| out.width = "100%"
 library(dplyr)
-library(rlang)
 ## extract group information
 GroupInfo <- myStat %>%
   dplyr::select(starts_with("AdjPvalue")) %>%
@@ -328,7 +333,7 @@ for(i in 1: length(GroupInfo)){
   filteredStat <- myStat %>%
     dplyr::select(contains(dfIndex)) %>%
     dplyr::filter(!!sym(paste0("AdjPvalue_", dfIndex)) < 0.05) %>%
-    dplyr::filter(!!sym(paste0("VIP_", dfIndex)) >=1) 
+    dplyr::filter(!!sym(paste0("VIP_", dfIndex)) > 1) 
   statSummary[i, 2] <- filteredStat %>%
     dplyr::filter(!!sym(paste0("Fold_", dfIndex)) >= 2) %>%
     dplyr::count() %>%
@@ -360,6 +365,55 @@ DT::datatable(statSummary,
                                 "}")
                               )
                )
+```
+
+Below you can find the detailed information of the differential mass features in each compared groups.
+
+
+```{r}
+#| label = diffTable, 
+#| echo = FALSE, 
+#| warning = FALSE, 
+#| message = FALSE,
+#| results = 'asis',
+#| out.width = "100%"
+myStatInfo <- myStat %>%
+  dplyr::mutate(ID = sub("_.*", "", ID)) %>%
+  dplyr::select(contains(c("ID", "AdjPvalue_", "VIP_", "Fold_")))
+
+groupTableList <- htmltools::tagList() # to ensure the inclusion of DT required javascript to work 
+for(i in 1: length(GroupInfo)){
+  dfIndex <- statSummary$Group[i]
+  groupTable <- myStatInfo %>%
+    dplyr::select(ID, contains(dfIndex)) %>%
+    dplyr::filter(!!sym(paste0("AdjPvalue_", dfIndex)) < 0.05) %>%
+    dplyr::filter(!!sym(paste0("VIP_", dfIndex)) > 1) %>%
+    dplyr::filter(!!sym(paste0("Fold_", dfIndex)) >= 2 | !!sym(paste0("Fold_", dfIndex)) <= 0.5) %>%
+    dplyr::left_join(x = ., y = myRawData, by = "ID")
+  
+  groupTableList[[i]] <- DT::datatable(data = groupTable,
+                                       caption = paste0("Table3.", i, ". ", "Statistically significant table for group: ", dfIndex),
+                                       extensions = 'Buttons',
+                                       options = list(scrollX = TRUE,
+                                                      deferRender = TRUE,
+                                                      scroller = TRUE,
+                                                      fixedColumns = FALSE,
+                                                      ## add download options
+                                                      dom = 'Bfrtip',
+                                                      buttons = list('print', 
+                                                                     list(extend = 'collection', 
+                                                                          buttons = c('csv', 'excel'), 
+                                                                          text = 'Download')),
+                                                      ## customize header
+                                                      initComplete = JS(
+                                                        "function(settings, json) {",
+                                                        "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
+                                                        "}")
+                                                      )
+                                       )
+  }
+
+groupTableList
 ```
 
 ### PLS-DA
@@ -427,8 +481,8 @@ for (i in seq_along(listnames)){
     }
   )
 
-  p1 <- MetaboReport::showOPLSDA(resultOPLSDA, Group = groupOPLSDA, size = 1, interactive = TRUE)
-  p2 <- MetaboReport::showSplot(matrixOPLSDA, resultOPLSDA, size = 1, interactive = TRUE)
+  p1 <- showOPLSDA(resultOPLSDA, Group = groupOPLSDA, size = 1, interactive = TRUE)
+  p2 <- showSplot(matrixOPLSDA, resultOPLSDA, size = 1, interactive = TRUE)
   OPLSDAList[[i]] <- plotly::subplot(p1, p2, nrows = 1, margin = 0.05, which_layout = 1)
 }
 

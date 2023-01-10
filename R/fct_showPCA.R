@@ -9,7 +9,7 @@
 #' @param interactive should the plot be interactive? default is FALSE.
 #' @importFrom stats prcomp
 #' @importFrom grDevices chull
-#' @importFrom ggplot2 ensym
+#' @importFrom ggplot2 ensym aes
 #' @importFrom dplyr %>%
 #' @importFrom plotly ggplotly
 #' @export
@@ -17,7 +17,7 @@
 #' @examples
 #' df <-  iris[1:4]
 #' Group <- iris$Species
-#' showPCA(df, Group, showFrame = "norm", interactive = T)
+#' showPCA(df, Group, showFrame = "norm", interactive = F)
 
 showPCA <- function(df,
                     Group,
@@ -76,8 +76,8 @@ showPCA <- function(df,
   }
 
   if(interactive){
-    p2 <- ggplotly(p1, tooltip = "text")
+    p1 <- plotly::ggplotly(p1, tooltip = "text")
   }
 
-  return(p2)
+  return(p1)
 }

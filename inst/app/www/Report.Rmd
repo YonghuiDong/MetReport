@@ -128,7 +128,7 @@ As long as the QCs cluster tightly, relative to the observed dispersion of biolo
 #| out.width = "100%"
 #(1) show PCA plot--------------------------------------------------------------
 
-plotly::ggplotly(params$myPCAPlot, tooltip = "label")
+plotly::ggplotly(params$myPCAPlot, tooltip = "text")
 ```
 
 ### Comprehensive QC Report
@@ -159,7 +159,7 @@ The PCA scores represent the new location of the samples in each principal compo
 #| out.width = "100%"
 #(2) show PCA plot--------------------------------------------------------------
 
-plotly::ggplotly(params$myPCAPlot, tooltip = "label")
+plotly::ggplotly(params$myPCAPlot, tooltip = "text")
 ```
 > <span style = "color : #FF8300">**Note:**</span>
 > 

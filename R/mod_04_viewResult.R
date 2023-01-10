@@ -345,26 +345,22 @@ mod_04_viewResult_ui <- function(id){
                collapsible = TRUE,
                collapsed = TRUE,
                closable = FALSE,
-               varSelectInput(inputId = ns("VCGroup"),
-                              label = "1. Select MetaData (Sample Groups)",
-                              data = ""
-                              ),
                fluidRow(width = 12,
                         column(width = 6,
                                selectInput(inputId = ns("VCLevel1"),
-                                           label = "2. Select the first sample group level",
+                                           label = "1. Select the first sample group level",
                                            choices = ""
                                            )
                                ),
                         column(width = 6,
                                selectInput(inputId = ns("VCLevel2"),
-                                           label = "2. Select the second sample group level",
+                                           label = "1. Select the second sample group level",
                                            choices = ""
                                            )
                                ),
                         column(width = 6,
                                numericInput(inputId = ns("VCFC"),
-                                            label = "3. Input fold change threshold",
+                                            label = "2. Input fold change threshold",
                                             value = 2,
                                             min = NA,
                                             max = NA
@@ -372,7 +368,7 @@ mod_04_viewResult_ui <- function(id){
                                ),
                         column(width = 6,
                                numericInput(inputId = ns("VCPvalue"),
-                                            label = "4. Input p-value threshold",
+                                            label = "3. Input p-value threshold",
                                             value = 0.05,
                                             min = 0,
                                             max = 1
@@ -899,7 +895,7 @@ mod_04_viewResult_server <- function(id, sfData){
     output$PCAPlot <- plotly::renderPlotly({
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      plotly::ggplotly(PCAPlot(), tooltip = "label")
+      plotly::ggplotly(PCAPlot(), tooltip = "text")
       })
 
     output$downloadPCA <- downloadHandler(
@@ -1160,24 +1156,24 @@ mod_04_viewResult_server <- function(id, sfData){
 
     #3. Volcano Plot------------------------------------------------------------
     ##(1) Volcano plot parameters-----------------------------------------------
-    VCGroup <- reactive({
-      as.character(input$VCGroup)
-      })
-    observeEvent(sfData$group, {
-      updateVarSelectInput(
-        inputId = "VCGroup",
-        data = sfData$group,
-        selected = "Group1"
-        )
-      })
+    # VCGroup <- reactive({
+    #   as.character(input$VCGroup)
+    #   })
+    # observeEvent(sfData$group, {
+    #   updateVarSelectInput(
+    #     inputId = "VCGroup",
+    #     data = sfData$group,
+    #     selected = "Group1"
+    #     )
+    #   })
     VCLevel1 <- reactive({
       as.character(input$VCLevel1)
       })
     VCLevel2 <- reactive({
       as.character(input$VCLevel2)
       })
-    observeEvent(VCGroup(),{
-      VCLevels <- sfData$group[, VCGroup()]
+    observeEvent(StatGroup(), {
+      VCLevels <- sfData$group[, StatGroup()]
       updateSelectInput(inputId = "VCLevel1",
                         choices = levels(as.factor(VCLevels[!(VCLevels %in% "QC")])),
                         selected = NULL
@@ -1626,7 +1622,7 @@ mod_04_viewResult_server <- function(id, sfData){
       dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
       OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
       statTable = statTable, # data matrix for volcano plot
-      VCGroup = VCGroup, # group information for volcano plot
+      VCGroup = StatGroup, # group information for volcano plot
       combinedTable = combinedTable,
       PCAPlot = PCAPlot,
       HMPlot = HMPlot,

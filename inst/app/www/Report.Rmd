@@ -302,6 +302,8 @@ DT::datatable(myStat,
 
 --------------------------------------------------------------------------------
 
+### Differential Features
+
 **Table 3. Summary of Statistical Result**
 
 The following criteria are used to select statistically significantly different mass features (or metabolites):

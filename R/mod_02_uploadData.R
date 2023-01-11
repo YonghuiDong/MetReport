@@ -54,6 +54,19 @@ mod_02_uploadData_ui <- function(id){
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
 
+               p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
+               p(style = "color:#b2182b;", "1. If the header of your data table does not contain meta
+                 information, you need to upload a meta table below"),
+               p(style = "color:#b2182b;", "2. You can check [Home Page] for detailed description of
+                 data table preparation"),
+
+               fileInput(inputId = ns("inputMeta"),
+                         label = "2. (Optional) Upload Sample Meta Group File:",
+                         multiple = FALSE,
+                         placeholder = "accepts csv, xls or xlsx format",
+                         accept = c(".csv", ".xls", ".xlsx")
+                         ),
+
                radioButtons(inputId = ns("showExample"),
                             label = "Do you want to play with demo Data?",
                             choices = c("Yes" = "Yes", "No" = "No"),
@@ -168,13 +181,26 @@ mod_02_uploadData_server <- function(id, sfData){
       return(df)
     })
 
+    inputMeta <- reactive({
+      inFile <- input$inputMeta
+      if(is.null(inFile)){return(NULL)}
+      extension <- tools::file_ext(inFile$name)
+      filepath <- inFile$datapath
+      df <- switch(extension,
+                   csv = readr::read_csv(filepath),
+                   xls = readxl::read_xls(filepath),
+                   xlsx = readxl::read_xlsx(filepath)
+                   )
+      return(df)
+    })
+
     #2. Format Data ============================================================
     getProcessedData <- reactive({
       shiny::req(inputData())
       if(showExample() == "Yes") {
         df <- formatData(DF = inputData(), format = "CD")
       } else{
-        df <- formatData(DF = inputData(), format = input$fileFormat)
+        df <- formatData(DF = inputData(), metaGrpup = inputMeta(), format = input$fileFormat)
         df$ID <- cleanNames(df$ID)
         df <- df %>% dplyr::relocate(ID)
       }

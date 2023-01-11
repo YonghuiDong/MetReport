@@ -182,6 +182,7 @@ A clustered heatmap is a representation where values are represented on a color 
 
 params$myHMPlot
 ```
+
 > <span style = "color : #FF8300">**Note:**</span>
 > 
 > Depending on the parameter settings in the **MetaboReport** data analysis work, heatmap can be made from either all the mass features detected in the samples or only statistically significant mass features.
@@ -394,7 +395,7 @@ for(i in 1: length(GroupInfo)){
     dplyr::left_join(x = ., y = myRawData, by = "ID")
   
   groupTableList[[i]] <- DT::datatable(data = groupTable,
-                                       caption = paste0("Table3.", i, ". ", "Statistically significant table for group: ", dfIndex),
+                                       caption = paste0("Table3.", i, ". ", "Statistically significant mass feature table for group: ", dfIndex),
                                        extensions = 'Buttons',
                                        options = list(scrollX = TRUE,
                                                       deferRender = TRUE,

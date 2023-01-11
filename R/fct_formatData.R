@@ -8,7 +8,7 @@
 #' @noRd
 #' @examples
 #' df1 <- data.frame(
-#' Name <- c("x", "y", "z"),
+#' Name = c("x", "y", "z"),
 #' `Area: WT_M_1` = 1:3,
 #' `Area: WT_M_2` = 1:3,
 #' `Area: WT_M_3` = 1:3,

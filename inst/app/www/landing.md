@@ -1,5 +1,5 @@
 
-# Welcome to MetStat &nbsp;<img src='www/logo.png' align="right" height="200"/>
+# Welcome to MetaboReport &nbsp;<img src='www/logo.png' align="right" height="200"/>
 
 <b><span style="color:#F17F42">MetaboReport</span></b> provides users a flexible and efficient way to generate a typical metabolomics report.
 

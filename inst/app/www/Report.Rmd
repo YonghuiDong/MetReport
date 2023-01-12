@@ -46,6 +46,8 @@ library(DT)
 library(plotly)
 library(htmltools)
 library(crosstalk)
+library(dplyr)
+library(tidyr)
 
 ## prepare and clean them
 myRawData <- params$myRawData
@@ -598,7 +600,6 @@ The bar (violin or box) plot shows the quantitative information of each metaboli
 #| message = FALSE,
 #| out.width = '100%'
 #(8) show box plot result-------------------------------------------------------
-
 BPData <- dataGlobal3Transform %>%
   dplyr::mutate(Group = sampleGroup[, BPGroup]) %>%
   dplyr::filter(Group != "QC") %>%
@@ -614,21 +615,21 @@ metaboliteFilter <- crosstalk::filter_select(id = "Metabolite",
                                              group = ~ Metabolite, 
                                              multiple = F
                                              )
-yText <- switch(params$BPTransform,
-               none = "Raw Peak Area",
-               log2 = "Log2 Transformed Peak Area",
-               log10 = "Log10 Transformed Peak Area"
-               )
+yLegend <- switch(params$BPTransform,
+                  none = "Raw Peak Area",
+                  log2 = "Log2 Transformed Peak Area",
+                  log10 = "Log10 Transformed Peak Area"
+                  )
 
-BPPlot <- plotly::plot_ly(data = BPData, 
-                          x = ~ Group, 
-                          y = ~ MEAN, 
+BPPlot <- plotly::plot_ly(data = BPData,
+                          x = ~ Group,
+                          y = ~ MEAN,
                           group = ~ interaction(Metabolite, Group),
                           color = ~ Group,
                           type = 'bar',
                           error_y = ~list(array = SD, color = '#808080')
                           ) %>%
-  layout(yaxis = list(categoryorder = "trace", title = 'Peak Area'))
+  layout(yaxis = list(categoryorder = "trace", title = yLegend))
 
 filter <- crosstalk::bscols(
   metaboliteFilter, 

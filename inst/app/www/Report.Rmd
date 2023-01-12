@@ -45,6 +45,7 @@ library(knitr)
 library(DT)
 library(plotly)
 library(htmltools)
+library(crosstalk)
 
 ## prepare and clean them
 myRawData <- params$myRawData
@@ -602,7 +603,9 @@ BPData <- dataGlobal3Transform %>%
   dplyr::mutate(Group = sampleGroup[, BPGroup]) %>%
   dplyr::filter(Group != "QC") %>%
   tidyr::pivot_longer(!Group, names_to = "Metabolite", values_to = "Area") %>%
-  dplyr::mutate(Area = round(Area, 2))
+  dplyr::mutate(Area = round(Area, 2)) %>%
+  dplyr::group_by(Metabolite, Group) %>%
+  dplyr::summarise(MEAN = round(mean(Area), 2), SD = round(sd(Area), 2))
 
 BPData <- crosstalk::SharedData$new(BPData)
 metaboliteFilter <- crosstalk::filter_select(id = "Metabolite", 
@@ -617,19 +620,19 @@ yText <- switch(params$BPTransform,
                log10 = "Log10 Transformed Peak Area"
                )
 
-BPPlot <- ggplot2::ggplot(data = BPData, 
-                          aes(x = Group, 
-                              y = Area, 
-                              group = interaction(Metabolite, Group)
-                              )
-                          ) +
-  ggplot2:: geom_boxplot(aes(fill = Group)) +
-  ggplot2::theme_bw() +
-  ggplot2::ylab(yText)
+BPPlot <- plotly::plot_ly(data = BPData, 
+                          x = ~ Group, 
+                          y = ~ MEAN, 
+                          group = ~ interaction(Metabolite, Group),
+                          color = ~ Group,
+                          type = 'bar',
+                          error_y = ~list(array = SD, color = '#808080')
+                          ) %>%
+  layout(yaxis = list(categoryorder = "trace", title = 'Peak Area'))
 
 filter <- crosstalk::bscols(
-  metaboliteFilter,
-  plotly::ggplotly(BPPlot, tooltip = NULL),
+  metaboliteFilter, 
+  BPPlot,
   widths = 12
   )
 

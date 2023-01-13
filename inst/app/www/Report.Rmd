@@ -584,11 +584,11 @@ DT::datatable(params$KMTable,
 
 ### Barplot
 
-The bar (violin or box) plot shows the quantitative information of each metabolite in different sample group.
+The bar plot shows the quantitative information of each metabolite in different sample group.
 
 > <span style = "color : #FF8300">**Note**</span>
 >
-> Depending on the setting in **MetaboReport** workflow, barplot, violin or box plot is displayed below for each metabolite.
+> Depending on the slected setting in **MetaboReport** workflow, different data transformation is used before maiking barplot, please refer to the y-axis legend for the data transformation method.
 >
 > In the selection box, you can choose the metabolite to display the plot for this metabolite. The corresponding table information of this selected metabolite will be displayed as well.
 

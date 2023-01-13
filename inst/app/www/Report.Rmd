@@ -608,11 +608,14 @@ BPData <- dataGlobal3Transform %>%
   dplyr::group_by(Metabolite, Group) %>%
   dplyr::summarise(MEAN = round(mean(Area), 2), SD = round(sd(Area), 2))
 
+## must order data by the colored variable here to avoid mismatch of standard deviation.
+## See issue 15
+BPData <- BPData[order(BPData$Group),]
 BPData <- crosstalk::SharedData$new(BPData)
 metaboliteFilter <- crosstalk::filter_select(id = "Metabolite", 
                                              label = "Select a metabolite", 
                                              sharedData = BPData, 
-                                             group = ~ Metabolite, 
+                                             group = ~ Metabolite,
                                              multiple = F
                                              )
 yLegend <- switch(params$BPTransform,
@@ -624,10 +627,10 @@ yLegend <- switch(params$BPTransform,
 BPPlot <- plotly::plot_ly(data = BPData,
                           x = ~ Group,
                           y = ~ MEAN,
-                          group = ~ interaction(Metabolite, Group),
                           color = ~ Group,
-                          type = 'bar',
-                          error_y = ~list(array = SD, color = '#808080')
+                          marker = list(line = list(color = 'grey', width = 1.5)),
+                          error_y = ~list(array = SD, color = 'grey'),
+                          type = 'bar'
                           ) %>%
   layout(yaxis = list(categoryorder = "trace", title = yLegend))
 

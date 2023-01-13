@@ -6,8 +6,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#' @importFrom DT dataTableOutput
+#' @rawNamespace import(shiny, except=c(dataTableOutput, renderDataTable))
 
 
 mod_02_uploadData_ui <- function(id){

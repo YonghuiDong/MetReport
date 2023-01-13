@@ -6,9 +6,9 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
 #' @importFrom dplyr n
-#' @importFrom DT dataTableOutput
+#' @rawNamespace import(shiny, except=c(dataTableOutput, renderDataTable))
+#'
 mod_04_viewResult_ui <- function(id){
   ns <- NS(id)
   tagList(

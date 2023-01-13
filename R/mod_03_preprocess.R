@@ -1,4 +1,5 @@
 #' 03_preprocess UI Function
+#
 #'
 #' @description A shiny Module.
 #'
@@ -6,8 +7,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#' @importFrom DT dataTableOutput
+#' @rawNamespace import(shiny, except=c(dataTableOutput, renderDataTable))
 #' @importFrom plotly plotlyOutput
 
 mod_03_preprocess_ui <- function(id){

@@ -466,7 +466,7 @@ mod_04_viewResult_ui <- function(id){
              box(
                width = 12,
                inputId = "viewBoxPlot",
-               title = strong("Box Plot"),
+               title = strong("Bar/Box/Violin Plot"),
                status = "success",
                solidHeader = FALSE,
                collapsible = TRUE,
@@ -495,8 +495,8 @@ mod_04_viewResult_ui <- function(id){
                         column(width = 6,
                                selectInput(inputId = ns("BPPlotType"),
                                            label = "4. Box plot or Violin plot?",
-                                           choices = list("Box plot", "Violin plot"),
-                                           selected = "Box plot"
+                                           choices = list("Bar plot", "Box plot", "Violin plot"),
+                                           selected = "Bar plot"
                                            )
                                ),
                         column(width = 6,
@@ -665,7 +665,7 @@ mod_04_viewResult_ui <- function(id){
 #' 04_viewResult Server Functions
 #'
 #' @noRd
-#' @importFrom ggplot2 aes scale_color_brewer scale_fill_brewer
+#' @importFrom ggplot2 aes scale_color_brewer scale_fill_brewer position_dodge
 mod_04_viewResult_server <- function(id, sfData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
@@ -1428,22 +1428,32 @@ mod_04_viewResult_server <- function(id, sfData){
       input$BPRatio
       })
     dataGlobal3Transform <- reactive({
-      tem <- switch(BPTransform(),
-                    none = dataGlobal3(),
-                    log2 = log2(dataGlobal3()),
-                    log10 = log10(dataGlobal3())
-                    )
-      return(tem)
+      switch(BPTransform(),
+             none = dataGlobal3(),
+             log2 = log2(dataGlobal3()),
+             log10 = log10(dataGlobal3())
+             )
+      })
+
+    yLegend <- reactive({
+      switch(BPTransform(),
+             none = "Peak Area",
+             log2 = "Log2 Transformed Peak Area",
+             log10 = "Log10 Transformed Peak Area"
+             )
       })
 
     ##(2) Prepare plot----------------------------------------------------------
+
     BPPlot <- reactive({
       p <- dataGlobal3Transform() %>%
         dplyr::mutate(Group = sfData$group[, BPGroup()]) %>%
         dplyr::select(Group, Metabolite = BPMetabolite()) %>%
         dplyr::filter(Group != "QC") %>%
-        ggplot2::ggplot(aes(x = Group, y = Metabolite)) +
-        ggplot2::ylab("") +
+        dplyr::group_by(Group) %>%
+        dplyr::mutate(MEAN = mean(Metabolite), SD = sd(Metabolite)) %>%
+        ggplot2::ggplot(aes(x = Group, fill = Group)) +
+        ggplot2::ylab(yLegend()) +
         ggplot2::theme_bw() +
         ggplot2::ggtitle(paste0("Metabolite: ", BPMetabolite())) +
         ggplot2::theme(text = element_text(size = 16),
@@ -1459,11 +1469,15 @@ mod_04_viewResult_server <- function(id, sfData){
       ## plot type
       p2 <- switch(BPPlotType(),
                    "Box plot" = p +
-                     ggplot2::geom_boxplot(aes(fill = Group), outlier.shape = 24, outlier.fill = "red", outlier.size = 3, alpha = 0.8) +
-                     ggplot2::geom_jitter(shape = 16, position = position_jitter(0.2), color = "black"),
+                     ggplot2::geom_boxplot(aes(y = Metabolite), outlier.shape = 24, outlier.fill = "red", outlier.size = 3, alpha = 0.8) +
+                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
                    "Violin plot" = p +
-                     ggplot2::geom_violin(aes(fill = Group), alpha = 0.8) +
-                     ggplot2::geom_jitter(shape = 16, position = position_jitter(0.2), color = "black")
+                     ggplot2::geom_violin(aes(y = Metabolite), alpha = 0.8) +
+                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
+                   "Bar plot" = p +
+                     ggplot2::geom_bar(aes(y = MEAN), alpha = 0.8, stat = "identity", width = 0.5, color = "black", position = position_dodge()) +
+                     ggplot2::geom_errorbar(aes(ymin = MEAN, ymax = MEAN + SD), width = 0.2, position = position_dodge(0.9)) +
+                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black")
                    )
       return(p2)
       })

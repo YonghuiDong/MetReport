@@ -513,7 +513,7 @@ listnames <- combn(n, 2, simplify = FALSE)
 volcanoList <- htmltools::tagList()
 for (i in seq_along(listnames)){
     volcanoList[[i]] <- plotly::as_widget(
-      MetaboReport::showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, p = 0.05)
+      showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, p = 0.05)
       )
     }
 

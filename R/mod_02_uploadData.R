@@ -154,7 +154,6 @@ mod_02_uploadData_ui <- function(id){
 #' @noRd
 #' @importFrom tools file_ext
 #' @importFrom dplyr relocate %>%
-#' @importFrom readr read_csv
 #' @importFrom readxl read_xls read_xlsx
 
 
@@ -173,7 +172,7 @@ mod_02_uploadData_server <- function(id, sfData){
       extension <- tools::file_ext(inFile$name)
       filepath <- inFile$datapath
       df <- switch(extension,
-                   csv = readr::read_csv(filepath),
+                   csv = read.csv(filepath, header = TRUE, check.names = FALSE),
                    xls = readxl::read_xls(filepath),
                    xlsx = readxl::read_xlsx(filepath)
                    )
@@ -186,7 +185,7 @@ mod_02_uploadData_server <- function(id, sfData){
       extension <- tools::file_ext(inFile$name)
       filepath <- inFile$datapath
       df <- switch(extension,
-                   csv = readr::read_csv(filepath),
+                   csv = read.csv(filepath, header = FALSE, check.names = FALSE),
                    xls = readxl::read_xls(filepath),
                    xlsx = readxl::read_xlsx(filepath)
                    )

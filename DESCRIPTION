@@ -18,7 +18,6 @@ Imports:
     plotly,
     qgraph,
     RColorBrewer,
-    readr,
     readxl,
     rmarkdown,
     ropls,
@@ -31,8 +30,6 @@ Imports:
     utils,
     VIM,
     waiter
-Suggests:
-    knitr
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

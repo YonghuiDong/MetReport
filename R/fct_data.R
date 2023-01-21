@@ -42,4 +42,5 @@
 #'   \item{Area: RPMI8226_Blood_5p.raw (F27)}{Peak Area}
 #'   \item{Area: RPMI8226_Blood_6p.raw (F33)}{Peak Area}
 #' }
+#' @export
 "cancerCell"

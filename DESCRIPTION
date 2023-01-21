@@ -1,6 +1,6 @@
 Package: MetReport
 Title: PKG_TITLE
-Version: 0.0.0.9000
+Version: 0.1.0.9000
 Authors@R: 
     person("Yonghui", "Dong", , "yonghui.dong@gmail.com", role = c("cre", "aut"))
 Description: PKG_DESC.
@@ -15,6 +15,7 @@ Imports:
     golem (>= 0.3.5),
     grDevices,
     igraph,
+    markdown,
     plotly,
     qgraph,
     RColorBrewer,

@@ -1,0 +1,4 @@
+docker build -f Dockerfile_base --progress=plain -t metreport_base .
+docker build -f Dockerfile --progress=plain -t metreport:latest .
+docker run -p 80:80 metreport:latest
+# then go to 127.0.0.1:80

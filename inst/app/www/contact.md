@@ -32,7 +32,8 @@ The following papers are reference when developing `MetReport`:
 
 [3] Ejigu, B.A., Valkenborg, D., Baggerman, G., Vanaerschot, M., Witters, E., Dujardin, J.C., Burzykowski, T. and Berg, M., 2013. Evaluation of normalization methods to pave the way towards large-scale LC-MS-based metabolomics profiling experiments. Omics: a journal of integrative biology, 17(9), pp.473-485. 
 
-**PLS-DA**
+**PLS-DA** 
+
 [4] Wiklund, S., Johansson, E., Sjöström, L., Mellerowicz, E.J., Edlund, U., Shockcor, J.P., Gottfries, J., Moritz, T. and Trygg, J., 2008. Visualization of GC/TOF-MS-based metabolomics data for identification of biochemically interesting compounds using OPLS class models. Analytical chemistry, 80(1), pp.115-122.
 
 ------

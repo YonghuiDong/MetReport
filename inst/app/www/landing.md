@@ -1,14 +1,7 @@
 
-# Welcome to MetaboReport &nbsp;<img src='www/logo.png' align="right" height="200"/>
+# Welcome to MetaboReport &nbsp;<img src='www/img/logo.png' align="right" height="200"/>
 
-<b><span style="color:#F17F42">MetaboReport</span></b> provides users a flexible and efficient way to generate a typical metabolomics report.
-
-In particular, it allows to: 
-
-(1). 
-
-
-(2). 
+<b><span style="color:#F17F42">MetaboReport</span></b> provides users a flexible and efficient way to analyse metabolomics datasets and generate interactive report.
 
 ---
 
@@ -21,7 +14,7 @@ Below is the general workflow of MetaboReport:
 
 <br></br>
 
-<img src='www/workflow.png' alt='workflow' title='workflow' style="vertical-align:middle;margin:0px 100px" width='700'/>
+<img src='www/img/workflow.png' alt='workflow' title='workflow' style="vertical-align:middle;margin:0px 100px" width='700'/>
 
 <br></br>
 
@@ -30,20 +23,20 @@ Below is the general workflow of MetaboReport:
 
 MetaboReport accepts a variety of outputs generated from different software tools, such as **XCMS**, **MSDIAL**, or **Compound Discoverer**. In general, the output table can be submitted to MetaboReport with very little modification.
 
-Metaboreport (as well as any other software) requires at least two pieces of information for metabolomics data analysis, i.e. `Peak area` and `sample metadata` information. 
+Metaboreport (as well as any other software) requires at least two pieces of information for metabolomics data analysis, i.e. `Peak area` and `sample metadata`. 
 
 > `Peak Area`: is the area under a peak (peak area count). It is a measure of the concentration of the peak it represents. Sometimes, **peak intensity** or **peak height** maybe used to represent the the concentration of the peak, depending on the software tools used for data processing.  
-> `Sample Metadata`: or sample label or group label. It is used to describe the sample. For instance, you want to compare the metabolic profiles between wild type and a mutant. Here **wild type** and **mutant** are sample metadata. Note that one sample can have more than one type of metadata, for instance, if your want to compare the metabolic profiles between male and famale mouse on the same set of sample. Then the sample will have the **Male** and **Female** metadata as well.
+> `Sample Metadata`: or sample label or group label. It is used to describe the sample. For instance, you want to compare the metabolic profiles between wild type and a mutant. Here **wild type** and **mutant** are sample metadata. Note that one sample can have more than one type of metadata, for instance, if your want to compare the metabolic profiles between male and famale mice on the same set of samples. Then the samples will have **Male** and **Female** metadata as well.
 
 ---
 
-Metaboreport provides two ways to prepare the data information:
+There are two ways to prepare input data for MetaboReport:
 
 1. The peak area and metadata are in the same table. You only need to upload one single table for data analysis.
 
-2. The peak area table and metadata table are two separated tables. You need to upload both for data analysis.
+2. The peak area table and metadata table are two separated tables. You need to upload both of them for data analysis.
 
-To better show you how to modify the table, let's start with one example. You want to compare the metabolic profiles between a group of wild type (**WT**) and Mutant (**MU**) mice; meanwhile, you would also like to know if there are any metabolic differences between **Male** and **Female** mice. Pooled QC (**QC**) were used as quality control in your study. Table 1 summarizes the sample information in your study.
+I will use an example here to show you how to prepare the input data table for MetaboReport. Suppose you want to compare the metabolic profiles between a group of wild type (**WT**) and Mutant (**MU**) mice; meanwhile, you also would like to know if there are any metabolic differences between **Male** and **Female** mice. Pooled QC (**QC**) were used as quality control in your study. Table 1 summarizes the sample information in your study.
 
 ---
 
@@ -70,7 +63,7 @@ To better show you how to modify the table, let's start with one example. You wa
 
 ---
 
-After LCMS Analysis and data processing, you got a data table like below:
+There are 16 samples in total (including QC). After LCMS analysis and data processing, you got a data table like below: 
 
 ---
 
@@ -127,7 +120,7 @@ For **peak area table**:
 > - Keyword `Sample` need to be added in **Peak Areas** columns are so that MetaboReport will know which columns contain peak area information. Pay attention that the keyword `Sample` is case sensitive.
 > - A `unique number` is needed after the `Sample` Keyword. This is make each sample unique. 
 > - all the other columns are not important or necessary for MetaboReport. You don't have to delete them, you can leave them as they are.  
-> - The peak area table can be also prepared exactly in the same way as shown in Mehtod 1.
+> - The peak area table can be also prepared exactly in the same way as shown in Mehtod 1. 
 
 See Table 4 for details.
 
@@ -178,7 +171,7 @@ For **Metadata table**:
 
 **Figure 2**. Pay attention that the samples in peak area table and metadata table must be in the same order.
 
-<img src='www/notice.png' alt='workflow' title='workflow' style="vertical-align:middle;margin:0px 100px" width='700'/>
+<img src='www/img/notice.png' alt='workflow' title='workflow' style="vertical-align:middle;margin:0px 100px" width='600'/>
 
 ---
 
@@ -194,4 +187,4 @@ We have also prepared a short video tutorial. Please click [Tutorial Video]() to
 Please contact [Dr.Yonghui Dong](mailto:yonghui.dong@gmail.com) to report any bugs or requst new features.
 
 ---
-<a href= 'https://www.weizmann.ac.il'><img src='www/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>
+<a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>

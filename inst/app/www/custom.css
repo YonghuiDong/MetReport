@@ -1,7 +1,7 @@
 /* Whole document: */
 body{
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   text-align: justify;
 }
 
@@ -10,11 +10,32 @@ blockquote{
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   background: white;
   border-left: 0.2em solid #76D7C4;
-  font-size: 14px;
+  font-size: 16px;
+   line-height: 2;
 }
 
 /* Code text  */
 code {
   background: #ffcccc;
   word-wrap: break-word;
+}
+
+/* Tables */
+
+table {
+  margin-left:100px;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+
+table thead th {
+  border-bottom: 1px solid #666;
+}
+
+th, td {
+  padding: 5px;
+}
+
+thead, tfoot, tr:nth-child(even) {
+  background: #f8f8f8;
 }

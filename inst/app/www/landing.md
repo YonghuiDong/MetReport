@@ -41,7 +41,7 @@ You can refer to the two demo data to help you prepare the input data for Metabo
 
 ## Feature Request/Bug Report
 
-> Please contact <b><span style="color:#E55B13">Dr.Yonghui Dong</span></b> [<i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) to report any bugs or requst new features.
+> Please contact <b><span style="color:#E55B13">Dr.Yonghui Dong</span></b> [<i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) or <b><span style="color:#E55B13">Dr.Sergey malitsky</span></b> [<i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il) to report any bugs or requst new features.
 
 ---
 <a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>

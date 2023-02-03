@@ -68,7 +68,7 @@ app_ui <- function(request) {
       ## Footer --------------------------------------------------------------------
       footer = dashboardFooter(
         left = "Weizmann Institute of Science",
-        right = "Copyright (C) 2022"
+        right = "Copyright (C) 2023"
       )
     )
   )

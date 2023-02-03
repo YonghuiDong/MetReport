@@ -1,14 +1,11 @@
 
 # Welcome to MetaboReport &nbsp;<img src='www/img/logo.png' align="right" height="200"/>
 
-<b><span style="color:#F17F42">MetaboReport</span></b> provides users a flexible and efficient way to analyse metabolomics datasets and generate interactive report.
+<b><span style="color:#E55B13">MetaboReport</span></b> provides users a flexible and efficient way to analyse metabolomics datasets and generate interactive report.
 
 ---
 
 ## The Workflow of MetaboReport
-
-
-The use of MetaboReport is pretty simple. You can follow the user guide in each tab to perform your data analysis.
 
 Below is the general workflow of MetaboReport:
 
@@ -19,18 +16,32 @@ Below is the general workflow of MetaboReport:
 <br></br>
 
 
-## How to Prepare Data Table for MetaboReport?
+## How to Use MetaboReport?
 
-> You can download the short tutorial <i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i> [here](www/How.pdf)
+The use of MetaboReport is pretty simple. You can follow the user guide in each tab to perform your data analysis. 
+
+#### User Manual
+
+> You can read this short manual regarding <b><span style="color:#E55B13">how to prepare input data table for MetaboReport</span></b>: <a href="www/How.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
 > 
-> We have also prepared a short video tutorial. Please click [Tutorial Video]() to watch.
+> You can watch this tutorial video regarding <b><span style="color:#E55B13">how to run MetaboReport</span></b>: <a href="" target="_new"><i class="fa fa-youtube fa-2xl" aria-hidden="true"></i></a>
+>
+> In addition, we have provided a demo data in <b><span style="color:#E55B13">Data Upload</span></b> panel, you can play the data as well.
+
+#### Demo Data
+
+You can refer to the two demo data to help you prepare the input data for MetaboReport.
+
+> Demo datatable 1. It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+>
+> Demo datatable 2. It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
 
 ---
 
 
 ## Feature Request/Bug Report
 
-Please contact [Dr.Yonghui Dong](mailto:yonghui.dong@gmail.com) to report any bugs or requst new features.
+> Please contact <b><span style="color:#E55B13">Dr.Yonghui Dong</span></b> [<i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) to report any bugs or requst new features.
 
 ---
 <a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>

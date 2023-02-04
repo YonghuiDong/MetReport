@@ -15,13 +15,13 @@ date: "2023-02-03"
 
 The use of MetaboReport is pretty simple. You only need to follow the user guide in each tab to perform your data analysis. 
 
-MetaboReport accepts a variety of outputs generated from different software tools, such as **XCMS**, **MSDIAL**, and **Compound Discoverer**. The output table can be submitted to MetaboReport with very little modification.
+MetaboReport accepts a variety of outputs produced by different software tools, such as **XCMS**, **MSDIAL**, and **Compound Discoverer**. The output table can be submitted to MetaboReport with very little modification.
 
-Lkke any other software tools, Metaboreport requires at least two pieces of information for metabolomics data analysis, i.e., **Peak area** and **sample metadata**.
+Like any other software tools, MetaboReport requires at least two pieces of information for metabolomics data analysis, i.e., **Peak area** and **sample metadata**.
 
 > `Peak Area`: is the area under a peak (peak area count). It is a measure of the concentration of the peak it represents. Sometimes, **peak intensity** or **peak height** maybe used to represent the the concentration of the peak, depending on the software tools used for data processing.
 >
-> `Sample Metadata`: or sample label or group label. It is used to describe the sample. For instance, you want to compare the metabolic profiles between wild type and mutant mice. Here **wild type** and **mutant** are sample metadata. Note that one sample can have more than one type of metadata, for instance, if your want to compare the metabolic profiles between male and famale mice on the same set of samples. Then the samples will have **Male** and **Female** metadata as well.
+> `Sample Metadata`: or sample label or group label. It is used to describe the sample. 
 
 There are **two ways** to prepare input data for MetaboReport:
 
@@ -35,14 +35,13 @@ This manual will guide you prepare the input data table for MetaboReport.
 
 ## Demo Data
 
-An example is used here to demonstrate how to prepare the input data table for MetaboReport. 
+Here an example is used to show you how to prepare the input data table for MetaboReport. 
 
-Suppose you want to compare the metabolic profiles between a group of wild type (**WT**) and Mutant (**MU**) mice; `WT` and `MU` will be the metadata, meaning each sample is labeled with either a **WT** or **Mu** metadata. 
-
+Suppose you want to compare the metabolic profiles between a group of wild type (**WT**) and Mutant (**MU**) mice; `WT` and `MU` are the metadata, meaning each sample is labeled with either a **WT** or **Mu** metadata. 
 
 Meanwhile, you believe that gender may also play an important role in your study, so you introduced another set of metadata in your study, namely `Male` and `Female`.  
 
-In order to evaluate any variations, you introduced a set of pooled QC (`QC`) samples in your study.
+In order to monitor, evaluate and correct system variations in the studies, you also introduced a set of pooled QC (`QC`) samples.
 
 This study contains two groups of metadata, i.e., WT, MU and QC in group 1, and Male, Female and QC in group 2. As such each sample is labeled with two metadata. For instance, Sample3 is WT and Male, and Sample13 is QC and QC (Table 1).
 
@@ -166,11 +165,17 @@ For **Metadata table**:
 
 <img src="img/notice.png" title="workflow" alt="workflow" style="vertical-align:middle;margin:0px 100px" width="600"/>
 
-# Conclusion
+# Common Mistakes
 
-The most common mistakes you will encounter during data analysis using MetaboReport is the data format issue. 
+The most common mistakes you may encounter during data analysis using MetaboReport is the data format issue. 
 
-> **Note:**
->
+> **Note** that
 > 
+> - Metadata is canse sensitive, therefore **WT**, **Wt** and **Wt**, and **wt** will be treated as different metadata, so be consistant with the metadata.
+>
+> - **Sample** is `reserved keyword`, which is used to help MetaboReport software to recognize **peak area** columns. 
+> 
+> - **QC** is `reserved keyword`, which is used to represent QC samples only.
+>
+> - Pay attention to **white spaces**. `WT` and `WT ` with one space will be treated as different metadata.
 

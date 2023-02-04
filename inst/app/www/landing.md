@@ -22,7 +22,7 @@ The use of MetaboReport is pretty simple. You can follow the user guide in each 
 
 #### User Manual
 
-> You can read this short manual regarding <b><span style="color:#E55B13">how to prepare input data table for MetaboReport</span></b>: <a href="www/How.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
+> You can read this short manual regarding <b><span style="color:#E55B13">how to prepare input data table for MetaboReport</span></b>: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
 > 
 > You can watch this tutorial video regarding <b><span style="color:#E55B13">how to run MetaboReport</span></b>: <a href="" target="_new"><i class="fa fa-youtube fa-2xl" aria-hidden="true"></i></a>
 >
@@ -32,9 +32,9 @@ The use of MetaboReport is pretty simple. You can follow the user guide in each 
 
 You can refer to the two demo data to help you prepare the input data for MetaboReport.
 
-> Demo datatable 1. It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+> **Demo datatable 1**: It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
 >
-> Demo datatable 2. It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+> **Demo datatable 2**: It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
 
 ---
 

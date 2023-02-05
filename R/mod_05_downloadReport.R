@@ -117,6 +117,9 @@ mod_05_downloadReport_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
+               p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
+               p(style = "color:#b2182b;", "It may take few minutes to download the reuslt.
+                 Don't repeatedly click the download button."),
                uiOutput(ns("report_button"))
                )
              )

@@ -10,9 +10,9 @@
 
 For reporting bugs or requesting new features, please email to:
 
-> <b><span style="color:#E55B13">Dr.Yonghui Dong</span></b> [<i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) to report any bugs or requst new features.
+> [<b><span style="color:#E55B13">Dr.Yonghui Dong</span></b> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) 
 >
-> <b><span style="color:#E55B13">Dr.Sergey malitsky</span></b> [<i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il) to report any bugs or requst new features.
+> [<b><span style="color:#E55B13">Dr.Sergey malitsky</span></b> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
 
 ------
 
@@ -26,7 +26,7 @@ If you find MetaboReport useful, please consider citing our manuscript. Thanks a
 
 ## References
 
-The following papers are reference when developing MetReport:
+The following papers are referenced when developing MetaboReport:
 
 <b><span style="color:#E55B13">Missing Value Imputation</span></b>:
 
@@ -44,3 +44,6 @@ The following papers are reference when developing MetReport:
 
 ------
 
+<a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>
+
+----

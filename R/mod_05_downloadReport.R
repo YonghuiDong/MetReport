@@ -163,8 +163,8 @@ mod_05_downloadReport_server <- function(id, sfData = global, inputData, resultL
       filename <- paste0(Sys.Date(), "_Report.html"),
       content <- function(file){
         shiny::withProgress(
-          message = "Generating report",
-          detail = "This may take a while...",
+          message = "Generating report, it will take few minutes",
+          detail = "Be patient...",
           value = 0.4,
           {
             tempReport <- file.path(tempdir(), "Report.Rmd")
@@ -172,7 +172,7 @@ mod_05_downloadReport_server <- function(id, sfData = global, inputData, resultL
             tempLogo <- file.path(tempdir(), "logo.png")
             file.copy(app_sys("app/www/Report.Rmd"), tempReport, overwrite = TRUE)
             file.copy(app_sys("app/www/reportCSS/style.css"), tempCSS)
-            file.copy(app_sys("app/www/logo.png"), tempLogo)
+            file.copy(app_sys("app/www/img/logo.png"), tempLogo)
             params <- list(
               myRawData = inputData(), # raw data
               sampleGroup = sfData$group, # complete sample meta group

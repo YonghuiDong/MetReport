@@ -41,13 +41,13 @@ mod_02_uploadData_ui <- function(id){
                selectInput(inputId = ns("fileFormat"),
                            label = "1. Select File Format",
                            choices = list("Compound Discoverer (CD)" = "CD",
-                                          "Other Format (DataFrame)" = "DF"),
+                                          "Other Format (DataFrame)" = "Other"),
                            selected = "CD",
                            multiple = FALSE
                            ),
 
                fileInput(inputId = ns("rawFile"),
-                         label = "2. Upload Data File:",
+                         label = "2. Upload Data Table (or Feature Table):",
                          multiple = FALSE,
                          placeholder = "accepts csv, xls or xlsx format",
                          accept = c(".csv", ".xls", ".xlsx")
@@ -60,7 +60,7 @@ mod_02_uploadData_ui <- function(id){
                  data table preparation"),
 
                fileInput(inputId = ns("inputMeta"),
-                         label = "2. (Optional) Upload Sample Meta Group File:",
+                         label = "2. (Optional) Upload Sample Metadata Table:",
                          multiple = FALSE,
                          placeholder = "accepts csv, xls or xlsx format",
                          accept = c(".csv", ".xls", ".xlsx")
@@ -185,7 +185,7 @@ mod_02_uploadData_server <- function(id, sfData){
       extension <- tools::file_ext(inFile$name)
       filepath <- inFile$datapath
       df <- switch(extension,
-                   csv = read.csv(filepath, header = FALSE, check.names = FALSE),
+                   csv = read.csv(filepath, header = TRUE, check.names = FALSE),
                    xls = readxl::read_xls(filepath),
                    xlsx = readxl::read_xlsx(filepath)
                    )
@@ -198,7 +198,7 @@ mod_02_uploadData_server <- function(id, sfData){
       if(showExample() == "Yes") {
         df <- formatData(DF = inputData(), format = "CD")
       } else{
-        df <- formatData(DF = inputData(), metaGrpup = inputMeta(), format = input$fileFormat)
+        df <- formatData(DF = inputData(), metaGroup = inputMeta(), format = input$fileFormat)
         df$ID <- cleanNames(df$ID)
         df <- df %>% dplyr::relocate(ID)
       }

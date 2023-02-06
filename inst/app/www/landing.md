@@ -32,9 +32,9 @@ The use of MetaboReport is pretty simple. You can follow the user guide in each 
 
 You can refer to the two demo data to help you prepare the input data for MetaboReport.
 
-> **Demo datatable 1**: It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+> **Demo data table 1**: It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="www/demo/M1_Feature_Metadata_Table.csv" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
 >
-> **Demo datatable 2**: It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="www/demo/Feature_Table.csv" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="www/demo/Medadata_Table.xlsx" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+> **Demo data table 2**: It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="www/demo/M2_Feature_Table.csv" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="www/demo/M2_Medadata_Table.xlsx" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
 
 ---
 

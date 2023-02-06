@@ -33,6 +33,8 @@ This manual will guide you prepare the input data table for MetaboReport.
 
 # Data Preparation
 
+The data table can be `csv` (comma-separated values), or MS-Excel format (`xlx`, `xlsx`) format. 
+
 ## Demo Data
 
 Here an example is used to show you how to prepare the input data table for MetaboReport. 
@@ -179,3 +181,10 @@ The most common mistakes you may encounter during data analysis using MetaboRepo
 >
 > - Pay attention to **white spaces**. `WT` and `WT ` with one space will be treated as different metadata.
 
+# Demo Data
+
+We have provided two demo data sets, prepared using method 1 and method 2, respectively. Please go to the **Home** Tab of MetaboReport Webapp to download them.
+
+You can refer to the two demo data to help you prepare your own dataset.
+
+<br></br>

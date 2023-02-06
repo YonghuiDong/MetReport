@@ -55,7 +55,8 @@ formatData <- function(DF, metaGroup = NULL, format = "CD") {
                             dplyr::rename_with(~ gsub(".raw.*", "", .x)),
                           "Other" = DF %>%
                             dplyr::mutate(ID = paste0("ID", row.names(.), "_", Name)) %>%
-                            dplyr::select(ID, starts_with("Sample"))
+                            dplyr::select(ID, starts_with("Sample")) %>%
+                            dplyr::rename_with(~ gsub("Sample_", "", .x, fixed = TRUE))
                           )
   if(!is.null(metaGroup)) {
     metaGroup <- metaGroup[, -1, drop=FALSE]

@@ -23,7 +23,12 @@ mod_03_preprocess_ui <- function(id){
                solidHeader = FALSE,
                collapsible = TRUE,
                collapsed = FALSE,
-               closable = FALSE
+               closable = FALSE,
+               p("1. If you have missing values in your data, please select the method in", strong("Missing Value Imputation"), "tab to fill the missing value; otherwise you can ignore this step."),
+               p("2. If you have pooled QCs in your data, you can filter the unstable features from", strong("QC-based Data Filtering"), "tab. The default CV threshould is 30%, meaning that features
+                 with CV > 30 in pooled QCs will be filtered out. You can set the CV threshould according to your study."),
+               p("3. You can normalized, transform and scale your data in", strong("Data Treatment"), "tab. The TIC barplot, PCA score plot, and feature distribution plot can be used to help
+                 you select the most appropriate data treatment method.")
                )
              ),
 

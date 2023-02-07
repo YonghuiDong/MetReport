@@ -22,7 +22,9 @@ mod_04_viewResult_ui <- function(id){
                solidHeader = FALSE,
                collapsible = TRUE,
                collapsed = FALSE,
-               closable = FALSE
+               closable = FALSE,
+               p("1. Statistical analyses are perfromed in this panel. Tables and most figures are interactive so that you can better inspect your data and results."),
+               p("2. You can customize the figures by changing the color, aspect ratio before downloading them with preferred format.")
                )
              ),
 

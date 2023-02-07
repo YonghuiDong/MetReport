@@ -22,7 +22,9 @@ mod_02_uploadData_ui <- function(id){
                solidHeader = FALSE,
                collapsible = TRUE,
                collapsed = FALSE,
-               closable = FALSE
+               closable = FALSE,
+               p("1. If your data table was prepared by Compound Discoverer, please select", strong("Compound Discoverer"), "fotmat; otherwise, plsese select", strong("Other"), "format."),
+               p("2. If your", strong("Peak Area"), "and", strong("Metadata"), "are in two seperated tables, please upload both of them.")
                )
              ),
 

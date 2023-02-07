@@ -1,7 +1,17 @@
 
 # Welcome to MetaboReport &nbsp;<img src='www/img/logo.png' align="right" height="200"/>
 
-<b><span style="color:#E55B13">MetaboReport</span></b> provides users a flexible and efficient way to analyse metabolomics datasets and generate interactive report.
+<b><span style="color:#E55B13">MetaboReport</span></b> is a web-based tool that provides a structured, flexible and user-friendly workflow for the exploration, visualization, and statistical analysis of metabolomics data. 
+
+A user starts with an uploaded spreadsheet of quantitative metabolomics data and runs a semi-automated process which includes pre-processing methods (e.g., missing value imputation, QC-based feature filtering, normalization, transformation and scaling), univariate and multivariate statistical methods, and interactive tables, plots are provided on a given metabolomics data.
+
+1. 
+
+2. 
+
+3. Report
+
+In addition, such as calculate accurate m/z values, tentatively metabolite identification based on MS1.
 
 ---
 
@@ -22,15 +32,17 @@ The use of MetaboReport is pretty simple. You can follow the user guide in each 
 
 #### User Manual
 
-> You can read this short manual regarding <b><span style="color:#E55B13">how to prepare input data table for MetaboReport</span></b>: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
+> You can read this short manual on <b><span style="color:#E55B13">how to prepare input data table for MetaboReport</span></b>: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
 > 
-> You can watch this tutorial video regarding <b><span style="color:#E55B13">how to run MetaboReport</span></b>: <a href="" target="_new"><i class="fa fa-youtube fa-2xl" aria-hidden="true"></i></a>
+> You can watch this tutorial video on <b><span style="color:#E55B13">how to run MetaboReport</span></b>: <a href="" target="_new"><i class="fa fa-youtube fa-2xl" aria-hidden="true"></i></a>
 >
 > In addition, we have provided a demo data in <b><span style="color:#E55B13">Data Upload</span></b> panel, you can play the data as well.
 
 #### Demo Data
 
 You can refer to the two demo data to help you prepare the input data for MetaboReport.
+
+Please select `Other Format` when uploading the demo data in **Upload Data** tab.
 
 > **Demo data table 1**: It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="www/demo/M1_Feature_Metadata_Table.csv" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
 >

@@ -1,5 +1,9 @@
 
-# Welcome to MetaboReport &nbsp;<img src='www/img/logo.png' align="right" height="200"/>
+# Welcome to MetaboReport 
+
+<img src='www/img/logo.png' align="right" height="180"/>
+
+<br></br>
 
 <b><span style="color:#E55B13">MetaboReport</span></b> is an intuitive, web-based platform designed to streamline the exploration, visualization, and statistical analysis of metabolomics data. It offers a structured and user-friendly workflow, making it a flexible tool for users of all levels.
 

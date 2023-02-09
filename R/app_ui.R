@@ -16,7 +16,7 @@ app_ui <- function(request) {
 
       ## Header ----------------------------------------------------------------
       header = dashboardHeader(
-        title = strong("MetReport")
+        title = strong("MetaboReport")
       ),
 
       ## Sidebar ---------------------------------------------------------------

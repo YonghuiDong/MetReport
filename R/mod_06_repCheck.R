@@ -23,7 +23,7 @@ mod_06_repCheck_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p("1. This widget is designed to check whether duplicate rows exist."),
+               p("1. This widget is designed to check if any duplicate rows exist."),
                p("2. After uploading the data table, you can select the columns to define duplicate rows. For instance, if column A and B are selected,
                  then rows with same information in column A and B will be treated as duplicated rows"),
                p("3. Then click", strong("Submit"), "button to perform duplicate analysis."),

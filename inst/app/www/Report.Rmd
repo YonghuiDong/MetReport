@@ -64,11 +64,14 @@ BPGroup <- params$BPGroup
 
 <img src = "logo.png" height = "150" style = "position: absolute; top: 90px; right: 10px;"/>
 
-<br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
 
 # Introduction
 
-Metabolomics is the systematic study of low molecular weight molecules (i.e., metabolites) in a given biological system. Depending on the research question or specific application, there are three common metabolomics strategies [1]:
+Metabolomics involves the comprehensive analysis of low-molecular-weight metabolites in biological systems. To address specific research questions or applications, there are three widely-used strategies in metabolomics [1]:
 
 `Untargeted Assay`: (or frequently referred to as untargeted metabolomics or global metabolomics). Its objective is to reproducibly measure as many metabolites as feasible, and provide semi-quantitative data (chromatographic peak areas are reported, not concentrations). The chemical identity of metabolites is not necessarily known prior to data acquisition.
 

@@ -65,7 +65,7 @@ mod_06_repCheck_ui <- function(id){
              box(
                width = 12,
                inputId = "repCheck_card",
-               title = strong("Replicate Data Panel"),
+               title = strong("Replicate Check Data Panel"),
                status = "success",
                solidHeader = FALSE,
                collapsible = TRUE,
@@ -114,6 +114,7 @@ mod_06_repCheck_server <- function(id){
       })
 
     observeEvent(input$submit, {
+      shiny::req(inputData())
       ##(2) Replicates Analysis ------------------------------------------------
       repData <- inputData() %>%
         dplyr::group_by(across(input$selectColumn)) %>%

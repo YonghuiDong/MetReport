@@ -25,6 +25,7 @@ golem::add_module(name = "02_uploadData", with_test = FALSE) # Name of the modul
 golem::add_module(name = "03_preprocess", with_test = FALSE) # Name of the module
 golem::add_module(name = "04_viewResult", with_test = FALSE) # Name of the module
 golem::add_module(name = "05_downloadReport", with_test = FALSE) # Name of the module
+golem::add_module(name = "06_repCheck", with_test = FALSE) # Name of the module
 golem::add_module(name = "10_contact", with_test = FALSE) # Name of the module
 
 ## Add helper functions ----

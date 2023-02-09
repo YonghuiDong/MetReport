@@ -37,8 +37,8 @@ app_ui <- function(request) {
           hr(),
           menuItem(text = strong("Widgets"), tabName = "widgets", icon = icon("tools"),
                    menuSubItem(text = strong("Replicate Check"), tabName = "repCheck", icon = icon("bolt")),
-                   menuSubItem(text = strong("Randomizer"), tabName = "randomizer", icon = icon("bolt")),
-                   menuSubItem(text = strong("Solvent"), tabName = "solvent", icon = icon("bolt")),
+                   #menuSubItem(text = strong("Randomizer"), tabName = "randomizer", icon = icon("bolt")),
+                   #menuSubItem(text = strong("Solvent"), tabName = "solvent", icon = icon("bolt")),
                    menuSubItem(text = strong("LC Tool"), tabName = "lcTool", icon = icon("bolt")),
                    menuSubItem(text = strong("MS Tool"), tabName = "massTool", icon = icon("bolt"))
           ),
@@ -58,7 +58,7 @@ app_ui <- function(request) {
           tabItem(tabName = "repCheck", mod_06_repCheck_ui("06_repCheck_1")),
           # tabItem(tabName = "randomizer",  source("ui-tab-randomizer.R", local = TRUE)$value),
           # tabItem(tabName = "solvent",  source("ui-tab-solvent.R", local = TRUE)$value),
-          # tabItem(tabName = "lcTool",  source("ui-tab-lcTool.R", local = TRUE)$value),
+          tabItem(tabName = "lcTool",  mod_08_lcTool_ui("08_lcTool_1")),
           # tabItem(tabName = "massTool",  source("ui-tab-massTool.R", local = TRUE)$value),
           tabItem(tabName = "contact",  mod_10_contact_ui("10_contact_1"))
         )

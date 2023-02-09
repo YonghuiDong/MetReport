@@ -1,17 +1,9 @@
 
 # Welcome to MetaboReport &nbsp;<img src='www/img/logo.png' align="right" height="200"/>
 
-<b><span style="color:#E55B13">MetaboReport</span></b> is a web-based tool that provides a structured, flexible and user-friendly workflow for the exploration, visualization, and statistical analysis of metabolomics data. 
+<b><span style="color:#E55B13">MetaboReport</span></b> is an intuitive, web-based platform designed to streamline the exploration, visualization, and statistical analysis of metabolomics data. It offers a structured and user-friendly workflow, making it a flexible tool for users of all levels.
 
-A user starts with an uploaded spreadsheet of quantitative metabolomics data and runs a semi-automated process which includes pre-processing methods (e.g., missing value imputation, QC-based feature filtering, normalization, transformation and scaling), univariate and multivariate statistical methods, and interactive tables, plots are provided on a given metabolomics data.
-
-1. 
-
-2. 
-
-3. Report
-
-In addition, such as calculate accurate m/z values, tentatively metabolite identification based on MS1.
+The workflow includes pre-processing (e.g., missing value imputation, QC-based feature filtering, normalization, transformation and scaling), univariate and multivariate statistical analyses, and visualization of the given metabolomics data. To aid interpretation, a comprehensive HTML report is generated that includes interactive visualizations, tables, summary statistics, and detailed explanations for the users, facilitating an in-depth inspection of the results (Figure 1).
 
 ---
 

@@ -10,17 +10,17 @@
 
 ## Feature Request/Bug Report
 
-For reporting bugs or requesting new features, please email to:
+To report bugs or request new features, please send an email to:
 
 > [<b><span style="color:#E55B13">Dr.Yonghui Dong</span></b> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) 
 >
-> [<b><span style="color:#E55B13">Dr.Sergey malitsky</span></b> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
+> [<b><span style="color:#E55B13">Dr.Sergey Malitsky</span></b> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
 
 ------
 
 ## Citation
 
-If you find MetaboReport useful, please consider citing our manuscript. Thanks a lot. <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-2xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b>
+If you find MetaboReport useful, kindly consider citing our manuscript in your work. Thank you. <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-2xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b>
 
 > MetaboReport
 
@@ -28,7 +28,7 @@ If you find MetaboReport useful, please consider citing our manuscript. Thanks a
 
 ## References
 
-The following papers are referenced when developing MetaboReport:
+The following papers are referenced during the development of MetaboReport:
 
 <b><span style="color:#E55B13">Missing Value Imputation</span></b>:
 

@@ -24,19 +24,19 @@ Below is the general workflow of MetaboReport:
 
 ## How to Use MetaboReport?
 
-The use of MetaboReport is pretty simple. You can follow the user guide in each tab to perform your data analysis. You can also check the user manual and play with the demo data.
+Using MetaboReport is straightforward. Simply follow the step-by-step instructions provided in each tab to perform your data analysis. For further guidance, consult the user manual, or experiment with the included demo data to get a hands-on feel for the software.
 
 #### User Manual
 
-> You can read this short manual on <b><span style="color:#E55B13">how to prepare input data table for MetaboReport</span></b>: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
+> For information on <b><span style="color:#E55B13">how to prepare an input data table for MetaboReport </span></b>, please refer to this concise manual: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
 > 
-> You can watch this tutorial video on <b><span style="color:#E55B13">how to run MetaboReport</span></b>: <a href="" target="_new"><i class="fa fa-youtube fa-2xl" aria-hidden="true"></i></a>
+> To learn <b><span style="color:#E55B13"> how to run MetaboReport</span></b>, please watch this tutorial video: <a href="" target="_new"><i class="fa fa-youtube fa-2xl" aria-hidden="true"></i></a>
 >
-> In addition, we have provided a demo data in <b><span style="color:#E55B13">Data Upload</span></b> panel, you can play the data as well.
+> Additionally, in the <b><span style="color:#E55B13">Data Upload panel</span></b>, we have included a demo dataset for you to experiment with.
 
 #### Demo Data
 
-You can refer to the two demo data to help you prepare the input data for MetaboReport.
+To assist in preparing input data for MetaboReport, you can use the two demo datasets as reference.
 
 Please select `Other Format` when uploading the demo data in **Upload Data** tab.
 

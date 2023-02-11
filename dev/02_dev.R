@@ -48,6 +48,7 @@ golem::add_fct("showOPLSDA", with_test = FALSE)
 golem::add_fct("showTIC", with_test = FALSE)
 golem::add_fct("getSamplePrep", with_test = FALSE)
 golem::add_fct("data", with_test = FALSE)
+golem::add_fct("checkReplicates", with_test = FALSE)
 golem::add_utils("xxx", with_test = FALSE)
 
 ## External resources

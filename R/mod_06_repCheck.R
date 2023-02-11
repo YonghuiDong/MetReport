@@ -24,15 +24,21 @@ mod_06_repCheck_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                p("1. This widget is designed to check if any duplicate rows exist."),
-               p("2. After uploading the data table, you can select the columns to define duplicate rows. For instance, if column A and B are selected,
-                 then rows with same information in column A and B will be treated as duplicated rows"),
-               p("3. Then click", strong("Submit"), "button to perform duplicate analysis."),
-               p("4. A label", strong("true"), "will be added to duplicate rows. For rows without any duplicates, a label", strong("false"), "will be added.")
+               p("2. After uploading the data table, you can select the columns to define duplicate rows."),
+               p("3. Two types of duplicates are defined:", strong("Type A columns:"), "rows are considered duplicates for the selected Type A columns
+                 if all elements from those columns are identical. For instance, if rows with both identical molecular weight and identification, then these
+                 rows are considered as duplicates. ", strong("Type B columns:"), "rows are considered duplicates for the selected Type B
+                 columns if any one element from those columns is identical. For instance, if rows with either molecular weight or identification identical, these
+                 rows are considered as duplicates. Finally, rows are considered duplicates for the entire data table only if when they are duplicates in both Type A and Type B."),
+               p("4. You can select type A and type B columns in the follow boxes. You can also leave one of them empty according to your needs, but you cannot
+                 leave both empty."),
+               p("5. Click", strong("Submit"), "button to perform duplicate analysis."),
+               p("5. A label", strong("true"), "will be added to duplicate rows. For rows without any duplicates, a label", strong("false"), "will be added.")
                )
              ),
 
       #(2) Data Input Panel ====================================================
-      column(width = 4,
+      column(width = 5,
              ##(1) Data upload Panel -------------------------------------------
              box(
                width = 12,
@@ -49,9 +55,12 @@ mod_06_repCheck_ui <- function(id){
                          placeholder = "accepts csv, xls or xlsx format",
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
-               uiOutput(outputId = ns("selectColumn"),
-                        label = "Please select the columns for replicate analysis"
-                        ),
+               column(width = 6,
+                      uiOutput(outputId = ns("selectColumnAll"))
+                      ),
+               column(width = 6,
+                      uiOutput(outputId = ns("selectColumnAny"))
+                      ),
                actionButton(inputId = ns("submit"),
                             label = "Submit",
                             icon = icon("paper-plane"),
@@ -61,7 +70,7 @@ mod_06_repCheck_ui <- function(id){
              ),
 
       #(3) Result Panel ========================================================
-      column(width = 8,
+      column(width = 7,
              box(
                width = 12,
                inputId = "repCheck_card",
@@ -104,22 +113,51 @@ mod_06_repCheck_server <- function(id){
     #2. Show Result ============================================================
 
     ##(1) Select Columns for Replicate Analysis --------------------------------
-    output$selectColumn <- renderUI({
+    output$selectColumnAll <- renderUI({
       shiny::req(inputData())
-      selectInput(inputId = ns("selectColumn"),
-                  label = "Select columns to remove",
+      selectInput(inputId = ns("selectColumnAll"),
+                  label = "Select columns type A",
                   multiple = TRUE,
                   choices = names(inputData())
                   )
       })
 
+    output$selectColumnAny <- renderUI({
+      shiny::req(inputData())
+      selectInput(inputId = ns("selectColumnAny"),
+                  label = "Select columns type B",
+                  multiple = TRUE,
+                  choices = names(inputData())
+                  )
+      })
+
+    observe({
+      if(!is.null(input$selectColumnAny)){
+        updateSelectInput(session = session,
+                          inputId = "selectColumnAll",
+                          choices = names(inputData())[!(names(inputData()) %in% input$selectColumnAny)],
+                          selected = isolate(input$selectColumnAll)
+                          )
+        }
+      })
+
+    observe({
+      if(!is.null(input$selectColumnAll)){
+        updateSelectInput(session = session,
+                          inputId = "selectColumnAny",
+                          choices = names(inputData())[!(names(inputData()) %in% input$selectColumnAll)],
+                          selected = isolate(input$selectColumnAny)
+                          )
+        }
+      })
+
+    ##(2) Replicates Analysis --------------------------------------------------
     observeEvent(input$submit, {
       shiny::req(inputData())
-      ##(2) Replicates Analysis ------------------------------------------------
-      repData <- inputData() %>%
-        dplyr::group_by(across(input$selectColumn)) %>%
-        dplyr::mutate(isDuplicate = n()>1) %>%
-        dplyr::relocate(isDuplicate)
+      shiny::validate(need(!is.null(input$selectColumnAll), message = "At least one column should be selected"))
+      repData <- checkReplicates(df = inputData(),
+                                 col_all = input$selectColumnAll,
+                                 col_any = input$selectColumnAny)
 
       ##(3) Show Replicate Table -----------------------------------------------
       output$repView <- DT::renderDataTable({

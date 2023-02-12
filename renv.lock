@@ -245,6 +245,18 @@
       "Hash": "e02d1a0f6122fd3e634b25b433704344",
       "Requirements": []
     },
+    "MSbox": {
+      "Package": "MSbox",
+      "Version": "1.4.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "031dafb7689dfe56d2cfb20d1a84c25d",
+      "Requirements": [
+        "crayon",
+        "stringr",
+        "xml2"
+      ]
+    },
     "Matrix": {
       "Package": "Matrix",
       "Version": "1.5-3",

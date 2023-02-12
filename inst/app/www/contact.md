@@ -49,21 +49,3 @@ The following papers are referenced during the development of MetaboReport:
 <a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>
 
 ----
-
-## Grossy
-
-1. `Missing Value`:
-
-Missing values in metabolomics datasets can be observed for three reasons: 
-
-- metabolite is detected in one sample but is not present at any concentration in another sample
-
-- metabolite is present in one sample but at a concentration below the analytical method’s limit of detection.
-
-- metabolite is present in a sample at a concentration greater than the analytical method’s limit of detection but the data processing software has not detected and reported the metabolite. 
-
-> For example, if one class of samples does not contain a metabolite that is present in another class of samples, the missing values in the dataset are most probably occurring for a biological reason and can be defined as MNAR. 
-> 
-> If a metabolite which is present in the sample is not detected in the majority of or all samples then this is most probably a result of the metabolite concentration being lower than the analytical methods’ limit of detection; the missing values are a result of a combination of biological and technical issues and therefore the missing value can be accounted as MNAR. 
->
-> Another source of missing values caused by technical reasons are errors associated with peak picking software where the peak is present but the peak observed in the raw data is not reported, in this case the missing value can be accounted as MCAR.

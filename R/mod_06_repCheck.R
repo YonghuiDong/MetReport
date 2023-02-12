@@ -33,7 +33,7 @@ mod_06_repCheck_ui <- function(id){
                p("4. You can select type A and type B columns in the follow boxes. You can also leave one of them empty according to your needs, but you cannot
                  leave both empty."),
                p("5. Click", strong("Submit"), "button to perform duplicate analysis."),
-               p("5. A label", strong("true"), "will be added to duplicate rows. For rows without any duplicates, a label", strong("false"), "will be added.")
+               p("6. A label", strong("true"), "will be added to duplicate rows. For rows without any duplicates, a label", strong("false"), "will be added.")
                )
              ),
 

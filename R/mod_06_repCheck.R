@@ -56,10 +56,10 @@ mod_06_repCheck_ui <- function(id){
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
                column(width = 6,
-                      uiOutput(outputId = ns("selectColumnAll"))
+                      uiOutput(outputId = ns("selectColumnAllOut"))
                       ),
                column(width = 6,
-                      uiOutput(outputId = ns("selectColumnAny"))
+                      uiOutput(outputId = ns("selectColumnAnyOut"))
                       ),
                actionButton(inputId = ns("submit"),
                             label = "Submit",
@@ -113,7 +113,7 @@ mod_06_repCheck_server <- function(id){
     #2. Show Result ============================================================
 
     ##(1) Select Columns for Replicate Analysis --------------------------------
-    output$selectColumnAll <- renderUI({
+    output$selectColumnAllOut <- renderUI({
       shiny::req(inputData())
       selectInput(inputId = ns("selectColumnAll"),
                   label = "Select columns type A",
@@ -122,7 +122,7 @@ mod_06_repCheck_server <- function(id){
                   )
       })
 
-    output$selectColumnAny <- renderUI({
+    output$selectColumnAnyOut <- renderUI({
       shiny::req(inputData())
       selectInput(inputId = ns("selectColumnAny"),
                   label = "Select columns type B",

@@ -109,7 +109,7 @@ mod_07_randomizer_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#b2182b;", "for Obitrap-type sequence, you need to insert", strong("Bracket Type=4"), "in the first row of the download sequence file."),
+               p(style = "color:#b2182b;", "For Obitrap-type sequence, you need to insert", strong("Bracket Type=4"), "in the first row of the download sequence file."),
                uiOutput(outputId = ns("downloadSeq")),
                hr(),
                DT::dataTableOutput(ns("randomizedList"))

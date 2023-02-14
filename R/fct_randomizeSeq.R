@@ -9,7 +9,7 @@
 #' df <- data.frame(Group = rep(c("A", "B", "C"), each = 20), Rep = rep(1:6, times = 10))
 #' result <- randomizeSeq(df, nBlank = 5, nQC = 6)
 
-randomizeSeq <- function(df, nBlank = 0, nQC = 0, plateRow = 6, plateCol = 8, plateIDType = "Letter") {
+randomizeSeq <- function(df, nBlank = 0, nQC = 0, plateRow = 6, plateCol = 8, plateIDType = "Letter", outputType = "Orbitrap") {
   ##(1) Suppress the no visible binding for global variable notes
   Group <- n <- Rep <- bin <- Block <- NULL
 
@@ -52,7 +52,12 @@ randomizeSeq <- function(df, nBlank = 0, nQC = 0, plateRow = 6, plateCol = 8, pl
   }
 
   ## add sample plate position
-  combinations <- paste0(rep(LETTERS[1:26], each = plateCol), 1:plateCol)[1: (plateRow * plateCol)]
+  if(outputType == "Orbitrap"){
+    combinations <- paste0(rep(LETTERS[1:26], each = plateCol), 1:plateCol)[1: (plateRow * plateCol)]
+  }
+  if(outputType == "Waters"){
+    combinations <- paste0(rep(LETTERS[1:26], each = plateCol), ",", 1:plateCol)[1: (plateRow * plateCol)]
+  }
   df2 <- df2 %>%
     dplyr::mutate(Position = rep(combinations, length.out = nrow(df2)))
 

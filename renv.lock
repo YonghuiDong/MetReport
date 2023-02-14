@@ -2426,6 +2426,17 @@
         "xtable"
       ]
     },
+    "shinyMatrix": {
+      "Package": "shinyMatrix",
+      "Version": "0.6.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e7cebbc4ebd05f59331667e34ce4c7fd",
+      "Requirements": [
+        "jsonlite",
+        "shiny"
+      ]
+    },
     "shinydashboard": {
       "Package": "shinydashboard",
       "Version": "0.7.2",

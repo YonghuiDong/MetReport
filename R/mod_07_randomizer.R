@@ -168,9 +168,9 @@ mod_07_randomizer_server <- function(id){
 
       #(3) Prepare output file -------------------------------------------------
       sequenceFile <- reactive({
+        getRows <- nrow(randomizedDF())
         if(!is.null(randomizedDF()) & outputType() == "Orbitrap"){
           header <- "Bracket Type=4"
-          getRows <- nrow(randomizedDF())
           thermoFile <- data.frame(
             "Sample Type" = character(getRows),
             "File Name" = character(getRows),
@@ -201,11 +201,21 @@ mod_07_randomizer_server <- function(id){
           return(thermoFile)
         }
         if(!is.null(randomizedDF()) & outputType() == "Waters"){
-          return(randomizedDF())
+          watersFile <- data.frame(
+            "File Name" = character(getRows),
+            "File Text" = character(getRows),
+            "MS File" = character(getRows),
+            "MS Tune File" = character(getRows),
+            "Inlet File" = character(getRows),
+            "Bottle" = character(getRows),
+            "Injection Volume" = character(getRows),
+            check.names = FALSE
+            )
+          watersFile$`File Name` <- randomizedDF()$Sample
+          watersFile$`Bottle` <- randomizedDF()$Position
+          return(watersFile)
         }
       })
-
-
 
       ## (3) show randomized sample list ---------------------------------------
       output$randomizedList <- DT::renderDataTable({

@@ -162,7 +162,8 @@ mod_07_randomizer_server <- function(id){
                      nQC = nQC(),
                      plateRow = plateRow(),
                      plateCol = plateCol(),
-                     plateIDType = plateIDType()
+                     plateIDType = plateIDType(),
+                     outputType = outputType()
                      )
         })
 
@@ -235,7 +236,7 @@ mod_07_randomizer_server <- function(id){
       output$downloadSeq <- renderUI({
         if(!is.null(sequenceFile())) {
           downloadButton(outputId = ns('seqFile'),
-                         label = paste('Download', outputType(), "format", sep = "_"),
+                         label = paste('Download', outputType(), "Injection Sequence", sep = "_"),
                          style = "color: #fff; background-color: #037e8a; border-color: #037e8a"
                          )
           }

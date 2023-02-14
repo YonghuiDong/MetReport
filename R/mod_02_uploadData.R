@@ -283,10 +283,12 @@ mod_02_uploadData_server <- function(id, sfData){
       })
 
     observeEvent(input$removeCol, {
+      shiny::req(sfData$data)
       sfData$data <- removecolumn(sfData$data, input$selectColumn)
       })
 
     observeEvent(input$undoCol, {
+      shiny::req(sfData$data)
       sfData$data <- getProcessedData()
       })
     return(inputData)

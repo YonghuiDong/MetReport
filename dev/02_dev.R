@@ -26,6 +26,7 @@ golem::add_module(name = "03_preprocess", with_test = FALSE) # Name of the modul
 golem::add_module(name = "04_viewResult", with_test = FALSE) # Name of the module
 golem::add_module(name = "05_downloadReport", with_test = FALSE) # Name of the module
 golem::add_module(name = "06_repCheck", with_test = FALSE) # Name of the module
+golem::add_module(name = "07_randomizer", with_test = FALSE) # Name of the module
 golem::add_module(name = "08_lcTool", with_test = FALSE) # Name of the module
 golem::add_module(name = "09_msTool", with_test = FALSE) # Name of the module
 golem::add_module(name = "10_contact", with_test = FALSE) # Name of the module
@@ -51,6 +52,7 @@ golem::add_fct("getSamplePrep", with_test = FALSE)
 golem::add_fct("data", with_test = FALSE)
 golem::add_fct("checkReplicates", with_test = FALSE)
 golem::add_fct("getMZ", with_test = FALSE)
+golem::add_fct("randomizeSeq", with_test = FALSE)
 golem::add_utils("xxx", with_test = FALSE)
 
 ## External resources

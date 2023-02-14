@@ -22,7 +22,8 @@ mod_05_downloadReport_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p("1. You can download the HTML report in this panel. Don't repeatedly click the download button. It will make the process even slower.")
+               p("1. You can download the HTML report in this panel. Don't repeatedly click the download button. It will make the process even slower."),
+               p("2. You may need to restart your PC if the report generation is stuck.")
                )
              ),
 

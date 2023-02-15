@@ -22,7 +22,11 @@ mod_07_randomizer_ui <- function(id){
                solidHeader = FALSE,
                collapsible = TRUE,
                collapsed = FALSE,
-               closable = FALSE
+               closable = FALSE,
+               p("1. This widget was designed to prepare LCMS injection sequence using a block randomization approach."),
+               p("2. Set the following parameters and click the", strong("Randomize"), "button, your injection sequence will be ready to download."),
+               p("3. If you are unsatistied with the generated sequence, you can click the", strong("Randomize"),
+                 "button to re-generate a new sequence file.")
                )
              ),
 

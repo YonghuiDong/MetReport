@@ -1,7 +1,7 @@
 #' randomizeSeq
 #'
 #' @description A fct function
-#' @importFrom dplyr %>% row_number add_row
+#' @importFrom dplyr %>% row_number add_row bind_rows
 #' @return The return value, if any, from executing the function.
 #'
 #' @noRd
@@ -10,16 +10,12 @@
 #' result <- randomizeSeq(df, nBlank = 5, nQC = 6)
 
 randomizeSeq <- function(df, nBlank = 0, nQC = 0, plateRow = 6, plateCol = 8, plateIDType = "Letter", outputType = "Orbitrap") {
-  ##(1) Suppress the no visible binding for global variable notes
-  Group <- n <- Rep <- bin <- Block <- NULL
-
+  colnames(df) <- c("Group", "Rep")
   ## Best block is designed when the replicates are not the same among different groups
   bestBlock <- df %>%
     dplyr::count(Group) %>%
     dplyr::summarize(Fre = names(which.max(table(n)))) %>%
-    as.numeric() %>%
-    mean() %>%
-    ceiling()
+    as.numeric()
 
   df2 <- df %>%
     dplyr::mutate(Group = as.factor(Group)) %>%
@@ -34,11 +30,13 @@ randomizeSeq <- function(df, nBlank = 0, nQC = 0, plateRow = 6, plateCol = 8, pl
 
   ## add QC
   if(nQC != 0){
+    new_row <- data.frame(Group = "QC", Sample = "QC")
     df2 <- df2 %>%
-      dplyr::group_by(grp = (row_number() + 1) %/% nQC) %>%
-      dplyr::group_modify(~ add_row(.x, Group = rep("QC", 1), Sample = rep("QC", 1))) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-grp) %>%
+      dplyr::slice(c(1:(nQC-1), nQC:nrow(.))) %>% # Slice into two parts
+      dplyr::group_by(group = (seq_len(nrow(.)) - 1) %/% nQC + 1) %>% # Group by every n rows
+      dplyr::do(bind_rows(., new_row)) %>% # Add new row after every n rows
+      dplyr::ungroup() %>% # Ungroup the data
+      dplyr::select(-group) %>%
       dplyr::group_by(Sample) %>%
       dplyr::mutate(Sample = ifelse(Sample == "QC", paste0("QC_", (row_number()+1)), Sample)) %>%
       dplyr::ungroup() %>%

@@ -45,6 +45,7 @@ The following papers are referenced during the development of MetaboReport:
 [4] Wiklund, S., Johansson, E., Sjöström, L., Mellerowicz, E.J., Edlund, U., Shockcor, J.P., Gottfries, J., Moritz, T. and Trygg, J., 2008. Visualization of GC/TOF-MS-based metabolomics data for identification of biochemically interesting compounds using OPLS class models. Analytical chemistry, 80(1), pp.115-122.
 
 <b><span style="color:#E55B13">Block Randomization</span></b>: 
+
 [5] Burger, B., Vaudel, M. and Barsnes, H., 2020. Importance of block randomization when designing proteomics experiments. Journal of proteome research, 20(1), pp.122-128.
 
 ------

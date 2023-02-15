@@ -73,7 +73,7 @@ usethis::use_test("app")
 # Documentation
 
 ## Vignette ----
-usethis::use_vignette("MetReport")
+usethis::use_vignette()
 devtools::build_vignettes()
 
 ## Code Coverage----

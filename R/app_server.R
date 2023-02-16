@@ -30,5 +30,6 @@ app_server <- function(input, output, session) {
   mod_06_repCheck_server("06_repCheck_1")
   mod_08_lcTool_server("08_lcTool_1")
   mod_09_msTool_server("09_msTool_1")
+  mod_11_idTool_server("11_idTool_1")
   mod_10_contact_server("10_contact_1")
 }

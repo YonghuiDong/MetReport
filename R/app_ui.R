@@ -40,7 +40,8 @@ app_ui <- function(request) {
                    menuSubItem(text = strong("Randomizer"), tabName = "randomizer", icon = icon("bolt")),
                    #menuSubItem(text = strong("Solvent"), tabName = "solvent", icon = icon("bolt")),
                    menuSubItem(text = strong("LC Tool"), tabName = "lcTool", icon = icon("bolt")),
-                   menuSubItem(text = strong("MS Tool"), tabName = "msTool", icon = icon("bolt"))
+                   menuSubItem(text = strong("MS Tool"), tabName = "msTool", icon = icon("bolt")),
+                   menuSubItem(text = strong("Identification"), tabName = "idTool", icon = icon("bolt"))
           ),
           hr(),
           menuItem(text = strong("Contact"), tabName = "contact", icon = icon("envelope"))
@@ -60,6 +61,7 @@ app_ui <- function(request) {
           # tabItem(tabName = "solvent",  source("ui-tab-solvent.R", local = TRUE)$value),
           tabItem(tabName = "lcTool",  mod_08_lcTool_ui("08_lcTool_1")),
           tabItem(tabName = "msTool",  mod_09_msTool_ui("09_msTool_1")),
+          tabItem(tabName = "idTool", mod_11_idTool_ui("11_idTool_1")),
           tabItem(tabName = "contact",  mod_10_contact_ui("10_contact_1"))
         )
       ),

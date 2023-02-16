@@ -262,7 +262,7 @@ mod_09_msTool_server <- function(id){
         extension <- tools::file_ext(inFile$name)
         filepath <- inFile$datapath
         df <- switch(extension,
-                     csv = read.csv(filepath, header = TURE),
+                     csv = read.csv(filepath, header = TRUE),
                      xls = readxl::read_xls(filepath),
                      xlsx = readxl::read_xlsx(filepath)
                      )

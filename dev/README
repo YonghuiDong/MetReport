@@ -4,6 +4,7 @@ docker run -p 80:80 metreport:latest
 # then go to 127.0.0.1:80
 
 ##(2) with M1 mac
-docker buildx build --platform=linux/amd64 -f Dockerfile_base --progress=plain -t metreport_base .
-docker buildx build --platform=linux/amd64 -f Dockerfile --progress=plain -t metreport:latest .
-docker run -p 80:80 metreport:latest
+docker buildx build --platform=linux/amd64 -f Dockerfile_base --progress=plain -t metaboreport_base .
+docker buildx build --platform=linux/amd64 -f Dockerfile --progress=plain -t metaboreport:latest .
+docker run -p 80:80 metaboreport:latest
+

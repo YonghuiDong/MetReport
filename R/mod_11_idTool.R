@@ -67,7 +67,7 @@ mod_11_idTool_ui <- function(id){
                            ),
                sliderInput(inputId = ns("rtTolerance"),
                            label = "3. If Yes, select retention time tolerance (min)",
-                           min = 0 ,
+                           min = 0.2 ,
                            max = 10,
                            value = 1,
                            step = 0.5),

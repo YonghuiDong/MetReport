@@ -90,6 +90,8 @@ mod_11_idTool_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
+               uiOutput(outputId = ns("download")),
+               hr(),
                DT::dataTableOutput(outputId = ns("idResult"))
                )
              )
@@ -173,6 +175,23 @@ mod_11_idTool_server <- function(id){
                                      )
                       )
         })
+
+      #(4) download result -----------------------------------------------------
+      output$download <- renderUI({
+        if(!is.null(getIdentification())) {
+          downloadButton(outputId = ns('idFile'),
+                         label = paste('Download')
+          )
+        }
+      })
+
+      output$idFile <- downloadHandler(
+        filename <- paste0("Identification", ".csv"),
+        content <- function(file) {
+          write.csv(getIdentification(), file, row.names = FALSE)
+        }
+      )
+
     })
 
   })

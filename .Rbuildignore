@@ -7,3 +7,6 @@ dev_history.R
 ^dev$
 $run_dev.*
 ^deploy$
+^deploy_sp$
+^app\.R$
+^rsconnect$

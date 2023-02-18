@@ -1,0 +1,13 @@
+name: MetaboReport
+title: MetaboReport
+username:
+account: bcdd
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6110752
+bundleId: 6860746
+url: https://bcdd.shinyapps.io/MetaboReport/
+when: 1676711554.58294
+lastSyncTime: 1676711554.58295
+asMultiple: FALSE
+asStatic: FALSE

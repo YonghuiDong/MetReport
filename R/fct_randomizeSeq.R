@@ -9,7 +9,7 @@
 #' @param plateCol number of columns of the sample plate.
 #' @param plateIDType sample plate ID type: by number or by letter?
 #' @param outputType the output data format. Currently support Orbitrap and Waters format.
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% bind_rows
 #' @return a dataframe which can be imported to LCMS instrument to build injection sequence.
 #' @noRd
 #' @export
@@ -43,7 +43,7 @@ randomizeSeq <- function(df, nBlank = 0, nQC = 0, nWithinBlank = 0, nEmptyCell =
     df2 <- df2 %>%
       dplyr::slice(c(1:(nQC-1), nQC:nrow(.))) %>% # Slice into two parts
       dplyr::group_by(group = (seq_len(nrow(.)) - 1) %/% nQC + 1) %>% # Group by every n rows
-      dplyr::do(bind_rows(., new_row)) %>% # Add new row after every n rows
+      dplyr::do(dplyr::bind_rows(., new_row)) %>% # Add new row after every n rows
       dplyr::ungroup() %>% # Ungroup the data
       dplyr::select(-group) %>%
       dplyr::group_by(Sample) %>%

@@ -51,10 +51,12 @@ mod_07_randomizer_ui <- function(id){
                  ),
 
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#b2182b;", "1.Blanks will be added at the beginning of the injection sequence."),
+               p(style = "color:#b2182b;", "1.Blanks can be added at the beginning of the injection sequence and/or within the sequence after QC."),
                p(style = "color:#b2182b;", "2.QC will be inserted every nth of the sample."),
+               p(style = "color:#b2182b;", "3.You can also reserve some positions for other purposes, e.g., another spare Blank or QC.
+                 Samples will not be placed in these positions."),
                sliderInput(inputId = ns("nBlank"),
-                           label = "How many Blanks do you want to use?",
+                           label = "How many Blanks do you want to add at the beginning of the injection?",
                            min = 0,
                            max = 20,
                            value = 0,
@@ -64,6 +66,20 @@ mod_07_randomizer_ui <- function(id){
                            label = "What frequency (every Nth sample) do you want to insert QC?",
                            min = 0,
                            max = 20,
+                           value = 0,
+                           step = 1,
+                           ),
+               sliderInput(inputId = ns("nWithinBlank"),
+                           label = "How many Blanks do you want to add after each QC within the injection?",
+                           min = 0,
+                           max = 20,
+                           value = 0,
+                           step = 1,
+                           ),
+               sliderInput(inputId = ns("nEmptyCell"),
+                           label = "How many positions you want to reserve?",
+                           min = 0,
+                           max = 10,
                            value = 0,
                            step = 1,
                            ),
@@ -133,6 +149,8 @@ mod_07_randomizer_server <- function(id){
     #(1) Parameters ============================================================
     nBlank <- reactive({input$nBlank})
     nQC <- reactive({input$nQC})
+    nWithinBlank <- reactive({input$nWithinBlank})
+    nEmptyCell <- reactive({input$nEmptyCell})
     plateRow <- reactive({input$plateRow})
     plateCol <- reactive({input$plateCol})
     plateIDType <- reactive({input$plateIDType})
@@ -164,6 +182,8 @@ mod_07_randomizer_server <- function(id){
         randomizeSeq(df = inputData(),
                      nBlank = nBlank(),
                      nQC = nQC(),
+                     nWithinBlank = nWithinBlank(),
+                     nEmptyCell = nEmptyCell(),
                      plateRow = plateRow(),
                      plateCol = plateCol(),
                      plateIDType = plateIDType(),

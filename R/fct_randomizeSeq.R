@@ -9,7 +9,7 @@
 #' @param plateCol number of columns of the sample plate.
 #' @param plateIDType sample plate ID type: by number or by letter?
 #' @param outputType the output data format. Currently support Orbitrap and Waters format.
-#' @importFrom dplyr %>% bind_rows
+#' @importFrom dplyr %>% bind_rows row_number
 #' @return a dataframe which can be imported to LCMS instrument to build injection sequence.
 #' @noRd
 #' @export

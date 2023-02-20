@@ -1,10 +1,18 @@
-#' randomizeSeq
-#' @param nWithinBlank the number of blanks within the samples, i.e., after QC.
-#' @description A fct function
-#' @importFrom dplyr %>% row_number add_row bind_rows
-#' @return The return value, if any, from executing the function.
-#'
+#' @title Randomize LCMS sample injection sequence
+#' @description Block randomize LCMS sample injection sequence and insert Blanks and QCs.
+#' @param df a dataframe used to describe the experiment design.
+#' @param nBlank number of Blanks to be added at the beginning of the injection sequence
+#' @param nQC frequency of QC to be inserted in the sequence, i.e., every nth QC will be inserted.
+#' @param nWithinBlank number of Blanks after the QC within the sample.
+#' @param nEmptyCell number of cells to be reserved in the sample plate.
+#' @param plateRow number of rows of the sample plate.
+#' @param plateCol number of columns of the sample plate.
+#' @param plateIDType sample plate ID type: by number or by letter?
+#' @param outputType the output data format. Currently support Orbitrap and Waters format.
+#' @importFrom dplyr %>%
+#' @return a dataframe which can be imported to LCMS instrument to build injection sequence.
 #' @noRd
+#' @export
 #' @examples
 #' df <- data.frame(Group = rep(c("A", "B", "C"), each = 20), Rep = rep(1:6, times = 10))
 #' result <- randomizeSeq(df, nBlank = 0, nQC = 6, nWithinBlank = 0, nEmptyCell = 2)

@@ -534,71 +534,71 @@ mod_04_viewResult_ui <- function(id){
                ),
 
              ##(7) Correlation Analysis Panel ----------------------------------
-             box(
-               width = 12,
-               inputId = "viewCN",
-               title = strong("Correlation Analysis"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               fluidRow(width = 12,
-                        column(width = 12,
-                               p(style = "color:#C70039;", strong("Attention:")),
-                               p("(1) Intensive computation is requied in this section.
-                             Don't run this section if you have over 150 features.
-                             Don't worry, you'll not miss any important information."),
-                             p("(2) ", code("Correlation Network "), "Panel offers you similar result."),
-                             p("(3) You can check the the number of features in above ", code("Statistics "), "Panel"),
-                             ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CAThreshold"),
-                                            label = "Select correlation threshold (absolute value)",
-                                            value = 0,
-                                            min = 0,
-                                            max = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CASize"),
-                                            label = "Set Metabolite ID size",
-                                            value = 3,
-                                            min = 1,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("CAType"),
-                                            label = "Select plot type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CARatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 12,
-                               actionButton(inputId = ns("RunCA"),
-                                            label = "Run Analysis",
-                                            icon = icon("paper-plane"),
-                                            style = "color: #fff; background-color: #7570b3; border-color: #7570b3"
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadCA"),
-                                              label = "Download"
-                                              )
-                               )
-                        ),
-               shiny::plotOutput(ns("CAPlot"))
-               ),
+             # box(
+             #   width = 12,
+             #   inputId = "viewCN",
+             #   title = strong("Correlation Analysis"),
+             #   status = "success",
+             #   solidHeader = FALSE,
+             #   collapsible = TRUE,
+             #   collapsed = TRUE,
+             #   closable = FALSE,
+             #   fluidRow(width = 12,
+             #            column(width = 12,
+             #                   p(style = "color:#C70039;", strong("Attention:")),
+             #                   p("(1) Intensive computation is requied in this section.
+             #                 Don't run this section if you have over 150 features.
+             #                 Don't worry, you'll not miss any important information."),
+             #                 p("(2) ", code("Correlation Network "), "Panel offers you similar result."),
+             #                 p("(3) You can check the the number of features in above ", code("Statistics "), "Panel"),
+             #                 ),
+             #            column(width = 6,
+             #                   numericInput(inputId = ns("CAThreshold"),
+             #                                label = "Select correlation threshold (absolute value)",
+             #                                value = 0,
+             #                                min = 0,
+             #                                max = 1
+             #                                )
+             #                   ),
+             #            column(width = 6,
+             #                   numericInput(inputId = ns("CASize"),
+             #                                label = "Set Metabolite ID size",
+             #                                value = 3,
+             #                                min = 1,
+             #                                max = NA
+             #                                )
+             #                   ),
+             #            column(width = 6,
+             #                   radioButtons(inputId = ns("CAType"),
+             #                                label = "Select plot type to download",
+             #                                choices = list("pdf", "tiff", "png"),
+             #                                selected = "pdf"
+             #                                )
+             #                   ),
+             #            column(width = 6,
+             #                   numericInput(inputId = ns("CARatio"),
+             #                                label = "Aspect ratio of the plot (width:height)",
+             #                                value = 1,
+             #                                min = NA,
+             #                                max = NA
+             #                                )
+             #                   ),
+             #            column(width = 12,
+             #                   actionButton(inputId = ns("RunCA"),
+             #                                label = "Run Analysis",
+             #                                icon = icon("paper-plane"),
+             #                                style = "color: #fff; background-color: #7570b3; border-color: #7570b3"
+             #                                )
+             #                   ),
+             #            column(width = 6,
+             #                   br(),
+             #                   downloadButton(outputId = ns("downloadCA"),
+             #                                  label = "Download"
+             #                                  )
+             #                   )
+             #            ),
+             #   shiny::plotOutput(ns("CAPlot"))
+             #   ),
 
              ##(8) Correlation analysis Panel ----------------------------------
              box(

@@ -13,12 +13,12 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     dashboardPage(
-
+      ## Perloader -------------------------------------------------------------
+      preloader = list(html = tagList(icon("smile", "fa-3x"), " Welcome to MetaboReport..."), color = "#3c8dbc"),
       ## Header ----------------------------------------------------------------
       header = dashboardHeader(
         title = strong("MetaboReport")
       ),
-
       ## Sidebar ---------------------------------------------------------------
       sidebar = dashboardSidebar(
 

@@ -23,7 +23,7 @@ mod_11_idTool_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                p("1. This widget is designed for identifing metabolites using your own database."),
-               p("2. Both your sample table and database table should contain a column named", strong("m/z"), "."),
+               p("2. Both your sample table and database table should contain a column named", strong("mz"), "."),
                p("3. To search by retention time, ensure that both your sample table and database table have a column labeled",
                  strong("RT"), ".Note that the retention time should be expressed in minutes.")
                )
@@ -70,7 +70,7 @@ mod_11_idTool_ui <- function(id){
                            min = 0.2 ,
                            max = 10,
                            value = 1,
-                           step = 0.5),
+                           step = 0.1),
                actionButton(inputId = ns("submit"),
                             label = "Submit",
                             icon = icon("paper-plane"),

@@ -369,10 +369,10 @@
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
-      "Version": "0.11.4.3.1",
+      "Version": "0.12.0.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "836c1aeec6a7a2b28273bd42a0511a9e",
+      "Hash": "dee7cfd76b4c78bab84e09b74b6d471f",
       "Requirements": [
         "Rcpp"
       ]

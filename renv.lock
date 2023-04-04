@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.0",
+    "Version": "4.2.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -1223,28 +1223,17 @@
     },
     "golem": {
       "Package": "golem",
-      "Version": "0.3.5.9001",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "golem",
-      "RemoteUsername": "ThinkR-open",
-      "RemoteRef": "89b40cb568ed2d8edd75909cbbf7dc693f25b82f",
-      "RemoteSha": "89b40cb568ed2d8edd75909cbbf7dc693f25b82f",
-      "Hash": "ad035c5b8762d23e266a7aed5335b7c3",
+      "Version": "0.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4275a95781526a472cff3e39f957c8be",
       "Requirements": [
         "attempt",
-        "cli",
         "config",
-        "crayon",
-        "desc",
-        "fs",
         "here",
         "htmltools",
         "rlang",
-        "rstudioapi",
         "shiny",
-        "usethis",
         "yaml"
       ]
     },

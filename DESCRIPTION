@@ -1,7 +1,8 @@
 Package: MetaboReport
 Title: PKG_TITLE
 Version: 0.2.1.9000
-Authors@R: person('Yonghui', 'Dong', email = 'yonghui.dong@gmail.com', role = c('cre', 'aut'))
+Authors@R: 
+    person("Yonghui", "Dong", , "yonghui.dong@gmail.com", role = c("cre", "aut"))
 Description: PKG_DESC.
 License: What license is it under?
 Depends: 
@@ -35,8 +36,6 @@ Imports:
     VIM,
     waiter
 VignetteBuilder: 
-    knitr
-Suggests:
     knitr
 Config/testthat/edition: 3
 Encoding: UTF-8

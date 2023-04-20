@@ -29,6 +29,8 @@ params:
   KMTable: NA,
   projectName: NA,
   authorName: NA
+  showIntro: NA
+  showMethods: NA
 editor_options: 
   chunk_output_type: console
 ---
@@ -69,6 +71,7 @@ BPGroup <- params$BPGroup
 <br></br>
 <br></br>
 
+```{asis, echo = params$showIntro}
 # Introduction
 
 Metabolomics involves the comprehensive analysis of low-molecular-weight metabolites in biological systems. To address specific research questions or applications, there are three widely-used strategies in metabolomics [1]:
@@ -88,8 +91,9 @@ This report is an overview of your data analysis results. Brief explanations are
 > (2) High resolution (600 dpi) static figures are provided along with this report. You can also download them in `Statistics` tab if you are using **MetaboReport** software by yourself to generate this report. 
 >
 > (3) If you want to perform additional statistics and/or re-analyse you data by yourself, you can use either Table 1 (raw data) or Table 2 (data with different statistical information). You can click `Download` button above the table to download it in **cvs** or **excel** format.
+```
 
-
+```{asis, echo = params$showMethods}
 # Materials and Methods
 
 > <span style = "color : #FF8300">**Note:**</span>
@@ -103,7 +107,7 @@ This report is an overview of your data analysis results. Brief explanations are
 `r mySamplePrep` 
 
 ## Data Analysis Method
-
+```
 
 # Results
 

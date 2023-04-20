@@ -58,8 +58,18 @@ mod_05_downloadReport_ui <- function(id){
                collapsible = FALSE,
                collapsed = FALSE,
                closable = FALSE,
+               radioButtons(inputId = ns("showIntro"),
+                            label = "1. Do you want to show introduction section in the report?",
+                            choices = list("Yes" = TRUE, "No" = FALSE),
+                            selected = TRUE
+                            ),
+               radioButtons(inputId = ns("showMethods"),
+                            label = "2. Do you want to show materials and methods section in the report?",
+                            choices = list("Yes" = TRUE, "No" = FALSE),
+                            selected = FALSE
+                            ),
                selectInput(inputId = ns("samplePrep"),
-                           label = "1. Select Sample Preparation Method",
+                           label = "2.1 Select Sample Preparation Method",
                            choices = list("None",
                                           "Method 1",
                                           "Method 2",
@@ -73,7 +83,7 @@ mod_05_downloadReport_ui <- function(id){
                          placeholder = "You can also paste your sample preparation method here"
                          ),
                selectInput(inputId = ns("instrument"),
-                           label = "2. Select Sample Analysis Method",
+                           label = "2.2 Select Sample Analysis Method",
                            choices = list("None",
                                           "Method 1",
                                           "Method 2",
@@ -87,7 +97,7 @@ mod_05_downloadReport_ui <- function(id){
                          placeholder = "You can also paste your sample analysis method here"
                          ),
                selectInput(inputId = ns("dataProcess"),
-                           label = "3. Select Data Processing Method",
+                           label = "2.3 Select Data Processing Method",
                            choices = list("None",
                                           "Method 1",
                                           "Method 2",
@@ -196,6 +206,8 @@ mod_05_downloadReport_server <- function(id, sfData = global, inputData, resultL
               KMTable = resultList$KMTable(),
               projectName = projectName(),
               authorName = authorName(),
+              showIntro = input$showIntro,
+              showMethods = input$showMethods,
               mySamplePrep = slectedSamplePrep()
               )
             rmarkdown::render(input = tempReport,

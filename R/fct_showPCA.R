@@ -17,7 +17,7 @@
 #' @examples
 #' df <-  iris[1:4]
 #' Group <- iris$Species
-#' showPCA(df, Group, showFrame = "norm", interactive = F)
+#' showPCA(df, Group, showFrame = "norm", interactive = T)
 
 showPCA <- function(df,
                     Group,
@@ -76,7 +76,8 @@ showPCA <- function(df,
   }
 
   if(interactive){
-    p1 <- plotly::ggplotly(p1, tooltip = "text")
+    p1 <- plotly::ggplotly(p1, tooltip = "text") %>%
+      plotly::config(toImageButtonOptions = list(format = "svg", filename = "PCA"))
   }
 
   return(p1)

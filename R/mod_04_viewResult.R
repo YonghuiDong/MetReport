@@ -77,8 +77,6 @@ mod_04_viewResult_ui <- function(id){
                            max = 0.1
                            ),
 
-               waiter::autoWaiter(),
-
                actionButton(inputId = ns("viewStat"),
                             label = "Start",
                             icon = icon("eye"),

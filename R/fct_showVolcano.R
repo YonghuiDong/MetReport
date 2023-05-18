@@ -10,9 +10,15 @@
 #' @noRd
 #' @export
 #'@examples
-#'\dontrun{
-#'showVolcano(result, compare_group = c("WT", "JA"))
-#'}
+#'dat <- matrix(runif(2*300), ncol = 2, nrow = 300)
+#'myGroup <- rep_len(LETTERS[1:3], 300)
+#'p <- getP(dat, Group = myGroup, Method = "anovaHSD")
+#'FC <- getFC(dat, Group = myGroup)
+#'result <- cbind.data.frame(p, FC)
+#'showVolcano(result, compare_group = c("A", "B"))
+#'result2 <- cbind.data.frame(AdjPvalue_A_vs_B = c(0.001, 0.003, 0.002, 0.3), Fold_A_vs_B = c(1000, 50, 10, 30), Fold_B_vs_A = c(0, 1/50, 1/10, 1/30))
+#'showVolcano(result2, compare_group = c("A", "B"))
+#'showVolcano(result2, compare_group = c("B", "A"))
 
 showVolcano <- function(result, compare_group, FC = 2, pValue = 0.05, interactive = TRUE) {
 
@@ -39,6 +45,7 @@ showVolcano <- function(result, compare_group, FC = 2, pValue = 0.05, interactiv
 
   ## prepare data frame for plot
   F_iden <- result[, F_id]
+  F_iden[F_iden == 0] <- 0.0001 # replace 0 with 0.0001 (FC round with 4 digits), see bug36
   P_iden <- result[, P_id]
   new_iden <- cbind.data.frame(fold_change = log2(F_iden), p_value = -log10(P_iden))
   colnames(new_iden) <- c("fold_change", "p_value") # to make sure colnames changed

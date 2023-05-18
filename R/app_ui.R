@@ -4,8 +4,7 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @import markdown
-#' @importFrom  shinydashboard sidebarMenu menuItem menuSubItem dashboardBody tabItems tabItem
-#' @import shinydashboardPlus
+#' @import shinydashboard
 #' @noRd
 
 app_ui <- function(request) {
@@ -56,25 +55,15 @@ app_ui <- function(request) {
           tabItem(tabName = "downloadReport",  mod_05_downloadReport_ui("05_downloadReport_1")),
           tabItem(tabName = "repCheck", mod_06_repCheck_ui("06_repCheck_1")),
           tabItem(tabName = "randomizer", mod_07_randomizer_ui("07_randomizer_1")),
-          # tabItem(tabName = "solvent",  source("ui-tab-solvent.R", local = TRUE)$value),
           tabItem(tabName = "lcTool",  mod_08_lcTool_ui("08_lcTool_1")),
           tabItem(tabName = "msTool",  mod_09_msTool_ui("09_msTool_1")),
           tabItem(tabName = "idTool", mod_11_idTool_ui("11_idTool_1")),
           tabItem(tabName = "contact",  mod_10_contact_ui("10_contact_1"))
         )
-      ),
-
-      ## Skin ------------------------------------------------------------------
-      controlbar = dashboardControlbar(collapsed = TRUE, skinSelector()),
-
-      ## Footer --------------------------------------------------------------------
-      footer = dashboardFooter(
-        left = "Weizmann Institute of Science",
-        right = "Copyright (C) 2023"
       )
-    )
-  )
-}
+
+
+))}
 
 #' Add external Resources to the Application
 #'

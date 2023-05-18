@@ -49,7 +49,6 @@ mod_04_viewResult_ui <- function(id){
                            selected = "anovaHSD",
                            multiple = FALSE
                            ),
-
                selectInput(inputId = ns("pAdjMethod"),
                            label = "2. Adjust p-value by:",
                            choices = c("Don't adjust" = "none",
@@ -59,24 +58,20 @@ mod_04_viewResult_ui <- function(id){
                            selected = "fdr",
                            multiple = FALSE
                            ),
-
                radioButtons(inputId = ns("SigFilter"),
                             label = "3. Only consider statistically significant mass features?",
                             choices = c("Yes" = 1, "No" = 0),
                             selected = 0
                             ),
-
                p(style = "color:#C70039;", shiny::icon("bell"), strong("Notes:")),
                p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
                p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
-
                sliderInput(inputId = ns("SigP"),
                            label = "If [Yes]: input p-value threshold",
                            value = 0.05,
                            min = 0,
                            max = 0.1
                            ),
-
                actionButton(inputId = ns("viewStat"),
                             label = "Start",
                             icon = icon("eye"),
@@ -98,7 +93,7 @@ mod_04_viewResult_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value filled and filtered data."),
+               p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value-filled and QC-filtered data."),
                p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
                p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
                fluidRow(width = 12,
@@ -239,7 +234,6 @@ mod_04_viewResult_ui <- function(id){
                                downloadButton(outputId = ns("downloadOPLSDA"))
                                )
                         ),
-
                shiny::plotOutput(ns("OPLSDAPlot")),
                plotly::plotlyOutput(ns("SPlot"))
                ),

@@ -33,5 +33,5 @@ getFC <- function(x, Group = NULL){
                           paste0("Fold_", j[2,], "_vs_", j[1,]))
   ret <- as.data.frame(t(f_change))
   cat(": FC calculation done!\n")
-  return(round(ret, 2))
+  return(round(ret, 4))
 }

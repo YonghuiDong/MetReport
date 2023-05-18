@@ -520,9 +520,9 @@ listnames <- combn(n, 2, simplify = FALSE)
 volcanoList <- htmltools::tagList()
 for (i in seq_along(listnames)){
     volcanoList[[i]] <- plotly::as_widget(
-      showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, p = 0.05)
-      )
-    }
+      showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, pValue = 0.05)
+    )
+}
 
 volcanoList
 ```
@@ -639,7 +639,8 @@ BPPlot <- plotly::plot_ly(data = BPData,
                           error_y = ~list(array = SD, color = 'grey'),
                           type = 'bar'
                           ) %>%
-  layout(yaxis = list(categoryorder = "trace", title = yLegend))
+  layout(yaxis = list(categoryorder = "trace", title = yLegend)) %>%
+  plotly::config(toImageButtonOptions = list(format = "svg", filename = "plot"))
 
 filter <- crosstalk::bscols(
   metaboliteFilter, 

@@ -6,7 +6,7 @@
 #' @param FC select fold change values, default = 2
 #' @param pValue select p value, default = 0.05
 #' @importFrom ggplot2 aes
-#' @importFrom plotly ggplotly
+#' @importFrom plotly ggplotly %>%
 #' @noRd
 #' @export
 #'@examples
@@ -78,7 +78,8 @@ showVolcano <- function(result, compare_group, FC = 2, pValue = 0.05, interactiv
     ggplot2::theme_bw() +
     ggplot2::geom_vline(xintercept = c(-log2(FC), log2(FC)), col = "grey", linetype = "longdash") +
     ggplot2::geom_hline(yintercept = -log10(pValue), col = "grey", linetype = "longdash")
-  VP2 <- plotly::ggplotly(VP, tooltip = c("text"))
+  VP2 <- plotly::ggplotly(VP, tooltip = c("text")) %>%
+    plotly::config(toImageButtonOptions = list(format = "svg", filename = "volcanoPlot"))
   if(!isTRUE(interactive)){VP2 <- VP}
   return(VP2)
 }

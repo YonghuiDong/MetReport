@@ -27,7 +27,6 @@ Imports:
     ropls,
     shiny (>= 1.7.3),
     shinydashboard,
-    shinydashboardPlus,
     shinyMatrix,
     stats,
     tidyr,

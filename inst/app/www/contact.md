@@ -9,7 +9,7 @@
 
 To report bugs or request new features, please send an email to:
 
-[<span style="color:#E55B13">Dr.Yonghui Dong</span> <i class="fa fa-envelope-o fa-l" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) or [<span style="color:#E55B13">Dr.Sergey Malitsky</span> <i class="fa fa-envelope-o fa-l" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
+Dr.Yonghui Dong [<i class="fa fa-envelope-o fa-l" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) or Dr.Sergey Malitsky [<i class="fa fa-envelope-o fa-l" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
 
 ------
 
@@ -17,7 +17,7 @@ To report bugs or request new features, please send an email to:
 
 If you find MetaboReport useful, kindly consider citing our manuscript in your work. Thank you. <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-2xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b>
 
-> MetaboReport
+> MetaboReport:
 
 ------
 
@@ -36,7 +36,3 @@ The following papers are referenced during the development of MetaboReport:
 [5] Burger, B., Vaudel, M. and Barsnes, H., 2020. Importance of block randomization when designing proteomics experiments. Journal of proteome research, 20(1), pp.122-128.
 
 ------
-
-<a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>
-
-----

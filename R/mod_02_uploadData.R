@@ -23,8 +23,8 @@ mod_02_uploadData_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-               p("1. If your data table was prepared by Compound Discoverer, please select", strong("Compound Discoverer"), "fotmat; otherwise, plsese select", strong("Other"), "format."),
-               p("2. If your", strong("Peak Area"), "and", strong("Metadata"), "are in two seperated tables, please upload both of them.")
+               p("1. If your data table was prepared using Compound Discoverer, choose the", strong("Compound Discoverer"), "format; otherwise, select", strong("Other"), "format."),
+               p("2. If your feature and metadata information are in separate tables, please upload both.")
                )
              ),
 
@@ -53,10 +53,8 @@ mod_02_uploadData_ui <- function(id){
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#b2182b;", "1. If the header of your data table does not contain meta
-                 information, you need to upload a meta table below"),
-               p(style = "color:#b2182b;", "2. You can check [Home Page] for detailed description of
-                 data table preparation"),
+               p(style = "color:#b2182b;", "1. If there is no metadata in the header, please upload a separate metadata table below."),
+               p(style = "color:#b2182b;", "2. Refer to the Home page for detailed data table preparation."),
                fileInput(inputId = ns("inputMeta"),
                          label = "2. (Optional) Upload Sample Metadata Table:",
                          multiple = FALSE,
@@ -86,10 +84,10 @@ mod_02_uploadData_ui <- function(id){
                collapsed = FALSE,
                closable = FALSE,
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#b2182b;", "Do not delete any of your samples unless they are outliers"),
+               p(style = "color:#b2182b;", "Do not remove any samples unless they are identified as outliers."),
                p(style = "color:#2166ac;", shiny::icon("lightbulb"), strong("Tips: ")),
-               p(style = "color:#2166ac;", "1. Continue with your analysis without deleting any samples"),
-               p(style = "color:#2166ac;", "2. If you find any outliers, then come back and delete them"),
+               p(style = "color:#2166ac;", "1. Proceed with your analysis without removing any samples."),
+               p(style = "color:#2166ac;", "2. If you identify any outliers, come back and remove them."),
                uiOutput(outputId = ns("selectColumn")),
                column(width = 6, actionButton(inputId = ns("removeCol"), label = "Remove")),
                column(width = 6, actionButton(inputId = ns("undoCol"), label = "Undo"))
@@ -98,54 +96,45 @@ mod_02_uploadData_ui <- function(id){
 
       #(3) Result Panel ========================================================
       column(width = 8,
-             box(
-               width = 12,
-               inputId = "RawData_card",
-               title = strong("Raw Data Panel"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               DT::dataTableOutput(outputId = ns("rawView"))
-               ),
-             box(
-               width = 12,
-               inputId = "meta_card",
-               title = strong("Metadata Panel"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               htmlOutput(outputId = ns("metaInfo")),
-               DT::dataTableOutput(outputId = ns("metaView"))
-               ),
-             box(
-               width = 12,
-               inputId = "sample_card",
-               title = strong("Processed Data Panel"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               DT::dataTableOutput(outputId = ns("processView"))
-               )
+             box(width = 12,
+                 inputId = "RawData_card",
+                 title = strong("Raw Data Panel"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 DT::dataTableOutput(outputId = ns("rawView"))
+             ),
+             box(width = 12,
+                 inputId = "meta_card",
+                 title = strong("Metadata Panel"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 htmlOutput(outputId = ns("metaInfo")),
+                 DT::dataTableOutput(outputId = ns("metaView"))
+             ),
+             box(width = 12,
+                 inputId = "sample_card",
+                 title = strong("Processed Data Panel"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 DT::dataTableOutput(outputId = ns("processView"))
              )
-      )
-    )
-  }
+            )
 
-
+))}
 
 #' uploadData Server Functions
 #'
 #' @noRd
-#' @importFrom tools file_ext
 #' @importFrom dplyr relocate %>%
-#' @importFrom readxl read_xls read_xlsx
-
 
 mod_02_uploadData_server <- function(id, sfData){
   ns <- NS(id)
@@ -203,11 +192,12 @@ mod_02_uploadData_server <- function(id, sfData){
       return(tem)
     })
 
-    #4. Show Result ============================================================
+    #(4) Show Result ===========================================================
     observeEvent(input$submit, {
-      ##(1) Raw Data Overview --------------------------------------------------
+
+      ##(4.1) Raw Data Overview ------------------------------------------------
       output$rawView <- DT::renderDataTable({
-        shiny::validate(need(!is.null(inputData()), message = "No input data"))
+        shiny::validate(need(!is.null(inputData()), message = "Input data not found."))
         DT::datatable(inputData() %>%
                         dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
                         dplyr::relocate(ID),
@@ -219,9 +209,9 @@ mod_02_uploadData_server <- function(id, sfData){
                       )
         })
 
-      #(2) Meta Info Overview -------------------------------------------------
+      ##(4.2) Meta Info Overview -----------------------------------------------
       output$metaInfo <- renderUI({
-        shiny::validate(need(!is.null(getMetaData()), message = "No metadata found"))
+        shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
         str1 <- p(h4("Here is a summary of the extracted metadata:"))
         str2 <- p(strong("Number of samples: "), code(nrow(sfData$group)))
         str3 <- p(strong("Number of meta groups: "), code(ncol(sfData$group)))
@@ -229,9 +219,9 @@ mod_02_uploadData_server <- function(id, sfData){
         HTML(paste(str1, str2, str3, str4, sep = '<br/>'))
       })
 
-      #(3) Meta table ---------------------------------------------------------
+      ##(4.3) Meta table -------------------------------------------------------
       output$metaView <- DT::renderDataTable({
-        shiny::validate(need(!is.null(getMetaData()), message = "No metadata found"))
+        shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
         DT::datatable(sfData$group,
                       caption = "Overview of Meta Information",
                       options = list(scrollX = TRUE,
@@ -240,11 +230,11 @@ mod_02_uploadData_server <- function(id, sfData){
                                      fixedColumns = FALSE
                                      )
                       )
-        })
+      })
 
-      #(4) Processed Data Overview ---------------------------------------------
+      ##(4.4) Processed Data Overview ------------------------------------------
       output$processView <- DT::renderDataTable({
-        shiny::validate(need(!is.null(getProcessedData()), message = "No input Data"))
+        shiny::validate(need(!is.null(getProcessedData()), message = "Input Data not found."))
         DT::datatable(sfData$data,
                       options = list(scrollX = TRUE,
                                      deferRender = TRUE,
@@ -252,12 +242,11 @@ mod_02_uploadData_server <- function(id, sfData){
                                      fixedColumns = FALSE
                                      )
                       )
-        })
       })
+    })
 
-    #5. Remove Outlier ---------------------------------------------------------
+    #(5) Remove Outlier ========================================================
     removecolumn <- function(df, nameofthecolumn){dplyr::select(df, -all_of(nameofthecolumn))}
-
     output$selectColumn <- renderUI({
       shiny::req(sfData$data)
       selectInput(inputId = ns("selectColumn"),
@@ -274,9 +263,10 @@ mod_02_uploadData_server <- function(id, sfData){
       shiny::req(sfData$data)
       sfData$data <- getProcessedData()
     })
-    return(inputData)
-  })
-}
+    #return(inputData)
+
+
+})}
 
 
 ## To be copied in the UI

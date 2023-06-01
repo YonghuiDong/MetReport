@@ -28,9 +28,9 @@ Using MetaboReport is straightforward. Simply follow the step-by-step instructio
 
 <b><span style="color:#5c5d61; font-size:22px;">1. User Manual</span></b>
 
-> For information on <span style="color:#E55B13">how to prepare an input data table</span>, please refer to this concise manual: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-2xl" aria-hidden="true"></i></a>
+> For information on <span style="color:#E55B13">how to prepare an input data table</span>, please refer to this concise manual: <a href="www/Manual.pdf" target="_new"><i class="fa fa-file-pdf-o fa-xl" aria-hidden="true"></i></a>
 >
-> Additionally, in the Data Upload panel, we have included a demo dataset for you to experiment with.
+> Additionally, in the Data Upload panel, we have included a demo dataset for you to play with.
 
 <b><span style="color:#5c5d61; font-size:22px;">2. Demo Data</span></b>
 
@@ -38,9 +38,9 @@ To assist in preparing input data for MetaboReport, you can use the two demo dat
 
 Please select <span style="color:#E55B13">Other Format</span> when uploading the demo data in <span style="color:#E55B13">Upload Data</span> tab.
 
-> Demo data table 1: It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="www/demo/M1_Feature_Metadata_Table.csv" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+> Demo data table 1: It was preapred using method 1 (see manual), and peak area table and metadata table are in the same table: <a href="www/demo/M1_Feature_Metadata_Table.csv" target="_new"><i class="fa fa-download fa-s" aria-hidden="true"></i></i></a>
 >
-> Demo data table 2: It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="www/demo/M2_Feature_Table.csv" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="www/demo/M2_Medadata_Table.xlsx" target="_new"><i class="fa fa-download fa-xl" aria-hidden="true"></i></i></a>
+> Demo data table 2: It was prepared using method 2 (see manual), and peak area table and metadata table are two seperated tables: (1) Peak Area Table <a href="www/demo/M2_Feature_Table.csv" target="_new"><i class="fa fa-download fa-s" aria-hidden="true"></i></i></a>, (2) Metadata Table <a href="www/demo/M2_Medadata_Table.xlsx" target="_new"><i class="fa fa-download fa-s" aria-hidden="true"></i></i></a>
 
 ---
 <a href= 'https://www.weizmann.ac.il'><img src='www/img/WIS.png' alt='WIS' title='Weizmann Institute of Science' width='300'/></a>

@@ -9,7 +9,7 @@
 
 To report bugs or request new features, please send an email to:
 
-[<span style="color:#E55B13">Dr.Yonghui Dong</span> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) or [<span style="color:#E55B13">Dr.Sergey Malitsky</span> <i class="fa fa-envelope-o fa-xl" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
+[<span style="color:#E55B13">Dr.Yonghui Dong</span> <i class="fa fa-envelope-o fa-l" aria-hidden="true"></i>](mailto:yonghui.dong@gmail.com) or [<span style="color:#E55B13">Dr.Sergey Malitsky</span> <i class="fa fa-envelope-o fa-l" aria-hidden="true"></i>](mailto:sergey.malitsky@weizmann.ac.il)
 
 ------
 

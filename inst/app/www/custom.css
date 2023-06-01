@@ -1,7 +1,7 @@
 /* Whole document: */
 body{
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   text-align: justify;
 }
 
@@ -10,7 +10,7 @@ blockquote{
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   background: #e6ecf2;
   border-left: 0.2em solid #9fc1e3;
-  font-size: 15px;
+  font-size: 16px;
    line-height: 1.5;
 }
 

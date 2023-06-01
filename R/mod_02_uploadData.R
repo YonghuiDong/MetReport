@@ -42,38 +42,32 @@ mod_02_uploadData_ui <- function(id){
                closable = FALSE,
                selectInput(inputId = ns("fileFormat"),
                            label = "1. Select File Format",
-                           choices = list("Compound Discoverer (CD)" = "CD",
-                                          "Other Format (DataFrame)" = "Other"),
+                           choices = list("Compound Discoverer (CD)" = "CD", "Other Format (DataFrame)" = "Other"),
                            selected = "CD",
                            multiple = FALSE
                            ),
-
                fileInput(inputId = ns("rawFile"),
                          label = "2. Upload Data Table (or Feature Table):",
                          multiple = FALSE,
-                         placeholder = "accepts csv, xls or xlsx format",
+                         placeholder = "accept csv, xls or xlsx format",
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
-
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#b2182b;", "1. If the header of your data table does not contain meta
                  information, you need to upload a meta table below"),
                p(style = "color:#b2182b;", "2. You can check [Home Page] for detailed description of
                  data table preparation"),
-
                fileInput(inputId = ns("inputMeta"),
                          label = "2. (Optional) Upload Sample Metadata Table:",
                          multiple = FALSE,
-                         placeholder = "accepts csv, xls or xlsx format",
+                         placeholder = "accept csv, xls or xlsx format",
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
-
                radioButtons(inputId = ns("showExample"),
                             label = "Do you want to play with demo Data?",
                             choices = c("Yes" = "Yes", "No" = "No"),
                             selected = "No"
                             ),
-
                actionButton(inputId = ns("submit"),
                             label = "Submit",
                             icon = icon("paper-plane"),
@@ -91,18 +85,14 @@ mod_02_uploadData_ui <- function(id){
                collapsible = TRUE,
                collapsed = FALSE,
                closable = FALSE,
-
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
                p(style = "color:#b2182b;", "Do not delete any of your samples unless they are outliers"),
                p(style = "color:#2166ac;", shiny::icon("lightbulb"), strong("Tips: ")),
                p(style = "color:#2166ac;", "1. Continue with your analysis without deleting any samples"),
                p(style = "color:#2166ac;", "2. If you find any outliers, then come back and delete them"),
-
                uiOutput(outputId = ns("selectColumn")),
-               column(width = 6,
-                      actionButton(inputId = ns("removeCol"), label = "Remove")),
-               column(width = 6,
-                      actionButton(inputId = ns("undoCol"), label = "Undo"))
+               column(width = 6, actionButton(inputId = ns("removeCol"), label = "Remove")),
+               column(width = 6, actionButton(inputId = ns("undoCol"), label = "Undo"))
                )
              ),
 
@@ -119,7 +109,6 @@ mod_02_uploadData_ui <- function(id){
                closable = FALSE,
                DT::dataTableOutput(outputId = ns("rawView"))
                ),
-
              box(
                width = 12,
                inputId = "meta_card",
@@ -132,7 +121,6 @@ mod_02_uploadData_ui <- function(id){
                htmlOutput(outputId = ns("metaInfo")),
                DT::dataTableOutput(outputId = ns("metaView"))
                ),
-
              box(
                width = 12,
                inputId = "sample_card",

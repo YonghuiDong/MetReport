@@ -150,13 +150,10 @@ mod_02_uploadData_ui <- function(id){
 mod_02_uploadData_server <- function(id, sfData){
   ns <- NS(id)
   moduleServer(id, function(input, output, session){
-    #1.Load Data ===============================================================
-    showExample <- reactive({
-      as.character(input$showExample)
-    })
 
+    #1.Load Data ===============================================================
     inputData <- reactive({
-      if(showExample() == "Yes") {return(cancerCell)}
+      if(input$showExample == "Yes"){return(cancerCell)}
       inFile <- input$rawFile
       if(is.null(inFile)){return(NULL)}
       extension <- tools::file_ext(inFile$name)
@@ -185,7 +182,7 @@ mod_02_uploadData_server <- function(id, sfData){
     #2. Format Data ============================================================
     getProcessedData <- reactive({
       shiny::req(inputData())
-      if(showExample() == "Yes") {
+      if(input$showExample == "Yes") {
         df <- formatData(DF = inputData(), format = "CD")
       } else{
         df <- formatData(DF = inputData(), metaGroup = inputMeta(), format = input$fileFormat)
@@ -268,20 +265,20 @@ mod_02_uploadData_server <- function(id, sfData){
                   multiple = TRUE,
                   choices = names(sfData$data %>% dplyr::select(-ID))
                   )
-      })
-
+    })
     observeEvent(input$removeCol, {
       shiny::req(sfData$data)
       sfData$data <- removecolumn(sfData$data, input$selectColumn)
-      })
-
+    })
     observeEvent(input$undoCol, {
       shiny::req(sfData$data)
       sfData$data <- getProcessedData()
-      })
+    })
     return(inputData)
   })
 }
+
+
 ## To be copied in the UI
 # mod_02_uploadData_ui("02_uploadData_1")
 

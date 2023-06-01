@@ -16,7 +16,7 @@
 #' `Area: Sample_MU_F_4` = 1:3,
 #' `Area: Sample_MU_F_5` = 1:3,
 #' `Area: Sample_MU_F_6` = 1:3,
-#' check.names = FALSE
+#'  check.names = FALSE
 #' )
 #' df1_format <- formatData(df1)
 #'
@@ -35,15 +35,9 @@
 #' A = c("P", "P", "P", "S", "S", "S"),
 #' B = c("M", "M", "M", "F", "F", "F")
 #' )
-#' df2_format <- formatData(df2, metaGroup, format = "Other")
+#' df2_format <- formatData(df2, metaGroup = metaGroup, format = "Other")
 
-formatData <- function(DF, metaGroup = NULL, format = "CD") {
-  #(1) Suppress no visible binding for global variable notes
-  Name <- NULL
-  ID <- NULL
-  . <- NULL
-
-  #(2) Function
+formatData <- function(DF, metaGroup = NULL, format = "CD"){
   ## CD processed files include "Area: ", which is a key word for peak area
   if (!("Name" %in% colnames(DF))){DF["Name"] <- "Unknown"} # add a Name column
   processedData <- switch(format,
@@ -58,12 +52,12 @@ formatData <- function(DF, metaGroup = NULL, format = "CD") {
                             dplyr::select(ID, starts_with("Sample")) %>%
                             dplyr::rename_with(~ gsub("Sample_", "", .x, fixed = TRUE))
                           )
-  if(!is.null(metaGroup)) {
-    metaGroup <- metaGroup[, -1, drop=FALSE]
+  if(!is.null(metaGroup)){
+    metaGroup <- metaGroup[, -1, drop = FALSE]
     dfName <- do.call(paste, c(metaGroup, sep = '_'))
     dfName <- paste0(dfName, "_", 1:length(dfName))
     if(length(dfName) != (dim(processedData)[2] - 1)) {stop("Sample number and meta number are not equal")}
     colnames(processedData) <- c("ID", dfName)
   }
   return(processedData)
-  }
+}

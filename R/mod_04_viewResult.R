@@ -67,7 +67,7 @@ mod_04_viewResult_ui <- function(id){
                p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
                p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
                sliderInput(inputId = ns("SigP"),
-                           label = "If [Yes]: input p-value threshold",
+                           label = "If [Yes]: enter p-value threshold",
                            value = 0.05,
                            min = 0,
                            max = 0.1

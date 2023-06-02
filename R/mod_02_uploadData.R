@@ -114,7 +114,7 @@ mod_02_uploadData_ui <- function(id){
                  collapsible = TRUE,
                  collapsed = FALSE,
                  closable = FALSE,
-                 htmlOutput(outputId = ns("metaInfo")),
+                 verbatimTextOutput(outputId = ns("metaInfo")),
                  DT::dataTableOutput(outputId = ns("metaView"))
              ),
              box(width = 12,
@@ -210,20 +210,18 @@ mod_02_uploadData_server <- function(id, sfData){
         })
 
       ##(4.2) Meta Info Overview -----------------------------------------------
-      output$metaInfo <- renderUI({
+      output$metaInfo <- renderPrint({
         shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
-        str1 <- p(h4("Here is a summary of the extracted metadata:"))
-        str2 <- p(strong("Number of samples: "), code(nrow(sfData$group)))
-        str3 <- p(strong("Number of meta groups: "), code(ncol(sfData$group)))
-        str4 <- '<hr/>'
-        HTML(paste(str1, str2, str3, str4, sep = '<br/>'))
+        cat("Below is the summary of extracted metadata:\n")
+        cat(paste0("Number of samples: ", nrow(sfData$group), "\n"))
+        cat(paste0("Number of meta groups: ", ncol(sfData$group), "\n"))
       })
 
       ##(4.3) Meta table -------------------------------------------------------
       output$metaView <- DT::renderDataTable({
         shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
         DT::datatable(sfData$group,
-                      caption = "Overview of Meta Information",
+                      caption = "Overview of Metadata Information",
                       options = list(scrollX = TRUE,
                                      deferRender = TRUE,
                                      scroller = TRUE,

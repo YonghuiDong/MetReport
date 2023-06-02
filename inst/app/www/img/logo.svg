@@ -16,11 +16,9 @@
 	.st8{fill:#4A555F;}
 	.st9{fill:#E0E0E0;}
 	.st10{fill:none;}
-	.st11{font-family:'BalooBhai2-Bold';}
+	.st11{font-family:'BalooBhai2-ExtraBold';}
 	.st12{font-size:18px;}
-	.st13{opacity:0.73;}
-	.st14{fill:#6D6F76;stroke:#6D6F76;stroke-width:0.75;stroke-miterlimit:10;}
-	.st15{opacity:0.31;fill:none;stroke:#6D6F76;stroke-width:2;stroke-miterlimit:10;}
+	.st13{opacity:0.31;fill:none;stroke:#6D6F76;stroke-width:2;stroke-miterlimit:10;}
 </style>
 <sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" id="namedview929" inkscape:current-layer="g2932" inkscape:cx="182.5" inkscape:cy="723" inkscape:document-units="pt" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1312" inkscape:window-maximized="0" inkscape:window-width="2560" inkscape:window-x="0" inkscape:window-y="25" inkscape:zoom="1" pagecolor="#ffffff" showgrid="false">
 	</sodipodi:namedview>
@@ -1167,23 +1165,17 @@
 		<line class="st3" x1="264.7" y1="79.2" x2="329.1" y2="116.4"/>
 	</g>
 	<g>
-		<path id="path142763" class="st8" d="M272.9,217.2h-26.4v-34.6h26.4V217.2z M247.1,216.6h25.3v-33.5h-25.3V216.6z"/>
-		<path id="path142765" class="st8" d="M278.5,212h-6.2v-29h-20.2v-5.6h26.4V212z M272.9,211.5h5V178h-25.3v4.6h20.2L272.9,211.5
-			L272.9,211.5z"/>
-		<path id="path142767" class="st9" d="M273.6,210.8v-29h-20.2v-3.3h24.1v32.3L273.6,210.8L273.6,210.8z"/>
-		<path id="path142769" class="st9" d="M250.2,187.9h9v9.8h-9V187.9z"/>
-		<path id="path142771" class="st8" d="M261.8,187.6h7.5v0.6h-7.5V187.6z M261.8,190.8h7.5v0.6h-7.5V190.8z M261.8,194h7.5v0.6h-7.5
-			V194z M261.8,197.1h7.5v0.6h-7.5V197.1z M250.2,200.3h19v0.6h-19V200.3z M250.2,208.5h19v0.6h-19V208.5z M250.2,211.4h19v0.6h-19
-			V211.4z"/>
+		<path id="path142763" class="st8" d="M272.2,198.3h-26.4v-34.6h26.4V198.3z M246.4,197.7h25.3v-33.5h-25.3V197.7z"/>
+		<path id="path142765" class="st8" d="M277.8,193.2h-6.2v-29h-20.2v-5.6h26.4V193.2z M272.2,192.6h5v-33.5H252v4.6h20.2V192.6
+			L272.2,192.6z"/>
+		<path id="path142767" class="st9" d="M272.9,192v-29h-20.2v-3.3h24.1v32.3L272.9,192L272.9,192z"/>
+		<path id="path142769" class="st9" d="M249.5,169h9v9.8h-9V169z"/>
+		<path id="path142771" class="st8" d="M261.1,168.8h7.5v0.6h-7.5V168.8z M261.1,171.9h7.5v0.6h-7.5V171.9z M261.1,175.1h7.5v0.6
+			h-7.5V175.1z M261.1,178.2h7.5v0.6h-7.5V178.2z M249.5,181.4h19v0.6h-19V181.4z M249.5,189.7h19v0.6h-19V189.7z M249.5,192.5h19
+			v0.6h-19V192.5z"/>
 	</g>
 	<rect x="173.3" y="115.8" class="st10" width="9.4" height="80.5"/>
-	<text transform="matrix(1 0 0 1 203.5309 162.1244)" class="st1 st11 st12">Metab</text>
-	<text transform="matrix(1 0 0 1 272.9485 162.1242)" class="st1 st11 st12">Report</text>
-	<g class="st13">
-		<path class="st14" d="M258.3,161.9c2.9,2.9,7.7,2.9,10.6,0c2.9-2.9,2.9-7.7,0-10.6c-2.9-2.9-7.7-2.9-10.6,0
-			C255.4,154.2,255.4,159,258.3,161.9z M258.9,151.9c2.6-2.6,6.8-2.6,9.4,0c2.6,2.6,2.6,6.8,0,9.4c-2.6,2.6-6.8,2.6-9.4,0
-			C256.3,158.7,256.3,154.5,258.9,151.9z"/>
-	</g>
+	<text transform="matrix(1 0 0 1 205.1673 139.3746)" class="st1 st11 st12">MetaboReport</text>
 </g>
-<line class="st15" x1="345.3" y1="156.1" x2="504.2" y2="156.1"/>
+<line class="st13" x1="345.3" y1="156.1" x2="504.2" y2="156.1"/>
 </svg>

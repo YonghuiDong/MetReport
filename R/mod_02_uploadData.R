@@ -53,7 +53,7 @@ mod_02_uploadData_ui <- function(id){
                          accept = c(".csv", ".xls", ".xlsx")
                          ),
                p(style = "color:#b2182b;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#b2182b;", "1. If there is no metadata in the header, please upload a separate metadata table below."),
+               p(style = "color:#b2182b;", "1. If there is no metadata in the file header, please upload the metadata table below."),
                p(style = "color:#b2182b;", "2. Refer to the Home page for detailed data table preparation."),
                fileInput(inputId = ns("inputMeta"),
                          label = "2. (Optional) Upload Sample Metadata Table:",
@@ -140,7 +140,7 @@ mod_02_uploadData_server <- function(id, sfData){
   ns <- NS(id)
   moduleServer(id, function(input, output, session){
 
-    #1.Load Data ===============================================================
+    #(1) Load Data =============================================================
     inputData <- reactive({
       if(input$showExample == "Yes"){return(cancerCell)}
       inFile <- input$rawFile
@@ -168,7 +168,7 @@ mod_02_uploadData_server <- function(id, sfData){
       return(df)
     })
 
-    #2. Format Data ============================================================
+    #(2) Format Data ===========================================================
     getProcessedData <- reactive({
       shiny::req(inputData())
       if(input$showExample == "Yes") {
@@ -182,7 +182,7 @@ mod_02_uploadData_server <- function(id, sfData){
       return(df)
     })
 
-    #3. Get Metadata ===========================================================
+    #(3) Get Metadata ==========================================================
     getMetaData <- reactive({
       shiny::req(sfData$data)
       tem <- getMeta(DF = sfData$data)
@@ -263,7 +263,8 @@ mod_02_uploadData_server <- function(id, sfData){
       shiny::req(sfData$data)
       sfData$data <- getProcessedData()
     })
-    #return(inputData)
+
+    return(inputData)
 
 
 })}

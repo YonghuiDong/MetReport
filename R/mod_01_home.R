@@ -19,7 +19,7 @@ mod_01_home_ui <- function(id){
 #'
 #' @noRd
 mod_01_home_server <- function(id){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
 
 })}

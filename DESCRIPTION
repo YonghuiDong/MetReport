@@ -17,7 +17,6 @@ Imports:
     golem (>= 0.3.5),
     grDevices,
     igraph,
-    markdown,
     MSbox,
     plotly,
     qgraph,

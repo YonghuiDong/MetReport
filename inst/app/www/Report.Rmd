@@ -617,7 +617,7 @@ BPData <- dataGlobal3Transform %>%
 
 ## must order data by the colored variable here to avoid mismatch of standard deviation.
 ## See issue 15
-BPData <- BPData[order(BPData$Group),]
+BPData <- BPData[order(BPData$Group), ]
 BPData <- crosstalk::SharedData$new(BPData)
 metaboliteFilter <- crosstalk::filter_select(id = "Metabolite", 
                                              label = "Select a metabolite", 

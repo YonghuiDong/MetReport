@@ -104,8 +104,7 @@ mod_02_uploadData_ui <- function(id){
                  collapsible = TRUE,
                  collapsed = FALSE,
                  closable = FALSE,
-                 shinycssloaders::withSpinner(textOutput(outputId = ns("featureInfo")), type = 5),
-                 DT::dataTableOutput(outputId = ns("rawView"))
+                 shinycssloaders::withSpinner(DT::dataTableOutput(outputId = ns("rawView")), type = 5)
                  ),
              box(width = 12,
                  inputId = "meta_card",
@@ -143,28 +142,26 @@ mod_02_uploadData_server <- function(id, sfData){
   moduleServer(id, function(input, output, session){
 
     #(1) Load Data =============================================================
-    inputData <- reactiveValues(feature = NULL)
-    output$featureInfo <- renderText({
-      if(input$showExample == "Yes"){inputData$feature <- cancerCell
+    inputData <- reactive({
+      if(input$showExample == "Yes"){df <- cancerCell
       } else{
         shiny::validate(need(!is.null(input$rawFile), message = "Input data not found"))
         inFile <- input$rawFile
         if(is.null(inFile)){return(NULL)}
         extension <- tools::file_ext(inFile$name)
         filepath <- inFile$datapath
-        inputData$feature <- switch(extension,
-                                    csv = read.csv(filepath, header = TRUE, check.names = FALSE),
-                                    xls = readxl::read_xls(filepath),
-                                    xlsx = readxl::read_xlsx(filepath)
-                                    )
+        df <- switch(extension,
+                     csv = read.csv(filepath, header = TRUE, check.names = FALSE),
+                     xls = readxl::read_xls(filepath),
+                     xlsx = readxl::read_xlsx(filepath)
+                     )
       }
-      shiny::req(inputData$feature)
-      inputData$feature <- inputData$feature %>%
+      shiny::req(df)
+      df <- df %>%
         dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
         dplyr::relocate(ID)
-      print("")
-    }) |>
-      bindEvent(input$submit)
+      return(df)
+    })
 
     inputMeta <- reactive({
       inFile <- input$inputMeta
@@ -181,11 +178,11 @@ mod_02_uploadData_server <- function(id, sfData){
 
     #(2) Format Data ===========================================================
     getProcessedData <- reactive({
-      shiny::req(inputData$feature)
+      shiny::req(inputData())
       if(input$showExample == "Yes") {
-        df <- formatData(DF = inputData$feature, format = "CD")
+        df <- formatData(DF = inputData(), format = "CD")
       } else{
-        df <- formatData(DF = inputData$feature, metaGroup = inputMeta(), format = input$fileFormat)
+        df <- formatData(DF = inputData(), metaGroup = inputMeta(), format = input$fileFormat)
         df$ID <- cleanNames(df$ID)
       }
       sfData$data <- df
@@ -203,19 +200,20 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     #(4) Show Result ===========================================================
-    observeEvent(input$submit, {
-      ##(4.1) Raw Data Overview ------------------------------------------------
-      output$rawView <- DT::renderDataTable({
-        shiny::req(inputData$feature)
-        DT::datatable(inputData$feature,
-                      options = list(scrollX = TRUE,
-                                     deferRender = TRUE,
-                                     scroller = TRUE,
-                                     fixedColumns = FALSE
-                                     )
-                      )
-      })
+    ##(4.1) Raw Data Overview ------------------------------------------------
+    output$rawView <- DT::renderDataTable({
+      shiny::validate(need(!is.null(inputData()), message = "Input data not found."))
+      DT::datatable(inputData(),
+                    options = list(scrollX = TRUE,
+                                   deferRender = TRUE,
+                                   scroller = TRUE,
+                                   fixedColumns = FALSE
+                                   )
+                    )
+    }) |>
+      bindEvent(input$submit)
 
+    observeEvent(input$submit, {
       ##(4.2) Meta Info Overview -----------------------------------------------
       output$metaInfo <- renderPrint({
         shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))

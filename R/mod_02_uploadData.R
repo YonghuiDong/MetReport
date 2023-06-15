@@ -104,8 +104,8 @@ mod_02_uploadData_ui <- function(id){
                  collapsible = TRUE,
                  collapsed = FALSE,
                  closable = FALSE,
-                 DT::dataTableOutput(outputId = ns("rawView"))
-             ),
+                 shinycssloaders::withSpinner(DT::dataTableOutput(outputId = ns("rawView")), type = 5)
+                 ),
              box(width = 12,
                  inputId = "meta_card",
                  title = strong("Metadata Panel"),
@@ -134,7 +134,7 @@ mod_02_uploadData_ui <- function(id){
 #' uploadData Server Functions
 #'
 #' @noRd
-#' @importFrom dplyr relocate %>%
+#' @importFrom dplyr %>%
 
 mod_02_uploadData_server <- function(id, sfData){
   ns <- NS(id)
@@ -143,15 +143,17 @@ mod_02_uploadData_server <- function(id, sfData){
     #(1) Load Data =============================================================
     inputData <- reactive({
       if(input$showExample == "Yes"){return(cancerCell)}
+      shiny::req(input$rawFile)
       inFile <- input$rawFile
-      if(is.null(inFile)){return(NULL)}
       extension <- tools::file_ext(inFile$name)
       filepath <- inFile$datapath
       df <- switch(extension,
                    csv = read.csv(filepath, header = TRUE, check.names = FALSE),
                    xls = readxl::read_xls(filepath),
                    xlsx = readxl::read_xlsx(filepath)
-                   )
+                   ) %>%
+        dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
+        dplyr::relocate(ID)
       return(df)
     })
 
@@ -169,21 +171,20 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     #(2) Format Data ===========================================================
-    getProcessedData <- reactive({
+    ProcessedData <- reactive({
       shiny::req(inputData())
       if(input$showExample == "Yes") {
         df <- formatData(DF = inputData(), format = "CD")
       } else{
         df <- formatData(DF = inputData(), metaGroup = inputMeta(), format = input$fileFormat)
         df$ID <- cleanNames(df$ID)
-        df <- df %>% dplyr::relocate(ID)
       }
       sfData$data <- df
       return(df)
     })
 
     #(3) Get Metadata ==========================================================
-    getMetaData <- reactive({
+    MetaData <- reactive({
       shiny::req(sfData$data)
       tem <- getMeta(DF = sfData$data)
       sfData$group <- tem %>%
@@ -193,33 +194,31 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     #(4) Show Result ===========================================================
+    ##(4.1) Raw Data Overview --------------------------------------------------
+    output$rawView <- DT::renderDataTable({
+      shiny::validate(need(!is.null(inputData()), message = "Input data not found."))
+      DT::datatable(inputData(),
+                    options = list(scrollX = TRUE,
+                                   deferRender = TRUE,
+                                   scroller = TRUE,
+                                   fixedColumns = FALSE
+                                   )
+                    )
+      }) |>
+      bindEvent(input$submit)
+
+    ##(4.2) Meta Info Overview -------------------------------------------------
     observeEvent(input$submit, {
-
-      ##(4.1) Raw Data Overview ------------------------------------------------
-      output$rawView <- DT::renderDataTable({
-        shiny::validate(need(!is.null(inputData()), message = "Input data not found."))
-        DT::datatable(inputData() %>%
-                        dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
-                        dplyr::relocate(ID),
-                      options = list(scrollX = TRUE,
-                                     deferRender = TRUE,
-                                     scroller = TRUE,
-                                     fixedColumns = FALSE
-                                     )
-                      )
-        })
-
-      ##(4.2) Meta Info Overview -----------------------------------------------
       output$metaInfo <- renderPrint({
-        shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
+        shiny::validate(need(!is.null(MetaData()), message = "Metadata not found."))
         cat("Below is the summary of extracted metadata:\n")
-        cat(paste0("Number of samples: ", nrow(sfData$group), "\n"))
+        cat(paste0("Number of samples: ", p(nrow(sfData$group)), "\n"))
         cat(paste0("Number of meta groups: ", ncol(sfData$group), "\n"))
       })
 
       ##(4.3) Meta table -------------------------------------------------------
       output$metaView <- DT::renderDataTable({
-        shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
+        shiny::validate(need(!is.null(MetaData()), message = "Metadata not found."))
         DT::datatable(sfData$group,
                       caption = "Overview of Metadata Information",
                       options = list(scrollX = TRUE,
@@ -232,7 +231,7 @@ mod_02_uploadData_server <- function(id, sfData){
 
       ##(4.4) Processed Data Overview ------------------------------------------
       output$processView <- DT::renderDataTable({
-        shiny::validate(need(!is.null(getProcessedData()), message = "Input Data not found."))
+        shiny::validate(need(!is.null(ProcessedData()), message = "Input Data not found."))
         DT::datatable(sfData$data,
                       options = list(scrollX = TRUE,
                                      deferRender = TRUE,
@@ -259,7 +258,7 @@ mod_02_uploadData_server <- function(id, sfData){
     })
     observeEvent(input$undoCol, {
       shiny::req(sfData$data)
-      sfData$data <- getProcessedData()
+      sfData$data <- ProcessedData()
     })
 
     return(inputData)

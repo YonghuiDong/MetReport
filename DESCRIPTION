@@ -25,6 +25,7 @@ Imports:
     rmarkdown,
     ropls,
     shiny (>= 1.7.3),
+    shinycssloaders,
     shinydashboard,
     shinyMatrix,
     stats,

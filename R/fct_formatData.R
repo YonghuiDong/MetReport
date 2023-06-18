@@ -105,7 +105,7 @@
 #' df2_format <- formatData(df2, metaGroup = metaGroup, format = "Other")
 
 
-formatData2 <- function(DF, metaGroup = NULL, format = "CD"){
+formatData <- function(DF, metaGroup = NULL, format = "CD"){
   #(1) Change DF to datatable --------------------------------------------------
   DF <- data.table::as.data.table(DF)
   if (!("Name" %in% colnames(DF))) {DF[, Name := "Unknown"]}

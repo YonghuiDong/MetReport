@@ -1,9 +1,7 @@
 #' @title Get meta data
-#' @description Get metadata from input raw data.
-#' @return The return value, if any, from executing the function.
-#' @param DF a dataframe
-#' @importFrom utils read.table
-#' @importFrom dplyr select
+#' @description Get metadata from processed data.
+#' @param DF the processed data frame resulted from formatData function.
+#' @return a data frame, which contains meta data information
 #' @export
 #' @noRd
 #' @examples
@@ -33,21 +31,14 @@
 #'                       Mu_Female_T2_2 = c(1, 2, 3),
 #'                       Mu_Female_T2_3 = c(1, 2, 3)
 #'                       )
-#'getMeta(DF)
-
+#'getMeta1(DF)
 
 getMeta <- function(DF) {
-  #(1) Suppress no visible binding for global variable
-  ID <- NULL
-
-  #(2) Function
-  rowNameDF <- DF %>%
-    dplyr::select(-ID) %>%
-    t() %>%
-    rownames()
+  rowNameDF <- colnames(DF)
+  rowNameDF <- rowNameDF[!rowNameDF %in% "ID"]
   metaData <- read.table(text = rowNameDF, sep = "_", colClasses = "character")
   colnames(metaData) <- sub("V", "Group", colnames(metaData))
-  metaTable <- cbind.data.frame(Sample = rowNameDF, metaData) %>%
-    dplyr::select(-dplyr::last_col())
+  metaTable <- cbind.data.frame(Sample = rowNameDF, metaData)
+  metaTable <- metaTable[, -ncol(metaTable)]
   return(metaTable)
 }

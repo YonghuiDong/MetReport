@@ -430,7 +430,7 @@ mod_03_preprocess_server <- function(id, sfData){
       shiny::req(treatedData())
       shiny::req(sfData$group)
       prePCAData <- treatedData() %>%
-        select(-ID) %>%
+        dplyr::select(-ID) %>%
         t()
       p <- showPCA(prePCAData,
                    Group = sfData$group[, prePCAGroup()],

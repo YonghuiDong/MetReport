@@ -157,9 +157,12 @@ mod_02_uploadData_server <- function(id, sfData){
                      )
       }
       shiny::req(df)
-      df <- df %>%
-        dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
-        dplyr::relocate(ID)
+      # df <- df %>%
+      #   dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
+      #   dplyr::relocate(ID)
+      df <- data.table::setDT(df) %>%
+        .[, ID := paste0("ID", seq_len(.N))] %>%
+        data.table::setcolorder(., neworder = "ID")
       return(df)
     })
 
@@ -195,7 +198,7 @@ mod_02_uploadData_server <- function(id, sfData){
       df <- getMeta(DF = sfData$data)
       sfData$group <- df %>%
         `rownames<-`(.$Sample) %>%
-        dplyr::select(-Sample)
+        .[-which(names(.) == "Sample")]
       return(df)
     })
 
@@ -248,17 +251,17 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     #(5) Remove Outlier ========================================================
-    removecolumn <- function(df, nameofthecolumn){dplyr::select(df, -all_of(nameofthecolumn))}
     output$selectColumn <- renderUI({
       shiny::req(sfData$data)
       selectInput(inputId = ns("selectColumn"),
                   label = "Select sample(s) to remove",
                   multiple = TRUE,
-                  choices = names(sfData$data %>% dplyr::select(-ID))
+                  choices = setdiff(names(sfData$data), "ID")
                   )
     })
     observeEvent(input$removeCol, {
       shiny::req(sfData$data)
+      shiny::req(input$selectColumn)
       sfData$data <- removecolumn(sfData$data, input$selectColumn)
     })
     observeEvent(input$undoCol, {

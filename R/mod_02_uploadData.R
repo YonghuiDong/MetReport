@@ -135,7 +135,7 @@ mod_02_uploadData_ui <- function(id){
 #' uploadData Server Functions
 #'
 #' @noRd
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 
 mod_02_uploadData_server <- function(id, sfData){
   ns <- NS(id)
@@ -145,21 +145,17 @@ mod_02_uploadData_server <- function(id, sfData){
     inputData <- reactive({
       if(input$showExample == "Yes"){df <- cancerCell
       } else{
-        shiny::validate(need(!is.null(input$rawFile), message = "Input data not found"))
+        shiny::validate(need(!is.null(input$rawFile), message = "Input data not found."))
         inFile <- input$rawFile
-        if(is.null(inFile)){return(NULL)}
         extension <- tools::file_ext(inFile$name)
         filepath <- inFile$datapath
         df <- switch(extension,
-                     csv = read.csv(filepath, header = TRUE, check.names = FALSE),
+                     csv = data.table::fread(filepath, header = TRUE, check.names = FALSE),
                      xls = readxl::read_xls(filepath),
                      xlsx = readxl::read_xlsx(filepath)
                      )
       }
       shiny::req(df)
-      # df <- df %>%
-      #   dplyr::mutate(ID = paste0("ID", rownames(.))) %>%
-      #   dplyr::relocate(ID)
       df <- data.table::setDT(df) %>%
         .[, ID := paste0("ID", seq_len(.N))] %>%
         data.table::setcolorder(., neworder = "ID")
@@ -167,12 +163,12 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     inputMeta <- reactive({
+      shiny::req(input$inputMeta)
       inFile <- input$inputMeta
-      if(is.null(inFile)){return(NULL)}
       extension <- tools::file_ext(inFile$name)
       filepath <- inFile$datapath
       df <- switch(extension,
-                   csv = read.csv(filepath, header = TRUE, check.names = FALSE),
+                   csv = data.table::fread(filepath, header = TRUE, check.names = FALSE),
                    xls = readxl::read_xls(filepath),
                    xlsx = readxl::read_xlsx(filepath)
                    )

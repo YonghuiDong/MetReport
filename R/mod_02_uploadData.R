@@ -199,9 +199,9 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     #(4) Show Result ===========================================================
-    ##(4.1) Raw Data Overview ------------------------------------------------
+    ##(4.1) Raw Data Overview --------------------------------------------------
     output$rawView <- DT::renderDataTable({
-      shiny::validate(need(!is.null(inputData()), message = "Input data not found."))
+      shiny::req(inputData())
       DT::datatable(inputData(),
                     options = list(scrollX = TRUE,
                                    deferRender = TRUE,

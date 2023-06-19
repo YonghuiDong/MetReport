@@ -37,6 +37,7 @@ golem::add_module(name = "10_contact", with_test = FALSE) # Name of the module
 golem::add_fct("cleanNames", with_test = FALSE)
 golem::add_fct("formatData", with_test = FALSE)
 golem::add_fct("getMeta", with_test = FALSE)
+golem::add_fct("removecolumn", with_test = FALSE)
 golem::add_fct("kNNMissing", with_test = FALSE)
 golem::add_fct("getCV", with_test = FALSE)
 golem::add_fct("doNormalization", with_test = FALSE)

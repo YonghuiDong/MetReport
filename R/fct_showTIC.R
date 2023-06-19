@@ -18,44 +18,37 @@
 #' Group <- c("X", "Y", "Z")
 #' showTIC(df, Group)
 
-showTIC <- function(df, Group = NULL, method = "fast"){
-  if(method == "fast") return(fastShowTIC(df, Group))
-  showTIC(df, Group)
-}
-
-# (1) Normal TIC with outlier ==================================================
-normalshowTIC <- function(df, Group = NULL){
-  #(1) format data
-  tem <- df[, !(names(df) %in% c("ID"))]
-  tem <- t(as.matrix(tem))
-  if(is.null(Group)){Group = rownames(tem)}
-  tem <- cbind.data.frame(Group = Group, Sample = rownames(tem), tem)
-  colnames(tem)[1] <- "Group"
-  tem <- tidyr::pivot_longer(tem, cols = !c(Group, Sample), names_to = "name", values_to = "Area")
-
-  #(2) plot
-  ggplot2::ggplot(tem, aes(x = Sample, y = Area, fill = Group)) +
-    ggplot2::geom_boxplot(alpha = 0.7) +
-    ggplot2::ylab("Peak Area") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = element_blank())
-}
-
-
-## (2) fast TIC but without outlier ============================================
-fastShowTIC <- function(df, Group = NULL){
-  #(1) format data
-  tem <- df[, !(names(df) %in% c("ID"))]
-  tem <- t(as.matrix(tem))
-  quantiles <- t(apply(tem, 1, quantile, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)))
+#(1) Fast TIC but without outlier ============================================
+showTIC <- function(df, Group = NULL){
+  #(1) Format data -------------------------------------------------------------
+  df$ID <- NULL
+  quantiles <- t(apply(df, 2, quantile, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)))
   if(is.null(Group)){Group = rownames(quantiles)}
-  tem <- cbind.data.frame(Group = Group, Sample = rownames(quantiles), quantiles)
-  colnames(tem)[1] <- "Group"
+  df <- cbind.data.frame(Group = Group, Sample = rownames(quantiles), quantiles)
 
-  #(2) plot
-  ggplot2::ggplot(tem, aes(x = Sample, ymin = `5%`, lower =`25%`, middle = `50%`, upper = `75%`, ymax = `95%`, fill = Group)) +
+  #(2) Plot --------------------------------------------------------------------
+  ggplot2::ggplot(df, aes(x = Sample, ymin = `5%`, lower =`25%`, middle = `50%`, upper = `75%`, ymax = `95%`, fill = Group)) +
     ggplot2::geom_boxplot(stat = "identity", alpha = 0.7) +
     ggplot2::ylab("Peak Area") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = element_blank())
 }
+
+# #(2) Normal TIC with outlier ===================================================
+# normalshowTIC <- function(df, Group = NULL){
+#   #(1) format data -------------------------------------------------------------
+#   tem <- df[, !(names(df) %in% c("ID"))]
+#   tem <- t(as.matrix(tem))
+#   if(is.null(Group)){Group = rownames(tem)}
+#   tem <- cbind.data.frame(Group = Group, Sample = rownames(tem), tem)
+#   colnames(tem)[1] <- "Group"
+#   tem <- tidyr::pivot_longer(tem, cols = !c(Group, Sample), names_to = "name", values_to = "Area")
+#
+#   #(2) plot --------------------------------------------------------------------
+#   ggplot2::ggplot(tem, aes(x = Sample, y = Area, fill = Group)) +
+#     ggplot2::geom_boxplot(alpha = 0.7) +
+#     ggplot2::ylab("Peak Area") +
+#     ggplot2::theme_bw() +
+#     ggplot2::theme(axis.text.x = element_blank())
+# }
+

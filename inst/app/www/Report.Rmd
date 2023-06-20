@@ -24,7 +24,6 @@ params:
   dataGlobal3Transform: NA
   BPGroup: NA
   BPTransform: NA,
-  KMDG: NA,
   KMTrendPlot: NA,
   KMTable: NA,
   projectName: NA,
@@ -531,24 +530,9 @@ volcanoList
 
 K-Means Cluster Analysis can be used to reveal the main subsets of mass features that displayed differential profiles across different sample groups.
 
-The `Circular Dendrogram` gives an overview of the number of mass features in each subset (subgroup).
-
 The `Cluster Plot` shows the trend of the metabolic profiles in each subset (subgroup)
 
 The `Table` provides more details information of each metabolite, such as metabolite name (if exit), standardized peak area and the group information.
-
-**Circular Dendrogram** 
-
-```{r}
-#| label = KMDG,
-#| echo = FALSE,
-#| warning = FALSE, 
-#| message = FALSE,
-#| out.width = '100%'
-#(8.1) show K-Means result------------------------------------------------------
-
-params$KMDG
-```
 
 **Metabolic Profile Clustering**
 ```{r}

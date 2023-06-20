@@ -655,9 +655,6 @@ mod_04_viewResult_server <- function(id, sfData){
 
     #(1) Statistics Panel=======================================================
     ##(1) Stat parameters-------------------------------------------------------
-    statMethod <- reactive({
-      as.character(input$statMethod)
-    })
     StatGroup <- reactive({
       as.character(input$StatGroup)
     })
@@ -668,62 +665,28 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    pAdjMethod <- reactive({
-      as.character(input$pAdjMethod)
-    })
     SigFilter <- reactive({
       as.logical(as.numeric(input$SigFilter))
     })
-    SigP <- reactive({
-      input$SigP
-    })
 
     ##(2) Perform statistics----------------------------------------------------
-    tDataGlobal <- reactive({
-      shiny::req(sfData$clean)
-      tem <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tem) <- sfData$clean$ID
-      return(tem)
-    })
+    # tDataGlobal <- reactive({
+    #   shiny::req(sfData$clean)
+    #   transformDF(sfData$clean)
+    # })
 
     statTable <- reactive({
       shiny::req(sfData$filter)
       shiny::req(sfData$filterNormTransform)
       shiny::req(sfData$clean)
       shiny::req(sfData$group)
-      ###(1) transpose filtered data
-      tFilter <- sfData$filter %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tFilter) <- sfData$filter$ID
-      ###(2) transpose filtered, normalized and transformed data
-      tFilterNormTransform <- sfData$filterNormTransform %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tFilterNormTransform) <- sfData$filterNormTransform$ID
-      ###(3) transpose filtered, normalized, transformed and scaled data
-      tClean <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tClean) <- sfData$clean$ID
-
-      ## Statistics not performed on QC; also to allow t-test possible when there are only two groups with QC
-      tFilterTem <- cbind.data.frame(tFilter, Group = sfData$group[, StatGroup()]) %>%
-        dplyr::filter(Group != "QC")
-      tFilter <- tFilterTem %>% dplyr::select(-Group)
-      Group <- tFilterTem %>% dplyr::select(Group) %>% dplyr::pull()
+      ## Transform the data for statistics, QCs are excluded.
+      tFilter <- transformDF(sfData$filter, Group = sfData$group[, StatGroup()]) # filtered DF
+      tFilterNormTransform <- transformDF(sfData$filterNormTransform, Group = sfData$group[, StatGroup()]) # filtered, normalized and transformed
+      tClean <- transformDF(sfData$clean, Group = sfData$group[, StatGroup()]) # filtered, normalized, transformed and scaled data
+      Group <- sfData$group[, StatGroup()]
+      Group <- Group[Group != "QC"]
       checkPair <- as.data.frame(table(Group)) # to valid paired test
-
-      tFilterNormTransformTem <- cbind.data.frame(tFilterNormTransform, Group = sfData$group[, StatGroup()]) %>%
-        dplyr::filter(Group != "QC")
-      tFilterNormTransform <- tFilterNormTransformTem %>% dplyr::select(-Group)
-
-      tCleanTem <- cbind.data.frame(tClean, Group = sfData$group[, StatGroup()]) %>%
-        dplyr::filter(Group != "QC")
-      tClean <- tCleanTem %>% dplyr::select(-Group)
-
       shiny::withProgress(
         message = "Performing statistics; Be patient",
         detail = "This may take a while...",
@@ -735,32 +698,31 @@ mod_04_viewResult_server <- function(id, sfData){
           if(input$statMethod == "anovaRM" & var(checkPair$Freq) != 0) {return(NULL)}
           statFC <- getFC(tFilter, Group = Group)
           statP <- getP(tFilterNormTransform, Group = Group, Method = input$statMethod)
-          statP <- statP %>% dplyr::mutate_all(~ p.adjust(., method = pAdjMethod(), n = length(.)))
+          statP <- statP %>% dplyr::mutate_all(~ p.adjust(., method = input$pAdjMethod, n = length(.)))
           statVIP <- getVIP(tClean, Group = Group)
           statTable <- cbind.data.frame(statFC, statP, statVIP)
           rownames(statTable) <- sfData$clean$ID
           return(statTable)
           })
     }) %>%
-      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, input$statMethod, StatGroup(), pAdjMethod()) %>%
+      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, input$statMethod, StatGroup(), input$pAdjMethod) %>%
       shiny::bindEvent(input$viewStat)
 
-    ### On click, both only QC-filtered (rawArea) and QC-filtered & transformed peak areas (processedAREA) are included
+    ### On click, both only QC-filtered (raw area) and QC-filtered & transformed peak areas (processed area) are included
     combinedTable <- eventReactive(input$viewStat, {
       shiny::req(sfData$filter)
       shiny::req(sfData$clean)
       shiny::req(statTable())
-      tem1 <- sfData$filter %>%
-        dplyr::select(-ID) %>%
-        setNames(paste0("rawArea_", names(.)))
-      tem2 <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        setNames(paste0("processedAREA_", names(.)))
+      tem1 <- subset(sfData$filter, select = -ID)
+      names(tem1) <- paste0("rawArea_", names(tem1))
+      tem2 <- subset(sfData$clean, select = -ID)
+      names(tem2) <- paste0("processedAREA_", names(tem2))
       tem3 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1, tem2)
-      ## p-value filtering
-      if(isTRUE(SigFilter())){
+
+      ## filter rows based on defined p-value
+      if(isTRUE(as.logical(as.numeric(input$SigFilter)))){
         tem3 <- tem3 %>%
-          dplyr::filter(if_any(contains("Pvalue"), ~ . < SigP()))
+          dplyr::filter(if_any(contains("Pvalue"), ~ . < input$SigP))
         }
       rownames(tem3) <- NULL
       return(tem3)

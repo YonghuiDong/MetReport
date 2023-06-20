@@ -69,11 +69,9 @@ doNormalization <-function(x, Method = NULL, Inx = NULL){
   #(2.6) IS-based normalization
   if(toupper(Method) == "IS"){
     # sum IS
-    SumIS <- x %>%
-      dplyr::slice(Inx) %>%
-      dplyr::summarise(across(everything(), mean))
+    SumIS <- colMeans(x[Inx, ])
 
-    # if contain 0, dataframe will not get normalized
+    # if contain 0, data frame will not get normalized
     if(isTRUE(any(SumIS == 0))){norm.metabo.data <- x}
 
     norm.metabo.data <- mapply('/', x, SumIS)

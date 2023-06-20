@@ -173,8 +173,7 @@ mod_04_viewResult_ui <- function(id){
                                downloadButton(outputId = ns("downloadPCA"))
                                )
                         ),
-
-               plotly::plotlyOutput(ns("PCAPlot"))
+               shinycssloaders::withSpinner(plotly::plotlyOutput(ns("PCAPlot")), type = 5)
                ),
 
              ##(3) OPLSDA Plot Panel -------------------------------------------
@@ -750,7 +749,7 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #2. PCA=====================================================================
+    #(2) PCA====================================================================
     ##(1) PCA parameters--------------------------------------------------------
     PCAGroup <- reactive({
       as.character(input$PCAGroup)
@@ -762,55 +761,27 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    PCAX <- reactive({
-      as.numeric(input$PCAX)
-    })
-    PCAY <- reactive({
-      as.numeric(input$PCAY)
-    })
-    PCALabel <- reactive({
-      as.logical(as.numeric(input$PCALabel))
-    })
-    PCAFrame <- reactive({
-      as.character(input$PCAFrame)
-    })
-    PCAColor <- reactive({
-      as.character(input$PCAColor)
-    })
-    PCAType <- reactive({
-      as.character(input$PCAType)
-    })
     PCARatio <- reactive({
       if(input$PCARatio <=0){return(1)}
       input$PCARatio
     })
 
     ##(2) Prepare plot----------------------------------------------------------
-    ## On click (For PCA, only filter by QC)
+    ### sfData$clean (QC filtered data) is used for PCA
     combinedTablePCA <- eventReactive(input$viewStat, {
       shiny::req(sfData$clean)
       shiny::req(statTable())
-      tem1 <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        setNames(paste0("rawArea_", names(.)))
+      tem1 <- subset(sfData$clean, select = -ID)
+      names(tem1) <- paste0("rawArea_", names(tem1))
       tem2 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1)
       rownames(tem2) <- NULL
       return(tem2)
     })
 
     dataGlobal3PCA <- reactive({
-      shiny::req(combinedTablePCA())
-      tem1 <- combinedTablePCA() %>%
-        dplyr::select(ID, starts_with("rawArea_")) %>%
-        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- tem1 %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tem2) <- tem1$ID
-      tem3 <- tem2 %>%
-        as.data.frame() %>%
-        dplyr::rename_with(make.names)
-      return(tem3)
+      shiny::req(sfData$clean)
+      tem <- transformDF(sfData$clean, Group = NULL, rowName = TRUE)
+      return(tem)
     })
 
     PCAPlot <- reactive({
@@ -818,19 +789,19 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(sfData$group)
       p <- showPCA(dataGlobal3PCA(),
                    Group = sfData$group[, PCAGroup()],
-                   inx = PCAX(),
-                   iny = PCAY(),
-                   showFrame = PCAFrame(),
+                   inx = as.numeric(input$PCAX),
+                   iny = as.numeric(input$PCAY),
+                   showFrame = input$PCAFrame,
                    interactive = FALSE
                    ) +
         ggplot2::theme(text = element_text(size = 16))
 
-      if(PCAColor() == "Default") {
+      if(input$PCAColor == "Default") {
         p <- p
         } else {
           p <- p +
-            scale_color_brewer(palette = PCAColor()) +
-            scale_fill_brewer(palette = PCAColor())
+            scale_color_brewer(palette = input$PCAColor) +
+            scale_fill_brewer(palette = input$PCAColor)
         }
       return(p)
     })
@@ -843,9 +814,11 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     output$downloadPCA <- downloadHandler(
-      filename = function(){paste("PCA", PCAType(), sep = ".")},
+      filename = function(){paste("PCA", input$PCAType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = PCAPlot(), dpi = 600, width = 20, height = 20 / PCARatio(), units = "cm", device = PCAType())
+        ggplot2::ggsave(file, plot = PCAPlot(), dpi = 600, width = 20, height = 20 / PCARatio(),
+                        units = "cm", device = input$PCAType
+                        )
       }
     )
 

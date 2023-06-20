@@ -31,7 +31,7 @@
 #'                       Mu_Female_T2_2 = c(1, 2, 3),
 #'                       Mu_Female_T2_3 = c(1, 2, 3)
 #'                       )
-#'getMeta1(DF)
+#'getMeta(DF)
 
 getMeta <- function(DF) {
   rowNameDF <- colnames(DF)

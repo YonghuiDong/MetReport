@@ -201,7 +201,6 @@ mod_05_downloadReport_server <- function(id, sfData = global, inputData, resultL
               dataGlobal3Transform= resultList$dataGlobal3Transform(), # data for boxplot
               BPGroup = resultList$BPGroup(), # group information for boxplot
               BPTransform = resultList$BPTransform(), # data transformation for boxplot
-              KMDG = resultList$KMDG(),
               KMTrendPlot = resultList$KMTrendPlot(),
               KMTable = resultList$KMTable(),
               projectName = projectName(),

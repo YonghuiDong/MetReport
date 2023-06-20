@@ -25,11 +25,11 @@ fillNA <- function(df, method = "1"){
   return(df)
 }
 
-#' @title k-Nearest Neighbour Imputation
-#' @description k-Nearest Neighbour imputation using VIM package
-#' @param x dataframe, row is feature, column is sample
+#' @title k-Nearest Neighbor Imputation
+#' @description k-Nearest Neighbor imputation using VIM package
+#' @param x data frame, row is feature, column is sample
 #' @importFrom VIM kNN
-#' @return a dataframe will filled missing value
+#' @return a data frame will filled missing value
 #' @export
 #' @noRd
 

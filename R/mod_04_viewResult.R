@@ -650,10 +650,10 @@ mod_04_viewResult_ui <- function(id){
 #' @noRd
 #' @importFrom ggplot2 aes scale_color_brewer scale_fill_brewer position_dodge
 mod_04_viewResult_server <- function(id, sfData){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    #1. General Statistics Panel================================================
+    #(1) Statistics Panel=======================================================
     ##(1) Stat parameters-------------------------------------------------------
     statMethod <- reactive({
       as.character(input$statMethod)
@@ -729,12 +729,12 @@ mod_04_viewResult_server <- function(id, sfData){
         detail = "This may take a while...",
         value = 0.4,
         {
-          if(statMethod() == "tTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
-          if(statMethod() == "ptTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
-          if(statMethod() == "ptTest" & var(checkPair$Freq) != 0) {return(NULL)}
-          if(statMethod() == "anovaRM" & var(checkPair$Freq) != 0) {return(NULL)}
+          if(input$statMethod == "tTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
+          if(input$statMethod == "ptTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
+          if(input$statMethod == "ptTest" & var(checkPair$Freq) != 0) {return(NULL)}
+          if(input$statMethod == "anovaRM" & var(checkPair$Freq) != 0) {return(NULL)}
           statFC <- getFC(tFilter, Group = Group)
-          statP <- getP(tFilterNormTransform, Group = Group, Method = statMethod())
+          statP <- getP(tFilterNormTransform, Group = Group, Method = input$statMethod)
           statP <- statP %>% dplyr::mutate_all(~ p.adjust(., method = pAdjMethod(), n = length(.)))
           statVIP <- getVIP(tClean, Group = Group)
           statTable <- cbind.data.frame(statFC, statP, statVIP)
@@ -742,7 +742,7 @@ mod_04_viewResult_server <- function(id, sfData){
           return(statTable)
           })
     }) %>%
-      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, statMethod(), StatGroup(), pAdjMethod()) %>%
+      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, input$statMethod, StatGroup(), pAdjMethod()) %>%
       shiny::bindEvent(input$viewStat)
 
     ### On click, both only QC-filtered (rawArea) and QC-filtered & transformed peak areas (processedAREA) are included

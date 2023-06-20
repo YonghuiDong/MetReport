@@ -95,17 +95,17 @@ mod_04_viewResult_ui <- function(id){
                  p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value-filled and QC-filtered data."),
                  p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
                  p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
-                 column(width = 12,
-                        varSelectInput(inputId = ns("StatGroup"),
-                                       label = "Select MetaData (Sample Groups) for statistics",
-                                       data = ""
-                                       )
-                        ),
-                 column(width = 12,
-                        downloadButton(outputId = ns("downloadStatTable"))
-                        ),
+                 fluidRow(width = 12,
+                          column(width = 12,
+                                 varSelectInput(inputId = ns("StatGroup"),
+                                                label = "Select MetaData (Sample Groups) for statistics",
+                                                data = ""
+                                                )
+                                 ),
+                          column(width = 12, downloadButton(outputId = ns("downloadStatTable")))
+                          ),
                  br(),
-                 DT::dataTableOutput(ns("StatResult"))
+                 shinycssloaders::withSpinner(DT::dataTableOutput(ns("StatResult")), type = 5)
                 ),
 
              ##(2) PCA Panel ---------------------------------------------------
@@ -664,9 +664,6 @@ mod_04_viewResult_server <- function(id, sfData){
         data = sfData$group,
         selected = "Group1"
       )
-    })
-    SigFilter <- reactive({
-      as.logical(as.numeric(input$SigFilter))
     })
 
     ##(2) Perform statistics----------------------------------------------------

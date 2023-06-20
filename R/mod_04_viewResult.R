@@ -13,7 +13,7 @@ mod_04_viewResult_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
-      #1. User Guide ===========================================================
+      #(1) User Guide **********************************************************
       column(width = 12,
              box(
                width = 12,
@@ -28,7 +28,7 @@ mod_04_viewResult_ui <- function(id){
                )
              ),
 
-      #2. View Statistics Panel ================================================
+      #(2) View Statistics Panel ***********************************************
       column(width = 4,
              box(
                width = 12,
@@ -80,36 +80,33 @@ mod_04_viewResult_ui <- function(id){
                )
              ),
 
-      #3. Statistics Panel =====================================================
+      #(3) Result Panel ********************************************************
       column(width = 8,
              ##(1) Statistics Panel --------------------------------------------
-             box(
-               width = 12,
-               inputId = "Stat_card",
-               title = strong("Statistics Panel"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value-filled and QC-filtered data."),
-               p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
-               p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
-               fluidRow(width = 12,
-                        column(width = 12,
-                               varSelectInput(inputId = ns("StatGroup"),
-                                              label = "Select MetaData (Sample Groups) for statistics",
-                                              data = ""
-                                              )
-                               ),
-                        column(width = 12,
-                               downloadButton(outputId = ns("downloadStatTable"))
-                               )
+             box(width = 12,
+                 inputId = "Stat_card",
+                 title = strong("Statistics Panel"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
+                 p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value-filled and QC-filtered data."),
+                 p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
+                 p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
+                 column(width = 12,
+                        varSelectInput(inputId = ns("StatGroup"),
+                                       label = "Select MetaData (Sample Groups) for statistics",
+                                       data = ""
+                                       )
                         ),
-               br(),
-               DT::dataTableOutput(ns("StatResult"))
-               ),
+                 column(width = 12,
+                        downloadButton(outputId = ns("downloadStatTable"))
+                        ),
+                 br(),
+                 DT::dataTableOutput(ns("StatResult"))
+                ),
 
              ##(2) PCA Panel ---------------------------------------------------
              box(

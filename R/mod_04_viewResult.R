@@ -432,24 +432,18 @@ mod_04_viewResult_ui <- function(id){
                                )
                         ),
                fluidRow(width = 12,
-                        column(width = 4,
-                               downloadButton(outputId = ns("downloadKMDG"),
-                                              label = "Download Dendrogram"
-                                              )
-                               ),
-                        column(width = 4,
+                        column(width = 6,
                                downloadButton(outputId = ns("downloadKMTrend"),
                                               label = "Download Line Plot"
                                               )
                                ),
-                        column(width = 4,
+                        column(width = 6,
                                downloadButton(outputId = ns("downloadKMTable"),
                                               label = "Download Table"
                                               )
                                )
                         ),
                br(),
-               shiny::plotOutput(ns("KMDG")),
                shiny::plotOutput(ns("KMTrendPlot")),
                DT::dataTableOutput(ns("KMTable"))
                ),
@@ -1297,41 +1291,41 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     ###(2.6) KM dendrogram
-    KMDG <- reactive({
-      d1 <- data.frame(from = "origin", to = levels(as.factor(KMTable()$clust)))
-      d2 <- data.frame(from = KMTable()$clust, to = KMTable()$Metabolite)
-      edges <- rbind(d1, d2)
-      vertices <- data.frame(
-        name = unique(c(as.character(edges$from), as.character(edges$to))) ,
-        value = 1
-      )
-      vertices$group <- edges$from[match(vertices$name, edges$to)]
-      vertices$id <- NA
-      myleaves <- which(is.na( match(vertices$name, edges$from) ))
-      nleaves <- length(myleaves)
-      vertices$id[myleaves] <- seq(1:nleaves)
-      vertices$angle <- 90 - 360 * vertices$id / nleaves
-      vertices$hjust <- ifelse(vertices$angle < -90, 1, 0)
-      vertices$angle <- ifelse(vertices$angle < -90, vertices$angle+180, vertices$angle)
-      mygraph <- igraph::graph_from_data_frame(edges, vertices = vertices )
-      p <- ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
-        ggraph::geom_edge_diagonal(colour="grey") +
-        ##ggraph::scale_edge_colour_distiller(palette = "RdPu") +
-        ggraph::geom_node_point(aes(filter = leaf, x = x * 1.07, y = y*1.07, colour = group), size = 4) +
-        ggplot2::scale_colour_manual(name = "Cluster", values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
-        ggplot2::scale_size_continuous(range = c(0.1,10) ) +
-        ggplot2::theme_void() +
-        ggplot2::theme(text = element_text(size = 14)) +
-        ggplot2::expand_limits(x = c(-1.3, 1.3), y = c(-1.3, 1.3))
-      return(p)
-    })
+    # KMDG <- reactive({
+    #   d1 <- data.frame(from = "origin", to = levels(as.factor(KMTable()$clust)))
+    #   d2 <- data.frame(from = KMTable()$clust, to = KMTable()$Metabolite)
+    #   edges <- rbind(d1, d2)
+    #   vertices <- data.frame(
+    #     name = unique(c(as.character(edges$from), as.character(edges$to))) ,
+    #     value = 1
+    #   )
+    #   vertices$group <- edges$from[match(vertices$name, edges$to)]
+    #   vertices$id <- NA
+    #   myleaves <- which(is.na( match(vertices$name, edges$from) ))
+    #   nleaves <- length(myleaves)
+    #   vertices$id[myleaves] <- seq(1:nleaves)
+    #   vertices$angle <- 90 - 360 * vertices$id / nleaves
+    #   vertices$hjust <- ifelse(vertices$angle < -90, 1, 0)
+    #   vertices$angle <- ifelse(vertices$angle < -90, vertices$angle+180, vertices$angle)
+    #   mygraph <- igraph::graph_from_data_frame(edges, vertices = vertices )
+    #   p <- ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
+    #     ggraph::geom_edge_diagonal(colour="grey") +
+    #     ##ggraph::scale_edge_colour_distiller(palette = "RdPu") +
+    #     ggraph::geom_node_point(aes(filter = leaf, x = x * 1.07, y = y*1.07, colour = group), size = 4) +
+    #     ggplot2::scale_colour_manual(name = "Cluster", values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
+    #     ggplot2::scale_size_continuous(range = c(0.1,10) ) +
+    #     ggplot2::theme_void() +
+    #     ggplot2::theme(text = element_text(size = 14)) +
+    #     ggplot2::expand_limits(x = c(-1.3, 1.3), y = c(-1.3, 1.3))
+    #   return(p)
+    # })
 
     ##(3) Show and download plot----------------------------------------------------
-    output$KMDG <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      KMDG() + ggplot2::ggtitle("Circular Dendrogram")
-    })
+    # output$KMDG <- shiny::renderPlot({
+    #   shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+    #   KMDG() + ggplot2::ggtitle("Circular Dendrogram")
+    # })
 
     output$KMTrendPlot <- shiny::renderPlot({
       shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
@@ -1355,12 +1349,12 @@ mod_04_viewResult_server <- function(id, sfData){
                     )
     })
 
-    output$downloadKMDG <- downloadHandler(
-      filename = function(){paste("KM_Dendrogram", KMType(), sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = KMDG(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = KMType())
-      }
-    )
+    # output$downloadKMDG <- downloadHandler(
+    #   filename = function(){paste("KM_Dendrogram", KMType(), sep = ".")},
+    #   content = function(file){
+    #     ggplot2::ggsave(file, plot = KMDG(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = KMType())
+    #   }
+    # )
 
     output$downloadKMTrend <- downloadHandler(
       filename = function(){paste("KM_Lineplot", KMType(), sep = ".")},
@@ -1631,7 +1625,6 @@ mod_04_viewResult_server <- function(id, sfData){
       dataGlobal3Transform = dataGlobal3Transform, # data for boxplot
       BPGroup = BPGroup, # group information for boxplot
       BPTransform = BPTransform, # data transformation for boxplot
-      KMDG = KMDG,
       KMTrendPlot = KMTrendPlot,
       KMTable = KMTable
       )

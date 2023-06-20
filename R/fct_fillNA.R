@@ -13,24 +13,24 @@
 fillNA <- function(df, method = "1"){
   id <- df$ID
   df <- subset(df, select = -ID)
-  df2 <- switch(method,
+  df <- switch(method,
                 "1" = replace(df, is.na(df), 1),
                 "HM" = as.data.frame(t(apply(df, 1, function(x) replace(x, is.na(x), 0.2 * min(x, na.rm = TRUE))))),
                 "KNN" = kNNMissing(df),
                 "Mean" = as.data.frame(t(apply(df, 1, function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))))),
                 "Median" = as.data.frame(t(apply(df, 1, function(x) replace(x, is.na(x), median(x, na.rm = TRUE)))))
                 )
-  df2$ID <- id
-  data.table::setcolorder(df2, neworder = "ID")
-  return(df2)
+  df$ID <- id
+  data.table::setcolorder(df, neworder = "ID")
+  return(df)
 }
 
 
 kNNMissing <- function(x) {
   df <- VIM::kNN(t(x), imp_var = FALSE)
   rownames(df) <- colnames(x)
-  df2 <- t(df)
-  df2 <- as.data.frame(df2)
-  rownames(df2) <- NULL
-  return(df2)
+  df <- t(df)
+  df <- as.data.frame(df)
+  return(df)
 }
+

@@ -714,6 +714,7 @@ mod_04_viewResult_server <- function(id, sfData){
       return(tem3)
     })
 
+
     ##(2) Show statistical result ==============================================
     output$StatResult <- DT::renderDataTable({
       shiny::validate(
@@ -845,6 +846,7 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
       shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "SAME"))
       dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
       dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
       OPLSDA$feature <- subset(dfOPLSDA, select = -Group)

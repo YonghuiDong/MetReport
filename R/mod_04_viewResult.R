@@ -382,7 +382,7 @@ mod_04_viewResult_ui <- function(id){
                                downloadButton(outputId = ns("downloadVCPlot"))
                                )
                         ),
-               plotly::plotlyOutput(ns("VCPlot"))
+               shinycssloaders::withSpinner(plotly::plotlyOutput(ns("VCPlot")), type = 5)
                ),
 
              ##(5) K-Means Panel -----------------------------------------------
@@ -1005,13 +1005,8 @@ mod_04_viewResult_server <- function(id, sfData){
         dev.off()
     })
 
-    #3. Volcano Plot------------------------------------------------------------
-    VCLevel1 <- reactive({
-      as.character(input$VCLevel1)
-    })
-    VCLevel2 <- reactive({
-      as.character(input$VCLevel2)
-    })
+    #(3) Volcano Plot ==========================================================
+    ##(1) Volcano plot parameters ----------------------------------------------
     observeEvent(StatGroup(), {
       VCLevels <- sfData$group[, StatGroup()]
       updateSelectInput(inputId = "VCLevel1",
@@ -1023,15 +1018,6 @@ mod_04_viewResult_server <- function(id, sfData){
                         selected = NULL
                         )
     })
-    VCFC <- reactive({
-      input$VCFC
-    })
-    VCPvalue <- reactive({
-      input$VCPvalue
-    })
-    VCType <- reactive({
-      as.character(input$VCType)
-    })
     VCRatio <- reactive({
       if(input$VCRatio <=0){return(1)}
       input$VCRatio
@@ -1040,13 +1026,15 @@ mod_04_viewResult_server <- function(id, sfData){
     ##(2) Prepare plot----------------------------------------------------------
     VCPlot <- reactive({
       shiny::req(statTable())
-      if(VCLevel1() == VCLevel2()) {return(NULL)}
-      if(VCPvalue() > 1 | VCPvalue() < 0) {return(NULL)}
-      if(VCFC() <=0) {return(NULL)}
+      shiny::validate(
+        need(input$VCLevel1 != input$VCLevel2, message = "Please select two different groups."),
+        need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
+        need(input$VCFC > 0, message = "Fold change should be positive value.")
+      )
       p <- showVolcano(result = statTable(),
-                       FC = VCFC(),
-                       pValue = VCPvalue(),
-                       compare_group = c(VCLevel1(), VCLevel2()),
+                       FC = input$VCFC,
+                       pValue = input$VCPvalue,
+                       compare_group = c(input$VCLevel1, input$VCLevel2),
                        interactive = FALSE
                        )
       return(p)
@@ -1057,16 +1045,16 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::validate(
         need(!is.null(sfData$clean), message = "Input data not found"),
         need(!is.null(sfData$group), message = "Meta data not found"),
-        need(VCLevel1() != VCLevel2(), message = "Please select two different groups"),
-        need(VCFC() > 0, message = "Fold change value should be higher than 0"),
+        need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
+        need(input$VCFC > 0, message = "Fold change should be positive value.")
       )
       plotly::ggplotly(VCPlot(), tooltip = c("text"))
     })
 
     output$downloadVCPlot <- downloadHandler(
-      filename = function(){paste("VolcanoPlot", VCType(), sep = ".")},
+      filename = function(){paste("VolcanoPlot", input$VCType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = VCPlot(), dpi = 600, width = 20, height = 20 / VCRatio(), units = "cm", device = VCType())
+        ggplot2::ggsave(file, plot = VCPlot(), dpi = 600, width = 20, height = 20 / VCRatio(), units = "cm", device = input$VCType)
       }
     )
 

@@ -823,7 +823,7 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #3. OPLSDA==================================================================
+    #(3) OPLSDA=================================================================
     ##(1) OPLSDA parameters-----------------------------------------------------
     OPLSDAGroup <- reactive({
       as.character(input$OPLSDAGroup)
@@ -866,36 +866,7 @@ mod_04_viewResult_server <- function(id, sfData){
     resultOPLSDA <- reactive({
       shiny::req(OPLSDA$feature)
       shiny::req(OPLSDA$group)
-      resultOPLSDA <- tryCatch({
-        ropls::opls(OPLSDA$feature,
-                    OPLSDA$group,
-                    log10L = FALSE,
-                    scaleC = "none",
-                    predI = 1,
-                    permI = 20,
-                    orthoI = 1, # see bug #25
-                    crossvalI = min(length(OPLSDA$group), 7),
-                    fig.pdfC = "none",
-                    info.txtC = "none"
-                    )
-      },
-      # For the following error:
-      # Error: No model was built because the first predictive component was already not significant;
-      # Select a number of predictive components of 1 if you want the algorithm to compute a model despite this.
-      error = function(e){
-        ropls::opls(OPLSDA$feature,
-                    OPLSDA$group,
-                    log10L = FALSE,
-                    scaleC = "none",
-                    predI = 1,
-                    permI = 20,
-                    orthoI = 1,
-                    crossvalI = min(length(OPLSDA$group), 7),
-                    fig.pdfC = "none",
-                    info.txtC = "none"
-                    )
-      })
-      return(resultOPLSDA)
+      getOPLSDA(Feature = OPLSDA$feature, Group = OPLSDA$group)
     })
 
     OPLSDAPlot <- reactive({

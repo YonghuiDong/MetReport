@@ -320,7 +320,7 @@ mod_04_viewResult_ui <- function(id){
                                downloadButton(outputId = ns("downloadHM"))
                                )
                         ),
-               shiny::plotOutput(outputId = ns("HMPlot"))
+               shinycssloaders::withSpinner(shiny::plotOutput(outputId = ns("HMPlot")), type = 5)
                ),
 
              ##(4) Volcano Plot Panel ------------------------------------------
@@ -817,9 +817,7 @@ mod_04_viewResult_server <- function(id, sfData){
     output$downloadPCA <- downloadHandler(
       filename = function(){paste("PCA", input$PCAType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = PCAPlot(), dpi = 600, width = 20, height = 20 / PCARatio(),
-                        units = "cm", device = input$PCAType
-                        )
+        ggplot2::ggsave(file, plot = PCAPlot(), dpi = 600, width = 20, height = 20 / PCARatio(), units = "cm", device = input$PCAType)
       }
     )
 
@@ -857,8 +855,8 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
       shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()]) %>%
-        dplyr::filter(Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2))
+      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
+      dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
       OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
       OPLSDA$group <- as.factor(dfOPLSDA$Group)
     })
@@ -919,7 +917,7 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #3. Heat Map================================================================
+    #(3) Heat Map===============================================================
     ##(1) Heatmap parameters----------------------------------------------------
     HMGroup <- reactive({
       as.character(input$HMGroup)
@@ -931,29 +929,8 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    HMColCluster <- reactive({
-      as.logical(as.numeric(input$HMColCluster))
-    })
-    HMRowCluster <- reactive({
-      as.logical(as.numeric(input$HMRowCluster))
-    })
-    HMColName <- reactive({
-      as.logical(as.numeric(input$HMColName))
-    })
-    HMRowName <- reactive({
-      as.logical(as.numeric(input$HMRowName))
-    })
-    HMSplitCol <- reactive({
-      input$HMSplitCol
-    })
-    HMSplitRow <- reactive({
-      input$HMSplitRow
-    })
     HMQCFilter <- reactive({
       as.logical(as.numeric(input$HMQCFilter))
-    })
-    HMType <- reactive({
-      as.character(input$HMType)
     })
     HMRatio <- reactive({
       if(input$HMRatio <=0){return(1)}
@@ -961,67 +938,72 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     ##(2) Prepare plot----------------------------------------------------------
-    ### Data for Figures that need non-transformed data: from sfData$filter
+    ### Non-transformed data: sfData$filter and p-values are needed
+    heatmapDF <- reactive({
+      shiny::req(combinedTable())
+      tem1 <- combinedTable() %>%
+        dplyr::select(ID, starts_with("rawArea_")) %>%
+        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
+      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      return(tem2)
+    })
+
+
+    ## this will be removed
     dataGlobal3 <- reactive({
       shiny::req(combinedTable())
       tem1 <- combinedTable() %>%
         dplyr::select(ID, starts_with("rawArea_")) %>%
         dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- tem1 %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tem2) <- tem1$ID
-      tem3 <- tem2 %>%
-        as.data.frame() %>%
-        dplyr::rename_with(make.names)
-      return(tem3)
+      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      return(tem2)
     })
 
+
     HMPlot <- reactive({
-      shiny::req(dataGlobal3())
+      shiny::req(heatmapDF())
       shiny::req(sfData$group)
-      HMData <- dataGlobal3() %>%
+      HMData <- heatmapDF() %>%
         dplyr::mutate(Group = sfData$group[, HMGroup()])
       ## Should QC be filtered?
       if(!HMQCFilter()){
-        HMData <- HMData %>%
-          dplyr::filter(Group != "QC")
+        HMData <- HMData[HMData$Group != "QC", ]
       }
       annoRow <- dplyr::select(HMData, Group)
       rownames(annoRow) <- rownames(HMData)
       set.seed(1998)
       ComplexHeatmap::pheatmap(scale(dplyr::select(HMData, -Group), center = T, scale = T),
                                name = "ColorBar",
-                               cluster_cols = HMColCluster(),
-                               cluster_rows = HMRowCluster(),
+                               cluster_cols = as.logical(as.numeric(input$HMColCluster)),
+                               cluster_rows = as.logical(as.numeric(input$HMRowCluster)),
                                annotation_row = annoRow,
-                               show_rownames = HMRowName(),
-                               show_colnames = HMColName(),
-                               column_km = HMSplitCol(),
-                               row_km = HMSplitRow()
+                               show_rownames = as.logical(as.numeric(input$HMRowName)),
+                               show_colnames = as.logical(as.numeric(input$HMColName)),
+                               column_km = input$HMSplitCol,
+                               row_km = input$HMSplitRow
                                )
     })
 
     ##(3) Show and download plot -----------------------------------------------
     output$HMPlot <- shiny::renderPlot({
       shiny::validate(
-        need(!is.null(sfData$clean), message = "Input data not found"),
+        need(!is.null(sfData$filter), message = "Input data not found"),
         need(!is.null(sfData$group), message = "Meta data not found")
       )
       HMPlot()
     })
 
     output$downloadHM <- downloadHandler(
-      filename = function(){paste("Heatmap", HMType(), sep = ".")},
+      filename = function(){paste("Heatmap", input$HMType, sep = ".")},
       content = function(file){
-        switch(HMType(),
+        switch(input$HMType,
                "png" = png(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600),
                "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
                "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
                )
         ComplexHeatmap::draw(HMPlot())
         dev.off()
-      })
+    })
 
     #3. Volcano Plot------------------------------------------------------------
     VCLevel1 <- reactive({

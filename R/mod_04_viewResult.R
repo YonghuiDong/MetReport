@@ -440,7 +440,7 @@ mod_04_viewResult_ui <- function(id){
                                )
                         ),
                br(),
-               shiny::plotOutput(ns("KMTrendPlot")),
+               shinycssloaders::withSpinner(shiny::plotOutput(ns("KMTrendPlot")), type = 5),
                DT::dataTableOutput(ns("KMTable"))
                ),
 
@@ -945,9 +945,9 @@ mod_04_viewResult_server <- function(id, sfData){
         dplyr::select(ID, starts_with("rawArea_")) %>%
         dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
       tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      write.csv(tem2, "hm.csv", row.names = F)
       return(tem2)
     })
-
 
     ## this will be removed
     dataGlobal3 <- reactive({
@@ -1059,7 +1059,7 @@ mod_04_viewResult_server <- function(id, sfData){
     )
 
     #4. K-Means=================================================================
-    ## (1) K-Means plot parameters----------------------------------------------
+    ##(1) K-Means plot parameters-----------------------------------------------
     KMGroup <- reactive({
       as.character(input$KMGroup)
     })
@@ -1070,12 +1070,6 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    KMCluster <- reactive({
-      input$KMCluster
-    })
-    KMType <- reactive({
-      as.character(input$KMType)
-    })
     KMRatio <- reactive({
       if(input$KMRatio <=0) {return(1)}
       input$KMRatio
@@ -1084,15 +1078,14 @@ mod_04_viewResult_server <- function(id, sfData){
     ##(2) Prepare plot----------------------------------------------------------
     ###(2.1)prepare k-means data
     KMdata <- reactive({
-      shiny::req(dataGlobal3())
-      tem <- dataGlobal3() %>%
+      shiny::req(heatmapDF())
+      tem <- heatmapDF() %>%
         dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
         dplyr::filter(Group != "QC") %>%
         tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
         dplyr::group_by(Group, Metabolite) %>%
         dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
         tidyr::pivot_wider(names_from = Group, values_from = meanArea)
-
       ## standardize data
       RS <- rowSums(dplyr::select(tem, -Metabolite))
       tem2 <- tem %>%
@@ -1103,18 +1096,22 @@ mod_04_viewResult_server <- function(id, sfData){
     ###(2.2) calculate k-means
     KMResult <- reactive({
       shiny::req(KMdata())
-      if(KMCluster() <= 0) {return(NULL)}
-      if(KMCluster() >= dim(KMdata())[1]) {return(NULL)}
-      kmeans(dplyr::select(KMdata(), -Metabolite), KMCluster())
+      shiny::validate(
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
+      kmeans(dplyr::select(KMdata(), -Metabolite), input$KMCluster)
     })
 
     ###(2.3) calculate k-means clusters
     KMResultCluster <- reactive({
       shiny::req(KMdata())
-      if(KMCluster() <= 0) {return(NULL)}
-      if(KMCluster() >= dim(KMdata())[1]) {return(NULL)}
+      shiny::validate(
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
       set.seed(666)
-      kmeans(dplyr::select(KMdata(), -Metabolite), centers = KMCluster())$cluster
+      kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
     })
 
     ###(2.4) KM Table
@@ -1133,7 +1130,6 @@ mod_04_viewResult_server <- function(id, sfData){
         ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
         ggplot2::geom_point(alpha = 0.1) +
         ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
-        ggplot2::scale_colour_manual(values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
         ggplot2::theme_bw() +
         ggplot2::theme(text = element_text(size = 14),
                        legend.position = "none",
@@ -1142,55 +1138,23 @@ mod_04_viewResult_server <- function(id, sfData){
         ggplot2::facet_wrap(~clust)
     })
 
-    ###(2.6) KM dendrogram
-    # KMDG <- reactive({
-    #   d1 <- data.frame(from = "origin", to = levels(as.factor(KMTable()$clust)))
-    #   d2 <- data.frame(from = KMTable()$clust, to = KMTable()$Metabolite)
-    #   edges <- rbind(d1, d2)
-    #   vertices <- data.frame(
-    #     name = unique(c(as.character(edges$from), as.character(edges$to))) ,
-    #     value = 1
-    #   )
-    #   vertices$group <- edges$from[match(vertices$name, edges$to)]
-    #   vertices$id <- NA
-    #   myleaves <- which(is.na( match(vertices$name, edges$from) ))
-    #   nleaves <- length(myleaves)
-    #   vertices$id[myleaves] <- seq(1:nleaves)
-    #   vertices$angle <- 90 - 360 * vertices$id / nleaves
-    #   vertices$hjust <- ifelse(vertices$angle < -90, 1, 0)
-    #   vertices$angle <- ifelse(vertices$angle < -90, vertices$angle+180, vertices$angle)
-    #   mygraph <- igraph::graph_from_data_frame(edges, vertices = vertices )
-    #   p <- ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
-    #     ggraph::geom_edge_diagonal(colour="grey") +
-    #     ##ggraph::scale_edge_colour_distiller(palette = "RdPu") +
-    #     ggraph::geom_node_point(aes(filter = leaf, x = x * 1.07, y = y*1.07, colour = group), size = 4) +
-    #     ggplot2::scale_colour_manual(name = "Cluster", values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
-    #     ggplot2::scale_size_continuous(range = c(0.1,10) ) +
-    #     ggplot2::theme_void() +
-    #     ggplot2::theme(text = element_text(size = 14)) +
-    #     ggplot2::expand_limits(x = c(-1.3, 1.3), y = c(-1.3, 1.3))
-    #   return(p)
-    # })
-
-    ##(3) Show and download plot----------------------------------------------------
-    # output$KMDG <- shiny::renderPlot({
-    #   shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-    #   KMDG() + ggplot2::ggtitle("Circular Dendrogram")
-    # })
-
+    ##(3) Show and download plot -----------------------------------------------
     output$KMTrendPlot <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(KMCluster() > 0, message = "Number of clusters should be higher than 0"))
-      shiny::validate(need(KMCluster() < dim(KMdata())[1], message = "Input a smaller cluster group"))
+      shiny::validate(
+        need(!is.null(sfData$data), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found"),
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
       KMTrendPlot() + ggplot2::ggtitle("Metabolic Profile Clustering")
     })
 
     output$KMTable <- DT::renderDataTable({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(!is.null(KMTable()), message = "K-means cluster table not found"))
+      shiny::validate(
+        need(!is.null(sfData$data), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found")
+      )
+      shiny::req(KMTable())
       DT::datatable(KMTable(),
                     caption = "K-means cluster table:",
                     options = list(scrollX = TRUE,
@@ -1201,17 +1165,10 @@ mod_04_viewResult_server <- function(id, sfData){
                     )
     })
 
-    # output$downloadKMDG <- downloadHandler(
-    #   filename = function(){paste("KM_Dendrogram", KMType(), sep = ".")},
-    #   content = function(file){
-    #     ggplot2::ggsave(file, plot = KMDG(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = KMType())
-    #   }
-    # )
-
     output$downloadKMTrend <- downloadHandler(
-      filename = function(){paste("KM_Lineplot", KMType(), sep = ".")},
+      filename = function(){paste("KM_Lineplot", input$KMType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = KMType())
+        ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = input$KMType)
       }
     )
 

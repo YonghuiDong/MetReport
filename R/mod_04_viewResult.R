@@ -230,7 +230,7 @@ mod_04_viewResult_ui <- function(id){
                                downloadButton(outputId = ns("downloadOPLSDA"))
                                )
                         ),
-               shiny::plotOutput(ns("OPLSDAPlot")),
+               shinycssloaders::withSpinner(shiny::plotOutput(ns("OPLSDAPlot")), type = 5),
                plotly::plotlyOutput(ns("SPlot"))
                ),
 
@@ -768,6 +768,7 @@ mod_04_viewResult_server <- function(id, sfData){
 
     ##(2) Prepare plot----------------------------------------------------------
     ### sfData$clean (QC filtered data) is used for PCA
+    ## Note: combinedTablePCA could be removed.
     combinedTablePCA <- eventReactive(input$viewStat, {
       shiny::req(sfData$clean)
       shiny::req(statTable())
@@ -834,12 +835,6 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    OPLSDALevel1 <- reactive({
-      as.character(input$OPLSDALevel1)
-    })
-    OPLSDALevel2 <- reactive({
-      as.character(input$OPLSDALevel2)
-    })
     observeEvent(OPLSDAGroup(),{
       OPLSDALevels <- sfData$group[, OPLSDAGroup()]
       updateSelectInput(inputId = "OPLSDALevel1",
@@ -851,50 +846,35 @@ mod_04_viewResult_server <- function(id, sfData){
                         selected = NULL
                         )
     })
-    OPLSDAColor <- reactive({
-      as.character(input$OPLSDAColor)
-    })
-    OPLSDAType <- reactive({
-      as.character(input$OPLSDAType)
-    })
     OPLSDARatio <- reactive({
       if(input$PCARatio <= 0){return(1)}
       input$OPLSDARatio
     })
 
     ##(2) Prepare plot----------------------------------------------------------
-    matrixOPLSDA <- reactive({
+    OPLSDA <- reactiveValues(feature = NULL, group = NULL)
+    observe({
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
       dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()]) %>%
-        dplyr::filter(Group %in% c(OPLSDALevel1(), OPLSDALevel2()))
-      matrixOPLSDA <- dplyr::select(dfOPLSDA, -Group)
-      return(matrixOPLSDA)
-    })
-
-    groupOPLSDA <- reactive({
-      shiny::req(dataGlobal3PCA())
-      shiny::req(sfData$group)
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
-      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()]) %>%
-        dplyr::filter(Group %in% c(OPLSDALevel1(), OPLSDALevel2()))
-      groupOPLSDA <- as.factor(dfOPLSDA$Group)
-      return(groupOPLSDA)
+        dplyr::filter(Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2))
+      OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
+      OPLSDA$group <- as.factor(dfOPLSDA$Group)
     })
 
     resultOPLSDA <- reactive({
-      shiny::req(matrixOPLSDA())
-      shiny::req(groupOPLSDA())
+      shiny::req(OPLSDA$feature)
+      shiny::req(OPLSDA$group)
       resultOPLSDA <- tryCatch({
-        ropls::opls(matrixOPLSDA(),
-                    groupOPLSDA(),
+        ropls::opls(OPLSDA$feature,
+                    OPLSDA$group,
                     log10L = FALSE,
                     scaleC = "none",
                     predI = 1,
                     permI = 20,
                     orthoI = 1, # see bug #25
-                    crossvalI = min(length(groupOPLSDA()), 7),
+                    crossvalI = min(length(OPLSDA$group), 7),
                     fig.pdfC = "none",
                     info.txtC = "none"
                     )
@@ -903,14 +883,14 @@ mod_04_viewResult_server <- function(id, sfData){
       # Error: No model was built because the first predictive component was already not significant;
       # Select a number of predictive components of 1 if you want the algorithm to compute a model despite this.
       error = function(e){
-        ropls::opls(matrixOPLSDA(),
-                    groupOPLSDA(),
+        ropls::opls(OPLSDA$feature,
+                    OPLSDA$group,
                     log10L = FALSE,
                     scaleC = "none",
                     predI = 1,
                     permI = 20,
                     orthoI = 1,
-                    crossvalI = min(length(groupOPLSDA()), 7),
+                    crossvalI = min(length(OPLSDA$group), 7),
                     fig.pdfC = "none",
                     info.txtC = "none"
                     )
@@ -920,24 +900,24 @@ mod_04_viewResult_server <- function(id, sfData){
 
     OPLSDAPlot <- reactive({
       shiny::req(resultOPLSDA())
-      shiny::req(groupOPLSDA())
-      p <- showOPLSDA(resultOPLSDA(), Group = groupOPLSDA()) +
+      shiny::req(OPLSDA$group)
+      p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
         ggplot2::theme(text = element_text(size = 16))
 
-      if(OPLSDAColor() == "Default") {
+      if(input$OPLSDAColor == "Default") {
         p <- p
         } else {
         p <- p +
-          scale_color_brewer(palette = OPLSDAColor()) +
-          scale_fill_brewer(palette = OPLSDAColor())
+          scale_color_brewer(palette = input$OPLSDAColor) +
+          scale_fill_brewer(palette = input$OPLSDAColor)
         }
       return(p)
     })
 
     SPlot <- reactive({
       shiny::req(resultOPLSDA())
-      shiny::req(matrixOPLSDA())
-      showSplot(matrixOPLSDA(), resultOPLSDA()) +
+      shiny::req(OPLSDA$feature)
+      showSplot(OPLSDA$feature, resultOPLSDA()) +
         ggplot2::theme(text = element_text(size = 16))
     })
 
@@ -945,14 +925,16 @@ mod_04_viewResult_server <- function(id, sfData){
     output$OPLSDAPlot <- shiny::renderPlot({
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(OPLSDAPlot())
       OPLSDAPlot()
     })
 
     output$SPlot <- plotly::renderPlotly({
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(SPlot())
       SPlot2 <- SPlot() +
         ggplot2::geom_point(size = 1) +
         ggplot2::theme(text = element_text(size = 12))
@@ -960,9 +942,9 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     output$downloadOPLSDA <- downloadHandler(
-      filename = function(){paste("OPLSDA_ScorePlot", OPLSDAType(), sep = ".")},
+      filename = function(){paste("OPLSDA_ScorePlot", input$OPLSDAType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = OPLSDAType())
+        ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = input$OPLSDAType)
       }
     )
 

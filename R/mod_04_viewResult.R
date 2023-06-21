@@ -15,69 +15,67 @@ mod_04_viewResult_ui <- function(id){
     fluidRow(
       #(1) User Guide **********************************************************
       column(width = 12,
-             box(
-               width = 12,
-               title = strong("User Guide"),
-               status = "warning",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               p("1. Statistical analyses are perfromed in this panel. Tables and most figures are interactive so that you can better inspect your data and results."),
-               p("2. You can customize the figures by changing the color, aspect ratio before downloading them with preferred format.")
-               )
+             box(width = 12,
+                 title = strong("User Guide"),
+                 status = "warning",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 p("1. Statistical analyses are perfromed in this panel. Tables and most figures are interactive so that you can better inspect your data and results."),
+                 p("2. You can customize the figures by changing the color, aspect ratio before downloading them with preferred format.")
+                 )
              ),
 
       #(2) View Statistics Panel ***********************************************
       column(width = 4,
-             box(
-               width = 12,
-               inputId = ns("input_card"),
-               title = strong("Perform Statistics"),
-               status = "primary",
-               solidHeader = TRUE,
-               collapsible = FALSE,
-               collapsed = FALSE,
-               closable = FALSE,
-               selectInput(inputId = ns("statMethod"),
-                           label = "1. What do you want to do?",
-                           choices = c("Compare two unpaired groups" = "tTest",
-                                       "Compare two paired groups" = "ptTest",
-                                       "Compare more than two unmatched groups" = "anovaHSD",
-                                       "Compare more than two matched groups" = "anovaRM"
-                                       ),
-                           selected = "anovaHSD",
-                           multiple = FALSE
-                           ),
-               selectInput(inputId = ns("pAdjMethod"),
-                           label = "2. Adjust p-value by:",
-                           choices = c("Don't adjust" = "none",
-                                       "False Discovery Rate" = "fdr",
-                                       "Bonferroni" = "bonferroni"
-                                       ),
-                           selected = "fdr",
-                           multiple = FALSE
-                           ),
-               radioButtons(inputId = ns("SigFilter"),
-                            label = "3. Only consider statistically significant mass features?",
-                            choices = c("Yes" = 1, "No" = 0),
-                            selected = 0
-                            ),
-               p(style = "color:#C70039;", shiny::icon("bell"), strong("Notes:")),
-               p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
-               p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
-               sliderInput(inputId = ns("SigP"),
-                           label = "If [Yes]: enter p-value threshold",
-                           value = 0.05,
-                           min = 0,
-                           max = 0.1
-                           ),
-               actionButton(inputId = ns("viewStat"),
-                            label = "Start",
-                            icon = icon("eye"),
-                            style = "color: #fff; background-color: #4daf4a; border-color: #4daf4a"
-                            )
-               )
+             box(width = 12,
+                 inputId = ns("input_card"),
+                 title = strong("Perform Statistics"),
+                 status = "primary",
+                 solidHeader = TRUE,
+                 collapsible = FALSE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 selectInput(inputId = ns("statMethod"),
+                             label = "1. What do you want to do?",
+                             choices = c("Compare two unpaired groups" = "tTest",
+                                         "Compare two paired groups" = "ptTest",
+                                         "Compare more than two unmatched groups" = "anovaHSD",
+                                         "Compare more than two matched groups" = "anovaRM"
+                                         ),
+                             selected = "anovaHSD",
+                             multiple = FALSE
+                             ),
+                 selectInput(inputId = ns("pAdjMethod"),
+                             label = "2. Adjust p-value by:",
+                             choices = c("Don't adjust" = "none",
+                                         "False Discovery Rate" = "fdr",
+                                         "Bonferroni" = "bonferroni"
+                                         ),
+                             selected = "fdr",
+                             multiple = FALSE
+                             ),
+                 radioButtons(inputId = ns("SigFilter"),
+                              label = "3. Only consider statistically significant mass features?",
+                              choices = c("Yes" = 1, "No" = 0),
+                              selected = 0
+                              ),
+                 p(style = "color:#C70039;", shiny::icon("bell"), strong("Notes:")),
+                 p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
+                 p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
+                 sliderInput(inputId = ns("SigP"),
+                             label = "If [Yes]: enter p-value threshold",
+                             value = 0.05,
+                             min = 0,
+                             max = 0.1
+                             ),
+                 actionButton(inputId = ns("viewStat"),
+                              label = "Start",
+                              icon = icon("eye"),
+                              style = "color: #fff; background-color: #4daf4a; border-color: #4daf4a"
+                              )
+                 )
              ),
 
       #(3) Result Panel ********************************************************
@@ -109,339 +107,331 @@ mod_04_viewResult_ui <- function(id){
                 ),
 
              ##(2) PCA Panel ---------------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewPCA",
-               title = strong("PCA Plot"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               varSelectInput(inputId = ns("PCAGroup"),
-                              label = "1. Select MetaData (Sample Groups) for Sample Coloring",
-                              data = ""
-                              ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               selectInput(inputId = ns("PCAX"),
-                                           label = "Which PC in X-axis?",
-                                           choices = list(1, 2, 3, 4),
-                                           selected = 1,
-                                           multiple = FALSE
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("PCAY"),
-                                           label = "Which PC in Y-axis?",
-                                           choices = list(1, 2, 3, 4),
-                                           selected = 2,
-                                           multiple = FALSE
-                                           )
-                               ),
-                        column(width = 12,
-                               radioButtons(inputId = ns("PCAFrame"),
-                                            label = "Add frame for group?",
-                                            choices = list("none", "polygon", "norm"),
-                                            selected = "none"
-                                            )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("PCAColor"),
-                                           label = "Color palette?",
-                                           choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
-                                           selected = "Default"
-                                           )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("PCAType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("PCARatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadPCA"))
-                               )
-                        ),
-               shinycssloaders::withSpinner(plotly::plotlyOutput(ns("PCAPlot")), type = 5)
+             box(width = 12,
+                 inputId = "viewPCA",
+                 title = strong("PCA Plot"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 varSelectInput(inputId = ns("PCAGroup"),
+                                label = "1. Select MetaData (Sample Groups) for Sample Coloring",
+                                data = ""
+                                ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 selectInput(inputId = ns("PCAX"),
+                                             label = "Which PC in X-axis?",
+                                             choices = list(1, 2, 3, 4),
+                                             selected = 1,
+                                             multiple = FALSE
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("PCAY"),
+                                             label = "Which PC in Y-axis?",
+                                             choices = list(1, 2, 3, 4),
+                                             selected = 2,
+                                             multiple = FALSE
+                                             )
+                                 ),
+                          column(width = 12,
+                                 radioButtons(inputId = ns("PCAFrame"),
+                                              label = "Add frame for group?",
+                                              choices = list("none", "polygon", "norm"),
+                                              selected = "none"
+                                              )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("PCAColor"),
+                                             label = "Color palette?",
+                                             choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
+                                             selected = "Default"
+                                             )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("PCAType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf"
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("PCARatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6,
+                                 br(),
+                                 downloadButton(outputId = ns("downloadPCA"))
+                                 )
+                          ),
+                 shinycssloaders::withSpinner(plotly::plotlyOutput(ns("PCAPlot")), type = 5)
                ),
 
              ##(3) OPLSDA Plot Panel -------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewOPLSDA",
-               title = strong("OPLS-DA Plot"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               varSelectInput(inputId = ns("OPLSDAGroup"),
-                              label = "1. Select MetaData (Sample Groups)",
-                              data = ""
-                              ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               selectInput(inputId = ns("OPLSDALevel1"),
-                                           label = "2. Select the first sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("OPLSDALevel2"),
-                                           label = "2. Select the second sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("OPLSDAColor"),
-                                           label = "Color palette?",
-                                           choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
-                                           selected = "Default"
-                                           )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("OPLSDAType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("OPLSDARatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadOPLSDA"))
-                               )
-                        ),
-               shinycssloaders::withSpinner(shiny::plotOutput(ns("OPLSDAPlot")), type = 5),
-               plotly::plotlyOutput(ns("SPlot"))
+             box(width = 12,
+                 inputId = "viewOPLSDA",
+                 title = strong("OPLS-DA Plot"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 varSelectInput(inputId = ns("OPLSDAGroup"),
+                                label = "1. Select MetaData (Sample Groups)",
+                                data = ""
+                                ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 selectInput(inputId = ns("OPLSDALevel1"),
+                                             label = "2. Select the first sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("OPLSDALevel2"),
+                                             label = "2. Select the second sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("OPLSDAColor"),
+                                             label = "Color palette?",
+                                             choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
+                                             selected = "Default"
+                                             )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("OPLSDAType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf"
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("OPLSDARatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6, downloadButton(outputId = ns("downloadOPLSDA"))),
+                          br()
+                          ),
+                 shinycssloaders::withSpinner(shiny::plotOutput(ns("OPLSDAPlot")), type = 5),
+                 plotly::plotlyOutput(ns("SPlot"))
                ),
 
              ##(4) Heatmap Panel -----------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewHeatmap",
-               title = strong("Heatmap"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               varSelectInput(inputId = ns("HMGroup"),
-                              label = "1. Select MetaData (Sample Groups) for Sample Coloring",
-                              data = ""
-                              ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMColCluster"),
-                                            label = "Cluster columns (mass features) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMRowCluster"),
-                                            label = "Cluster rows (samples) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMColName"),
-                                            label = "Show column names (mass feature names) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 0
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMRowName"),
-                                            label = "Show row names (sample names) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("HMSplitCol"),
-                                            label = "Number of column groups (features) you want to split",
-                                            value = 1,
-                                            min = 1,
-                                            step = 1,
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("HMSplitRow"),
-                                            label = "Number of row groups (samples) you want to split",
-                                            value = 1,
-                                            min = 1,
-                                            step = 1,
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMQCFilter"),
-                                            label = "Do you want to include QC samples (if exist)?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf", inline = T
-                                            )
-                               ),
-                        column(width = 12,
-                               numericInput(inputId = ns("HMRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadHM"))
-                               )
-                        ),
-               shinycssloaders::withSpinner(shiny::plotOutput(outputId = ns("HMPlot")), type = 5)
+             box(width = 12,
+                 inputId = "viewHeatmap",
+                 title = strong("Heatmap"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 varSelectInput(inputId = ns("HMGroup"),
+                                label = "1. Select MetaData (Sample Groups) for Sample Coloring",
+                                data = ""
+                                ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMColCluster"),
+                                              label = "Cluster columns (mass features) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMRowCluster"),
+                                              label = "Cluster rows (samples) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMColName"),
+                                              label = "Show column names (mass feature names) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 0
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMRowName"),
+                                              label = "Show row names (sample names) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("HMSplitCol"),
+                                              label = "Number of column groups (features) you want to split",
+                                              value = 1,
+                                              min = 1,
+                                              step = 1,
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("HMSplitRow"),
+                                              label = "Number of row groups (samples) you want to split",
+                                              value = 1,
+                                              min = 1,
+                                              step = 1,
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMQCFilter"),
+                                              label = "Do you want to include QC samples (if exist)?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf", inline = T
+                                              )
+                                 ),
+                          column(width = 12,
+                                 numericInput(inputId = ns("HMRatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6,
+                                 br(),
+                                 downloadButton(outputId = ns("downloadHM"))
+                                 )
+                          ),
+                 shinycssloaders::withSpinner(shiny::plotOutput(outputId = ns("HMPlot")), type = 5)
                ),
 
              ##(4) Volcano Plot Panel ------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewVolcano",
-               title = strong("Volcano Plot"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               fluidRow(width = 12,
-                        column(width = 6,
-                               selectInput(inputId = ns("VCLevel1"),
-                                           label = "1. Select the first sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("VCLevel2"),
-                                           label = "1. Select the second sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("VCFC"),
-                                            label = "2. Input fold change threshold",
-                                            value = 2,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("VCPvalue"),
-                                            label = "3. Input p-value threshold",
-                                            value = 0.05,
-                                            min = 0,
-                                            max = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("VCType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf",
-                                            inline = T
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("VCRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 4,
-                               downloadButton(outputId = ns("downloadVCPlot"))
-                               )
-                        ),
-               shinycssloaders::withSpinner(plotly::plotlyOutput(ns("VCPlot")), type = 5)
+             box(width = 12,
+                 inputId = "viewVolcano",
+                 title = strong("Volcano Plot"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 selectInput(inputId = ns("VCLevel1"),
+                                             label = "1. Select the first sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("VCLevel2"),
+                                             label = "1. Select the second sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("VCFC"),
+                                              label = "2. Input fold change threshold",
+                                              value = 2,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("VCPvalue"),
+                                              label = "3. Input p-value threshold",
+                                              value = 0.05,
+                                              min = 0,
+                                              max = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("VCType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf",
+                                              inline = T
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("VCRatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 4, downloadButton(outputId = ns("downloadVCPlot")))
+                          ),
+                 shinycssloaders::withSpinner(plotly::plotlyOutput(ns("VCPlot")), type = 5)
                ),
 
              ##(5) K-Means Panel -----------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewKMeans",
-               title = strong("K-means Cluster Analysis"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               fluidRow(width = 12,
-                        column(width = 6,
-                               varSelectInput(inputId = ns("KMGroup"),
-                                              label = "1. Select MetaData (Sample Groups)",
-                                              data = ""
+             box(width = 12,
+                 inputId = "viewKMeans",
+                 title = strong("K-means Cluster Analysis"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 varSelectInput(inputId = ns("KMGroup"),
+                                                label = "1. Select MetaData (Sample Groups)",
+                                                data = ""
+                                                )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("KMCluster"),
+                                              label = "2. Input number of clusters",
+                                              value = 1,
+                                              min = 1,
+                                              max = NA
                                               )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("KMCluster"),
-                                            label = "2. Input number of clusters",
-                                            value = 1,
-                                            min = 1,
-                                            max = NA)
-                               )
-                        ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               radioButtons(inputId = ns("KMType"),
-                                            label = "Select plot type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("KMRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               )
-                        ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               downloadButton(outputId = ns("downloadKMTrend"),
-                                              label = "Download Line Plot"
+                                 )
+                          ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 radioButtons(inputId = ns("KMType"),
+                                              label = "Select plot type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf"
                                               )
-                               ),
-                        column(width = 6,
-                               downloadButton(outputId = ns("downloadKMTable"),
-                                              label = "Download Table"
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("KMRatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
                                               )
-                               )
-                        ),
-               br(),
-               shinycssloaders::withSpinner(shiny::plotOutput(ns("KMTrendPlot")), type = 5),
-               DT::dataTableOutput(ns("KMTable"))
+                                 )
+                          ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 downloadButton(outputId = ns("downloadKMTrend"),
+                                                label = "Download Line Plot"
+                                                )
+                                 ),
+                          column(width = 6,
+                                 downloadButton(outputId = ns("downloadKMTable"),
+                                                label = "Download Table"
+                                                )
+                                 )
+                          ),
+                 br(),
+                 shinycssloaders::withSpinner(shiny::plotOutput(ns("KMTrendPlot")), type = 5),
+                 DT::dataTableOutput(ns("KMTable"))
                ),
 
              ##(6) Box Plot Panel ----------------------------------------------

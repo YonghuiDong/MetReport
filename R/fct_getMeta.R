@@ -5,40 +5,18 @@
 #' @export
 #' @noRd
 #' @examples
-#'DF <- cbind.data.frame(ID = c("malic acid", "citric acid", "glucose"),
-#'                       WT_Male_T1_1 = c(1, 2, 3),
-#'                       WT_Male_T1_2 = c(1, 2, 3),
-#'                       WT_Male_T1_3 = c(1, 2, 3),
-#'                       WT_Male_T2_1 = c(1, 2, 3),
-#'                       WT_Male_T2_2 = c(1, 2, 3),
-#'                       WT_Male_T2_3 = c(1, 2, 3),
-#'                       WT_Female_T1_1 = c(1, 2, 3),
-#'                       WT_Female_T1_2 = c(1, 2, 3),
-#'                       WT_Female_T1_3 = c(1, 2, 3),
-#'                       WT_Female_T2_1 = c(1, 2, 3),
-#'                       WT_Female_T2_2 = c(1, 2, 3),
-#'                       WT_Female_T2_3 = c(1, 2, 3),
-#'                       Mu_Male_T1_1 = c(1, 2, 3),
-#'                       Mu_Male_T1_2 = c(1, 2, 3),
-#'                       Mu_Male_T1_3 = c(1, 2, 3),
-#'                       Mu_Male_T2_1 = c(1, 2, 3),
-#'                       Mu_Male_T2_2 = c(1, 2, 3),
-#'                       Mu_Male_T2_3 = c(1, 2, 3),
-#'                       Mu_Female_T1_1 = c(1, 2, 3),
-#'                       Mu_Female_T1_2 = c(1, 2, 3),
-#'                       Mu_Female_T1_3 = c(1, 2, 3),
-#'                       Mu_Female_T2_1 = c(1, 2, 3),
-#'                       Mu_Female_T2_2 = c(1, 2, 3),
-#'                       Mu_Female_T2_3 = c(1, 2, 3)
-#'                       )
-#'getMeta(DF)
+#' library(magrittr)
+#' library(data.table)
+#' load("data/cancerCell.rda")
+#' feature <- formatData(cancerCell)
+#' meta <- getMeta(feature)
 
 getMeta <- function(DF) {
   rowNameDF <- colnames(DF)
   rowNameDF <- rowNameDF[!rowNameDF %in% "ID"]
   metaData <- read.table(text = rowNameDF, sep = "_", colClasses = "character")
   colnames(metaData) <- sub("V", "Group", colnames(metaData))
-  metaTable <- cbind.data.frame(Sample = rowNameDF, metaData)
-  metaTable <- metaTable[, -ncol(metaTable)]
-  return(metaTable)
+  metaData <- subset(metaData, select = -ncol(metaData))
+  rownames(metaData) <- rowNameDF
+  return(metaData)
 }

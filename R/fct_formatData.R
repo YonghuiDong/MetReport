@@ -69,23 +69,16 @@
 #' @param DF raw data
 #' @param metaGroup meta group information
 #' @param format data format, Compound Discoverer and other.
-#' @import data.table
-#' @import magrittr
+#' @importFrom dplyr %>%
+#' @importFrom data.table as.data.table
 #' @return The return value, if any, from executing the function.
 #' @noRd
 #' @examples
 #' ## Method 1: peak area and metadata are in the same table
-#' df1 <- data.frame(
-#' Name = c("x", "y", "z"),
-#' `Area: Sample_WT_M_1` = 1:3,
-#' `Area: Sample_WT_M_2` = 1:3,
-#' `Area: Sample_WT_M_3` = 1:3,
-#' `Area: Sample_MU_F_4` = 1:3,
-#' `Area: Sample_MU_F_5` = 1:3,
-#' `Area: Sample_MU_F_6` = 1:3,
-#'  check.names = FALSE
-#' )
-#' df1_format <- formatData(df1)
+#' library(dplyr)
+#' library(data.table)
+#' load("data/cancerCell.rda")
+#' feature <- formatData(cancerCell)
 #'
 #' ## Method2: feature table and metadata table are separated
 #' df2 <- data.frame(

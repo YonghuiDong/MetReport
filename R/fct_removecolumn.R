@@ -2,7 +2,7 @@
 #' @description Delete columns
 #' @param df a data frame
 #' @param nameofthecolumn names of the columns to be deleted
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 #' @return a data frame.
 #' @noRd
 #' @examples

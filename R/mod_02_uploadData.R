@@ -133,9 +133,8 @@ mod_02_uploadData_ui <- function(id){
 ))}
 
 #' uploadData Server Functions
-#'
 #' @noRd
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 
 mod_02_uploadData_server <- function(id, sfData){
   ns <- NS(id)
@@ -160,7 +159,8 @@ mod_02_uploadData_server <- function(id, sfData){
         .[, ID := paste0("ID", seq_len(.N))] %>%
         data.table::setcolorder(., neworder = "ID")
       return(df)
-    })
+    }) |>
+      bindEvent(input$submit)
 
     inputMeta <- reactive({
       shiny::req(input$inputMeta)
@@ -173,7 +173,8 @@ mod_02_uploadData_server <- function(id, sfData){
                    xlsx = readxl::read_xlsx(filepath)
                    )
       return(df)
-    })
+    }) |>
+      bindEvent(input$submit)
 
     #(2) Format Data ===========================================================
     getProcessedData <- reactive({
@@ -189,13 +190,9 @@ mod_02_uploadData_server <- function(id, sfData){
     })
 
     #(3) Get Metadata ==========================================================
-    getMetaData <- reactive({
+    observeEvent(sfData$data, {
       shiny::req(sfData$data)
-      df <- getMeta(DF = sfData$data)
-      sfData$group <- df %>%
-        `rownames<-`(.$Sample) %>%
-        .[-which(names(.) == "Sample")]
-      return(df)
+      sfData$group <- getMeta(DF = sfData$data)
     })
 
     #(4) Show Result ===========================================================
@@ -215,14 +212,15 @@ mod_02_uploadData_server <- function(id, sfData){
     observeEvent(input$submit, {
       ##(4.2) Meta Info Overview -----------------------------------------------
       output$metaInfo <- renderPrint({
-        shiny::validate(need(!is.null(getMetaData()), message = "Metadata not found."))
+        shiny::req(getProcessedData())
+        shiny::validate(need(!is.null(sfData$group), message = "Metadata not found."))
         cat(paste("Number of samples:", nrow(sfData$group), "\n"))
         cat(paste("Number of meta groups:", ncol(sfData$group), "\n"))
       })
 
       ##(4.3) Meta table -------------------------------------------------------
       output$metaView <- DT::renderDataTable({
-        shiny::req(getMetaData())
+        shiny::req(getProcessedData())
         DT::datatable(sfData$group,
                       caption = "Overview of Metadata Information",
                       options = list(scrollX = TRUE,
@@ -246,6 +244,7 @@ mod_02_uploadData_server <- function(id, sfData){
       })
     })
 
+
     #(5) Remove Outlier ========================================================
     output$selectColumn <- renderUI({
       shiny::req(sfData$data)
@@ -255,11 +254,13 @@ mod_02_uploadData_server <- function(id, sfData){
                   choices = setdiff(names(sfData$data), "ID")
                   )
     })
+
     observeEvent(input$removeCol, {
       shiny::req(sfData$data)
       shiny::req(input$selectColumn)
       sfData$data <- removecolumn(sfData$data, input$selectColumn)
     })
+
     observeEvent(input$undoCol, {
       shiny::req(sfData$data)
       sfData$data <- getProcessedData()

@@ -754,25 +754,27 @@ mod_04_viewResult_server <- function(id, sfData){
     ##(2) Prepare plot----------------------------------------------------------
     ### sfData$clean (QC filtered data) is used for PCA
     ## Note: combinedTablePCA could be removed.
-    combinedTablePCA <- eventReactive(input$viewStat, {
-      shiny::req(sfData$clean)
-      shiny::req(statTable())
-      tem1 <- subset(sfData$clean, select = -ID)
-      names(tem1) <- paste0("rawArea_", names(tem1))
-      tem2 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1)
-      rownames(tem2) <- NULL
-      return(tem2)
-    })
+    # combinedTablePCA <- eventReactive(input$viewStat, {
+    #   shiny::req(sfData$clean)
+    #   shiny::req(statTable())
+    #   tem1 <- subset(sfData$clean, select = -ID)
+    #   names(tem1) <- paste0("rawArea_", names(tem1))
+    #   tem2 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1)
+    #   rownames(tem2) <- NULL
+    #   return(tem2)
+    # })
 
     dataGlobal3PCA <- reactive({
       shiny::req(sfData$clean)
       tem <- transformDF(sfData$clean, Group = NULL, rowName = TRUE)
       return(tem)
-    })
+    }) |>
+      bindEvent(input$viewStat)
 
     PCAPlot <- reactive({
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples."))
       p <- showPCA(dataGlobal3PCA(),
                    Group = sfData$group[, PCAGroup()],
                    inx = as.numeric(input$PCAX),
@@ -794,8 +796,8 @@ mod_04_viewResult_server <- function(id, sfData){
 
     ##(3) Show PCA Result ------------------------------------------------------
     output$PCAPlot <- plotly::renderPlotly({
-      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found."))
+      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found."))
       plotly::ggplotly(PCAPlot(), tooltip = "text")
     })
 
@@ -806,624 +808,624 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #(3) OPLSDA=================================================================
-    ##(1) OPLSDA parameters-----------------------------------------------------
-    OPLSDAGroup <- reactive({
-      as.character(input$OPLSDAGroup)
-    })
-    observeEvent(sfData$group, {
-      updateVarSelectInput(
-        inputId = "OPLSDAGroup",
-        data = sfData$group,
-        selected = "Group1"
-      )
-    })
-    observeEvent(OPLSDAGroup(),{
-      OPLSDALevels <- sfData$group[, OPLSDAGroup()]
-      updateSelectInput(inputId = "OPLSDALevel1",
-                        choices = levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")])),
-                        selected = NULL
-                        )
-      updateSelectInput(inputId = "OPLSDALevel2",
-                        choices = rev(levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")]))),
-                        selected = NULL
-                        )
-    })
-    OPLSDARatio <- reactive({
-      if(input$PCARatio <= 0){return(1)}
-      input$OPLSDARatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    OPLSDA <- reactiveValues(feature = NULL, group = NULL)
-    observe({
-      shiny::req(dataGlobal3PCA())
-      shiny::req(sfData$group)
-      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "SAME"))
-      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
-      dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
-      OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
-      OPLSDA$group <- as.factor(dfOPLSDA$Group)
-    })
-
-    resultOPLSDA <- reactive({
-      shiny::req(OPLSDA$feature)
-      shiny::req(OPLSDA$group)
-      getOPLSDA(Feature = OPLSDA$feature, Group = OPLSDA$group)
-    })
-
-    OPLSDAPlot <- reactive({
-      shiny::req(resultOPLSDA())
-      shiny::req(OPLSDA$group)
-      p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
-        ggplot2::theme(text = element_text(size = 16))
-
-      if(input$OPLSDAColor == "Default") {
-        p <- p
-        } else {
-        p <- p +
-          scale_color_brewer(palette = input$OPLSDAColor) +
-          scale_fill_brewer(palette = input$OPLSDAColor)
-        }
-      return(p)
-    })
-
-    SPlot <- reactive({
-      shiny::req(resultOPLSDA())
-      shiny::req(OPLSDA$feature)
-      showSplot(OPLSDA$feature, resultOPLSDA()) +
-        ggplot2::theme(text = element_text(size = 16))
-    })
-
-    ##(3) Show OPLSDA Result ---------------------------------------------------
-    output$OPLSDAPlot <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-      shiny::req(OPLSDAPlot())
-      OPLSDAPlot()
-    })
-
-    output$SPlot <- plotly::renderPlotly({
-      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-      shiny::req(SPlot())
-      SPlot2 <- SPlot() +
-        ggplot2::geom_point(size = 1) +
-        ggplot2::theme(text = element_text(size = 12))
-      plotly::ggplotly(SPlot2, tooltip = "text")
-    })
-
-    output$downloadOPLSDA <- downloadHandler(
-      filename = function(){paste("OPLSDA_ScorePlot", input$OPLSDAType, sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = input$OPLSDAType)
-      }
-    )
-
-    #(3) Heat Map===============================================================
-    ##(1) Heatmap parameters----------------------------------------------------
-    HMGroup <- reactive({
-      as.character(input$HMGroup)
-    })
-    observeEvent(sfData$group, {
-      updateVarSelectInput(
-        inputId = "HMGroup",
-        data = sfData$group,
-        selected = "Group1"
-      )
-    })
-    HMQCFilter <- reactive({
-      as.logical(as.numeric(input$HMQCFilter))
-    })
-    HMRatio <- reactive({
-      if(input$HMRatio <=0){return(1)}
-      input$HMRatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    ### Non-transformed data: sfData$filter and p-values are needed
-    heatmapDF <- reactive({
-      shiny::req(combinedTable())
-      tem1 <- combinedTable() %>%
-        dplyr::select(ID, starts_with("rawArea_")) %>%
-        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
-      write.csv(tem2, "hm.csv", row.names = F)
-      return(tem2)
-    })
-
-    ## this will be removed
-    dataGlobal3 <- reactive({
-      shiny::req(combinedTable())
-      tem1 <- combinedTable() %>%
-        dplyr::select(ID, starts_with("rawArea_")) %>%
-        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
-      return(tem2)
-    })
-
-
-    HMPlot <- reactive({
-      shiny::req(heatmapDF())
-      shiny::req(sfData$group)
-      HMData <- heatmapDF() %>%
-        dplyr::mutate(Group = sfData$group[, HMGroup()])
-      ## Should QC be filtered?
-      if(!HMQCFilter()){
-        HMData <- HMData[HMData$Group != "QC", ]
-      }
-      annoRow <- dplyr::select(HMData, Group)
-      rownames(annoRow) <- rownames(HMData)
-      set.seed(1998)
-      ComplexHeatmap::pheatmap(scale(dplyr::select(HMData, -Group), center = T, scale = T),
-                               name = "ColorBar",
-                               cluster_cols = as.logical(as.numeric(input$HMColCluster)),
-                               cluster_rows = as.logical(as.numeric(input$HMRowCluster)),
-                               annotation_row = annoRow,
-                               show_rownames = as.logical(as.numeric(input$HMRowName)),
-                               show_colnames = as.logical(as.numeric(input$HMColName)),
-                               column_km = input$HMSplitCol,
-                               row_km = input$HMSplitRow
-                               )
-    })
-
-    ##(3) Show and download plot -----------------------------------------------
-    output$HMPlot <- shiny::renderPlot({
-      shiny::validate(
-        need(!is.null(sfData$filter), message = "Input data not found"),
-        need(!is.null(sfData$group), message = "Meta data not found")
-      )
-      HMPlot()
-    })
-
-    output$downloadHM <- downloadHandler(
-      filename = function(){paste("Heatmap", input$HMType, sep = ".")},
-      content = function(file){
-        switch(input$HMType,
-               "png" = png(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600),
-               "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
-               "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
-               )
-        ComplexHeatmap::draw(HMPlot())
-        dev.off()
-    })
-
-    #(3) Volcano Plot ==========================================================
-    ##(1) Volcano plot parameters ----------------------------------------------
-    observeEvent(StatGroup(), {
-      VCLevels <- sfData$group[, StatGroup()]
-      updateSelectInput(inputId = "VCLevel1",
-                        choices = levels(as.factor(VCLevels[!(VCLevels %in% "QC")])),
-                        selected = NULL
-                        )
-      updateSelectInput(inputId = "VCLevel2",
-                        choices = rev(levels(as.factor(VCLevels[!(VCLevels %in% "QC")]))),
-                        selected = NULL
-                        )
-    })
-    VCRatio <- reactive({
-      if(input$VCRatio <=0){return(1)}
-      input$VCRatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    VCPlot <- reactive({
-      shiny::req(statTable())
-      shiny::validate(
-        need(input$VCLevel1 != input$VCLevel2, message = "Please select two different groups."),
-        need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
-        need(input$VCFC > 0, message = "Fold change should be positive value.")
-      )
-      p <- showVolcano(result = statTable(),
-                       FC = input$VCFC,
-                       pValue = input$VCPvalue,
-                       compare_group = c(input$VCLevel1, input$VCLevel2),
-                       interactive = FALSE
-                       )
-      return(p)
-    })
-
-    ##(3) Show and download plot------------------------------------------------
-    output$VCPlot <- plotly::renderPlotly({
-      shiny::validate(
-        need(!is.null(sfData$clean), message = "Input data not found"),
-        need(!is.null(sfData$group), message = "Meta data not found"),
-        need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
-        need(input$VCFC > 0, message = "Fold change should be positive value.")
-      )
-      plotly::ggplotly(VCPlot(), tooltip = c("text"))
-    })
-
-    output$downloadVCPlot <- downloadHandler(
-      filename = function(){paste("VolcanoPlot", input$VCType, sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = VCPlot(), dpi = 600, width = 20, height = 20 / VCRatio(), units = "cm", device = input$VCType)
-      }
-    )
-
-    #4. K-Means=================================================================
-    ##(1) K-Means plot parameters-----------------------------------------------
-    KMGroup <- reactive({
-      as.character(input$KMGroup)
-    })
-    observeEvent(sfData$group, {
-      updateVarSelectInput(
-        inputId = "KMGroup",
-        data = sfData$group,
-        selected = "Group1"
-      )
-    })
-    KMRatio <- reactive({
-      if(input$KMRatio <=0) {return(1)}
-      input$KMRatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    ###(2.1)prepare k-means data
-    KMdata <- reactive({
-      shiny::req(heatmapDF())
-      tem <- heatmapDF() %>%
-        dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
-        dplyr::filter(Group != "QC") %>%
-        tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
-        dplyr::group_by(Group, Metabolite) %>%
-        dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
-        tidyr::pivot_wider(names_from = Group, values_from = meanArea)
-      ## standardize data
-      RS <- rowSums(dplyr::select(tem, -Metabolite))
-      tem2 <- tem %>%
-        dplyr::mutate_if(is.numeric, function(x)(x/RS))
-      return(tem2)
-    })
-
-    ###(2.2) calculate k-means
-    KMResult <- reactive({
-      shiny::req(KMdata())
-      shiny::validate(
-        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-      )
-      kmeans(dplyr::select(KMdata(), -Metabolite), input$KMCluster)
-    })
-
-    ###(2.3) calculate k-means clusters
-    KMResultCluster <- reactive({
-      shiny::req(KMdata())
-      shiny::validate(
-        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-      )
-      set.seed(666)
-      kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
-    })
-
-    ###(2.4) KM Table
-    KMTable <- reactive({
-      shiny::req(KMResultCluster())
-      data_with_cust_info <- KMdata() %>%
-        dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
-    })
-
-    ###(2.5) K-means trend plot
-    KMTrendPlot <- reactive({
-      KMTable() %>%
-        tidyr::pivot_longer(cols = !c(Metabolite, clust), names_to = "Group", values_to = "normArea") %>%
-        dplyr::group_by(Group) %>%
-        dplyr::mutate(row_num =  1:n()) %>%
-        ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
-        ggplot2::geom_point(alpha = 0.1) +
-        ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(text = element_text(size = 14),
-                       legend.position = "none",
-                       axis.text.x = element_text(angle = 90 , vjust = 0.4)) +
-        ggplot2::ylab("Standardized Peak Area") +
-        ggplot2::facet_wrap(~clust)
-    })
-
-    ##(3) Show and download plot -----------------------------------------------
-    output$KMTrendPlot <- shiny::renderPlot({
-      shiny::validate(
-        need(!is.null(sfData$data), message = "Input data not found"),
-        need(!is.null(sfData$group), message = "Meta data not found"),
-        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-      )
-      KMTrendPlot() + ggplot2::ggtitle("Metabolic Profile Clustering")
-    })
-
-    output$KMTable <- DT::renderDataTable({
-      shiny::validate(
-        need(!is.null(sfData$data), message = "Input data not found"),
-        need(!is.null(sfData$group), message = "Meta data not found")
-      )
-      shiny::req(KMTable())
-      DT::datatable(KMTable(),
-                    caption = "K-means cluster table:",
-                    options = list(scrollX = TRUE,
-                                   deferRender = TRUE,
-                                   scroller = TRUE,
-                                   fixedColumns = FALSE
-                                   )
-                    )
-    })
-
-    output$downloadKMTrend <- downloadHandler(
-      filename = function(){paste("KM_Lineplot", input$KMType, sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = input$KMType)
-      }
-    )
-
-    output$downloadKMTable <- downloadHandler(
-      filename = "K-means_table.csv",
-      content = function(file){
-        write.csv(KMTable(), file, row.names = FALSE)
-      }
-    )
-
-    #5. Box Plot ===============================================================
-    ##(1) Parameters -----------------------------------------------------------
-
-    BPGroup <- reactive({
-      as.character(input$BPGroup)
-    })
-    observeEvent(sfData$group, {
-      updateVarSelectInput(
-        inputId = "BPGroup",
-        data = sfData$group,
-        selected = "Group1"
-      )
-    })
-    BPMetabolite <- reactive({
-      as.character(input$BPMetabolite)
-    })
-    observeEvent(input$viewStat,{
-      updateVarSelectizeInput(
-        server = TRUE,
-        inputId = "BPMetabolite",
-        data = dataGlobal3()
-      )
-    })
-    BPTransform <- reactive({
-      as.character(input$BPTransform)
-    })
-    BPPlotType <- reactive({
-      as.character(input$BPPlotType)
-    })
-    BPPlotColor <- reactive({
-      as.character(input$BPPlotColor)
-    })
-    BPType <- reactive({
-      as.character(input$BPType)
-    })
-    BPRatio <- reactive({
-      if(input$BPRatio <=0){return(1)}
-      input$BPRatio
-    })
-    dataGlobal3Transform <- reactive({
-      switch(BPTransform(),
-             none = dataGlobal3(),
-             log2 = log2(dataGlobal3()),
-             log10 = log10(dataGlobal3())
-             )
-    })
-    yLegend <- reactive({
-      switch(BPTransform(),
-             none = "Peak Area",
-             log2 = "Log2 Transformed Peak Area",
-             log10 = "Log10 Transformed Peak Area"
-             )
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-
-    BPPlot <- reactive({
-      p <- dataGlobal3Transform() %>%
-        dplyr::mutate(Group = sfData$group[, BPGroup()]) %>%
-        dplyr::select(Group, Metabolite = BPMetabolite()) %>%
-        dplyr::filter(Group != "QC") %>%
-        dplyr::group_by(Group) %>%
-        dplyr::mutate(MEAN = mean(Metabolite), SD = sd(Metabolite)) %>%
-        ggplot2::ggplot(aes(x = Group, fill = Group)) +
-        ggplot2::ylab(yLegend()) +
-        ggplot2::theme_bw() +
-        ggplot2::ggtitle(paste0("Metabolite: ", BPMetabolite())) +
-        ggplot2::theme(text = element_text(size = 16),
-                       legend.position="none"
-                       )
-      ## color palette
-      if(BPPlotColor() == "Default") {
-        p <- p
-        } else {
-          p <- p + scale_fill_brewer(palette = BPPlotColor())
-        }
-
-      ## plot type
-      p2 <- switch(BPPlotType(),
-                   "Box plot" = p +
-                     ggplot2::geom_boxplot(aes(y = Metabolite), outlier.shape = 24, outlier.fill = "red", outlier.size = 3, alpha = 0.8) +
-                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
-                   "Violin plot" = p +
-                     ggplot2::geom_violin(aes(y = Metabolite), alpha = 0.8) +
-                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
-                   "Bar plot" = p +
-                     ggplot2::geom_bar(aes(y = MEAN), alpha = 0.8, stat = "identity", width = 0.5, color = "black", position = position_dodge()) +
-                     ggplot2::geom_errorbar(aes(ymin = MEAN, ymax = MEAN + SD), width = 0.2, position = position_dodge(0.9)) +
-                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black")
-                   )
-      return(p2)
-    })
-
-    ##(3) Show and download plot----------------------------------------------------
-    output$BPPlot <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      BPPlot()
-    })
-
-    output$downloadBP <- downloadHandler(
-      filename = function(){paste("Box_plot", BPType(), sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = BPType())
-      }
-    )
-
-    # #6. Correlation Network ----------------------------------------------------
-    ##(1) parameters------------------------------------------------------------
-    CNMetabolite <- reactive({
-      as.character(input$CNMetabolite)
-    })
-    observeEvent(input$viewStat,{
-      updateVarSelectizeInput(
-        server = TRUE,
-        inputId = "CNMetabolite",
-        data = dataGlobal3()
-      )
-    })
-    CNName <- reactive({
-      as.character(input$CNName)
-    })
-    CNThreshold <- reactive({
-      if(input$CNThreshold <= 0 | input$CNThreshold >1) {return(1)}
-      input$CNThreshold
-    })
-    CNType <- reactive({
-      as.character(input$CNType)
-    })
-    CNRatio <- reactive({
-      if(input$CNRatio <=0) {return(1)}
-      input$CNRatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    CNCor <- reactive({
-      cor(dataGlobal3())
-    })
-
-    CNPlot <- reactive({
-      if(CNThreshold() <= 0) {return(NULL)}
-      tem <- CNCor() %>%
-        as.data.frame() %>%
-        dplyr::select(Metabolite = CNMetabolite()) %>%
-        dplyr::filter(Metabolite >= CNThreshold() | Metabolite <= -CNThreshold()) %>%
-        as.matrix()
-
-      selectedName <- CNMetabolite()
-      if(CNName() == "IDNO"){
-        colnames(tem) <- sub("_.*", "", colnames(tem))
-        rownames(tem) <- sub("_.*", "", rownames(tem))
-        selectedName <- sub("_.*", "", selectedName)
-      }
-
-      links <- cbind.data.frame(from = rep(selectedName, dim(tem)[1]),
-                                to = rownames(tem),
-                                weight = tem[, 1] ,
-                                mycolor = ifelse(tem[, 1] > 0, "Pos", "Neg")
-                                )
-
-      p <- ggraph::ggraph(links, layout = "star") +
-        ggraph::geom_edge_link(aes(width = abs(links$weight)), alpha = 0.5) +
-        ggraph::scale_edge_width_continuous(name = "Absolute Correlation Coefficient") +
-        ggraph::geom_node_point(aes(fill = links$mycolor), shape = 21, size = 15, stroke = 1) +
-        ggplot2::scale_fill_manual(name = "Positive/Negative Correlation", values = c("#e78ac3", "#8da0cb")) +
-        ggraph::geom_node_text(aes(label = name), size = 5, repel = FALSE) +
-        ggplot2::theme_void()
-
-      return(p)
-    })
-
-    output$CNPlot <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      CNPlot()
-    })
-
-    ##(3) Download plot-------------------------------------------------------------
-    output$downloadCN <- downloadHandler(
-      filename = function(){paste("Correlation_Network", CNType(), sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = CNPlot(), dpi = 600, width = 20, height = 20 / CNRatio(), units = "cm", device = CNType())
-      })
-
-    #7. Correlation Analysis ===================================================
-    ##(1) parameters------------------------------------------------------------
-    CASize <- reactive({
-      input$CASize
-    })
-    CAThreshold <- reactive({
-      input$CAThreshold
-    })
-    CAType <- reactive({
-      as.character(input$CAType)
-    })
-    CARatio <- reactive({
-      if(input$CNRatio <=0) {return(1)}
-      input$CNRatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    CAPlot <- eventReactive(input$RunCA, {
-      CACor <- CNCor()
-      colnames(CACor) <- sub("_.*", "", colnames(CACor))
-      rownames(CACor) <- sub("_.*", "", rownames(CACor))
-      p <- qgraph::qgraph(-CACor,
-                          posCol = "#d01c8b",
-                          negCol = "#4dac26",
-                          layout = "spring",
-                          vsize = CASize(),
-                          minimum = CAThreshold(),
-                          labels = colnames(CACor)
-                          )
-      return(p)
-    })
-
-    observeEvent(input$RunCA, {
-      output$CAPlot <- shiny::renderPlot({
-        shiny::validate(need(!is.null(sfData$data), message = "Input data not found"),
-                        need(!is.null(sfData$group), message = "Meta data not found"),
-                        need(CAThreshold() >=0 & CAThreshold() < 1, message = "Absolute correlation threshold value should between 0 and 1.")
-                        )
-        CAPlot()
-      })
-    })
-
-    ##(3) Download plot---------------------------------------------------------
-    output$downloadCA <- downloadHandler(
-      filename = function(){paste("Correlation_Analysis", CAType(), sep = ".")},
-      content = function(file){
-        if(CAType() == "pdf"){
-          pdf(file, width = 20, height = 20 / CNRatio())
-          plot(CAPlot())
-          dev.off()
-        } else if(CAType() == "png"){
-          png(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
-          plot(CAPlot())
-          dev.off()
-        } else{
-          tiff(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
-          plot(CAPlot())
-          dev.off()
-        }
-    })
-    resultList <- list(
-      dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
-      OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
-      statTable = statTable, # data matrix for volcano plot
-      VCGroup = StatGroup, # group information for volcano plot
-      combinedTable = combinedTable,
-      PCAPlot = PCAPlot,
-      HMPlot = HMPlot,
-      dataGlobal3Transform = dataGlobal3Transform, # data for boxplot
-      BPGroup = BPGroup, # group information for boxplot
-      BPTransform = BPTransform, # data transformation for boxplot
-      KMTrendPlot = KMTrendPlot,
-      KMTable = KMTable
-      )
-    return(resultList)
+    # #(3) OPLSDA=================================================================
+    # ##(1) OPLSDA parameters-----------------------------------------------------
+    # OPLSDAGroup <- reactive({
+    #   as.character(input$OPLSDAGroup)
+    # })
+    # observeEvent(sfData$group, {
+    #   updateVarSelectInput(
+    #     inputId = "OPLSDAGroup",
+    #     data = sfData$group,
+    #     selected = "Group1"
+    #   )
+    # })
+    # observeEvent(OPLSDAGroup(),{
+    #   OPLSDALevels <- sfData$group[, OPLSDAGroup()]
+    #   updateSelectInput(inputId = "OPLSDALevel1",
+    #                     choices = levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")])),
+    #                     selected = NULL
+    #                     )
+    #   updateSelectInput(inputId = "OPLSDALevel2",
+    #                     choices = rev(levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")]))),
+    #                     selected = NULL
+    #                     )
+    # })
+    # OPLSDARatio <- reactive({
+    #   if(input$PCARatio <= 0){return(1)}
+    #   input$OPLSDARatio
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    # OPLSDA <- reactiveValues(feature = NULL, group = NULL)
+    # observe({
+    #   shiny::req(dataGlobal3PCA())
+    #   shiny::req(sfData$group)
+    #   shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+    #   shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "SAME"))
+    #   dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
+    #   dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
+    #   OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
+    #   OPLSDA$group <- as.factor(dfOPLSDA$Group)
+    # })
+    #
+    # resultOPLSDA <- reactive({
+    #   shiny::req(OPLSDA$feature)
+    #   shiny::req(OPLSDA$group)
+    #   getOPLSDA(Feature = OPLSDA$feature, Group = OPLSDA$group)
+    # })
+    #
+    # OPLSDAPlot <- reactive({
+    #   shiny::req(resultOPLSDA())
+    #   shiny::req(OPLSDA$group)
+    #   p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
+    #     ggplot2::theme(text = element_text(size = 16))
+    #
+    #   if(input$OPLSDAColor == "Default") {
+    #     p <- p
+    #     } else {
+    #     p <- p +
+    #       scale_color_brewer(palette = input$OPLSDAColor) +
+    #       scale_fill_brewer(palette = input$OPLSDAColor)
+    #     }
+    #   return(p)
+    # })
+    #
+    # SPlot <- reactive({
+    #   shiny::req(resultOPLSDA())
+    #   shiny::req(OPLSDA$feature)
+    #   showSplot(OPLSDA$feature, resultOPLSDA()) +
+    #     ggplot2::theme(text = element_text(size = 16))
+    # })
+    #
+    # ##(3) Show OPLSDA Result ---------------------------------------------------
+    # output$OPLSDAPlot <- shiny::renderPlot({
+    #   shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
+    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+    #   shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+    #   shiny::req(OPLSDAPlot())
+    #   OPLSDAPlot()
+    # })
+    #
+    # output$SPlot <- plotly::renderPlotly({
+    #   shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
+    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+    #   shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+    #   shiny::req(SPlot())
+    #   SPlot2 <- SPlot() +
+    #     ggplot2::geom_point(size = 1) +
+    #     ggplot2::theme(text = element_text(size = 12))
+    #   plotly::ggplotly(SPlot2, tooltip = "text")
+    # })
+    #
+    # output$downloadOPLSDA <- downloadHandler(
+    #   filename = function(){paste("OPLSDA_ScorePlot", input$OPLSDAType, sep = ".")},
+    #   content = function(file){
+    #     ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = input$OPLSDAType)
+    #   }
+    # )
+    #
+    # #(3) Heat Map===============================================================
+    # ##(1) Heatmap parameters----------------------------------------------------
+    # HMGroup <- reactive({
+    #   as.character(input$HMGroup)
+    # })
+    # observeEvent(sfData$group, {
+    #   updateVarSelectInput(
+    #     inputId = "HMGroup",
+    #     data = sfData$group,
+    #     selected = "Group1"
+    #   )
+    # })
+    # HMQCFilter <- reactive({
+    #   as.logical(as.numeric(input$HMQCFilter))
+    # })
+    # HMRatio <- reactive({
+    #   if(input$HMRatio <=0){return(1)}
+    #   input$HMRatio
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    # ### Non-transformed data: sfData$filter and p-values are needed
+    # heatmapDF <- reactive({
+    #   shiny::req(combinedTable())
+    #   tem1 <- combinedTable() %>%
+    #     dplyr::select(ID, starts_with("rawArea_")) %>%
+    #     dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
+    #   tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+    #   write.csv(tem2, "hm.csv", row.names = F)
+    #   return(tem2)
+    # })
+    #
+    # ## this will be removed
+    # dataGlobal3 <- reactive({
+    #   shiny::req(combinedTable())
+    #   tem1 <- combinedTable() %>%
+    #     dplyr::select(ID, starts_with("rawArea_")) %>%
+    #     dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
+    #   tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+    #   return(tem2)
+    # })
+    #
+    #
+    # HMPlot <- reactive({
+    #   shiny::req(heatmapDF())
+    #   shiny::req(sfData$group)
+    #   HMData <- heatmapDF() %>%
+    #     dplyr::mutate(Group = sfData$group[, HMGroup()])
+    #   ## Should QC be filtered?
+    #   if(!HMQCFilter()){
+    #     HMData <- HMData[HMData$Group != "QC", ]
+    #   }
+    #   annoRow <- dplyr::select(HMData, Group)
+    #   rownames(annoRow) <- rownames(HMData)
+    #   set.seed(1998)
+    #   ComplexHeatmap::pheatmap(scale(dplyr::select(HMData, -Group), center = T, scale = T),
+    #                            name = "ColorBar",
+    #                            cluster_cols = as.logical(as.numeric(input$HMColCluster)),
+    #                            cluster_rows = as.logical(as.numeric(input$HMRowCluster)),
+    #                            annotation_row = annoRow,
+    #                            show_rownames = as.logical(as.numeric(input$HMRowName)),
+    #                            show_colnames = as.logical(as.numeric(input$HMColName)),
+    #                            column_km = input$HMSplitCol,
+    #                            row_km = input$HMSplitRow
+    #                            )
+    # })
+    #
+    # ##(3) Show and download plot -----------------------------------------------
+    # output$HMPlot <- shiny::renderPlot({
+    #   shiny::validate(
+    #     need(!is.null(sfData$filter), message = "Input data not found"),
+    #     need(!is.null(sfData$group), message = "Meta data not found")
+    #   )
+    #   HMPlot()
+    # })
+    #
+    # output$downloadHM <- downloadHandler(
+    #   filename = function(){paste("Heatmap", input$HMType, sep = ".")},
+    #   content = function(file){
+    #     switch(input$HMType,
+    #            "png" = png(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600),
+    #            "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
+    #            "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
+    #            )
+    #     ComplexHeatmap::draw(HMPlot())
+    #     dev.off()
+    # })
+    #
+    # #(3) Volcano Plot ==========================================================
+    # ##(1) Volcano plot parameters ----------------------------------------------
+    # observeEvent(StatGroup(), {
+    #   VCLevels <- sfData$group[, StatGroup()]
+    #   updateSelectInput(inputId = "VCLevel1",
+    #                     choices = levels(as.factor(VCLevels[!(VCLevels %in% "QC")])),
+    #                     selected = NULL
+    #                     )
+    #   updateSelectInput(inputId = "VCLevel2",
+    #                     choices = rev(levels(as.factor(VCLevels[!(VCLevels %in% "QC")]))),
+    #                     selected = NULL
+    #                     )
+    # })
+    # VCRatio <- reactive({
+    #   if(input$VCRatio <=0){return(1)}
+    #   input$VCRatio
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    # VCPlot <- reactive({
+    #   shiny::req(statTable())
+    #   shiny::validate(
+    #     need(input$VCLevel1 != input$VCLevel2, message = "Please select two different groups."),
+    #     need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
+    #     need(input$VCFC > 0, message = "Fold change should be positive value.")
+    #   )
+    #   p <- showVolcano(result = statTable(),
+    #                    FC = input$VCFC,
+    #                    pValue = input$VCPvalue,
+    #                    compare_group = c(input$VCLevel1, input$VCLevel2),
+    #                    interactive = FALSE
+    #                    )
+    #   return(p)
+    # })
+    #
+    # ##(3) Show and download plot------------------------------------------------
+    # output$VCPlot <- plotly::renderPlotly({
+    #   shiny::validate(
+    #     need(!is.null(sfData$clean), message = "Input data not found"),
+    #     need(!is.null(sfData$group), message = "Meta data not found"),
+    #     need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
+    #     need(input$VCFC > 0, message = "Fold change should be positive value.")
+    #   )
+    #   plotly::ggplotly(VCPlot(), tooltip = c("text"))
+    # })
+    #
+    # output$downloadVCPlot <- downloadHandler(
+    #   filename = function(){paste("VolcanoPlot", input$VCType, sep = ".")},
+    #   content = function(file){
+    #     ggplot2::ggsave(file, plot = VCPlot(), dpi = 600, width = 20, height = 20 / VCRatio(), units = "cm", device = input$VCType)
+    #   }
+    # )
+    #
+    # #4. K-Means=================================================================
+    # ##(1) K-Means plot parameters-----------------------------------------------
+    # KMGroup <- reactive({
+    #   as.character(input$KMGroup)
+    # })
+    # observeEvent(sfData$group, {
+    #   updateVarSelectInput(
+    #     inputId = "KMGroup",
+    #     data = sfData$group,
+    #     selected = "Group1"
+    #   )
+    # })
+    # KMRatio <- reactive({
+    #   if(input$KMRatio <=0) {return(1)}
+    #   input$KMRatio
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    # ###(2.1)prepare k-means data
+    # KMdata <- reactive({
+    #   shiny::req(heatmapDF())
+    #   tem <- heatmapDF() %>%
+    #     dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
+    #     dplyr::filter(Group != "QC") %>%
+    #     tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
+    #     dplyr::group_by(Group, Metabolite) %>%
+    #     dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
+    #     tidyr::pivot_wider(names_from = Group, values_from = meanArea)
+    #   ## standardize data
+    #   RS <- rowSums(dplyr::select(tem, -Metabolite))
+    #   tem2 <- tem %>%
+    #     dplyr::mutate_if(is.numeric, function(x)(x/RS))
+    #   return(tem2)
+    # })
+    #
+    # ###(2.2) calculate k-means
+    # KMResult <- reactive({
+    #   shiny::req(KMdata())
+    #   shiny::validate(
+    #     need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+    #     need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+    #   )
+    #   kmeans(dplyr::select(KMdata(), -Metabolite), input$KMCluster)
+    # })
+    #
+    # ###(2.3) calculate k-means clusters
+    # KMResultCluster <- reactive({
+    #   shiny::req(KMdata())
+    #   shiny::validate(
+    #     need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+    #     need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+    #   )
+    #   set.seed(666)
+    #   kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
+    # })
+    #
+    # ###(2.4) KM Table
+    # KMTable <- reactive({
+    #   shiny::req(KMResultCluster())
+    #   data_with_cust_info <- KMdata() %>%
+    #     dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
+    # })
+    #
+    # ###(2.5) K-means trend plot
+    # KMTrendPlot <- reactive({
+    #   KMTable() %>%
+    #     tidyr::pivot_longer(cols = !c(Metabolite, clust), names_to = "Group", values_to = "normArea") %>%
+    #     dplyr::group_by(Group) %>%
+    #     dplyr::mutate(row_num =  1:n()) %>%
+    #     ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
+    #     ggplot2::geom_point(alpha = 0.1) +
+    #     ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
+    #     ggplot2::theme_bw() +
+    #     ggplot2::theme(text = element_text(size = 14),
+    #                    legend.position = "none",
+    #                    axis.text.x = element_text(angle = 90 , vjust = 0.4)) +
+    #     ggplot2::ylab("Standardized Peak Area") +
+    #     ggplot2::facet_wrap(~clust)
+    # })
+    #
+    # ##(3) Show and download plot -----------------------------------------------
+    # output$KMTrendPlot <- shiny::renderPlot({
+    #   shiny::validate(
+    #     need(!is.null(sfData$data), message = "Input data not found"),
+    #     need(!is.null(sfData$group), message = "Meta data not found"),
+    #     need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+    #     need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+    #   )
+    #   KMTrendPlot() + ggplot2::ggtitle("Metabolic Profile Clustering")
+    # })
+    #
+    # output$KMTable <- DT::renderDataTable({
+    #   shiny::validate(
+    #     need(!is.null(sfData$data), message = "Input data not found"),
+    #     need(!is.null(sfData$group), message = "Meta data not found")
+    #   )
+    #   shiny::req(KMTable())
+    #   DT::datatable(KMTable(),
+    #                 caption = "K-means cluster table:",
+    #                 options = list(scrollX = TRUE,
+    #                                deferRender = TRUE,
+    #                                scroller = TRUE,
+    #                                fixedColumns = FALSE
+    #                                )
+    #                 )
+    # })
+    #
+    # output$downloadKMTrend <- downloadHandler(
+    #   filename = function(){paste("KM_Lineplot", input$KMType, sep = ".")},
+    #   content = function(file){
+    #     ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = input$KMType)
+    #   }
+    # )
+    #
+    # output$downloadKMTable <- downloadHandler(
+    #   filename = "K-means_table.csv",
+    #   content = function(file){
+    #     write.csv(KMTable(), file, row.names = FALSE)
+    #   }
+    # )
+    #
+    # #5. Box Plot ===============================================================
+    # ##(1) Parameters -----------------------------------------------------------
+    #
+    # BPGroup <- reactive({
+    #   as.character(input$BPGroup)
+    # })
+    # observeEvent(sfData$group, {
+    #   updateVarSelectInput(
+    #     inputId = "BPGroup",
+    #     data = sfData$group,
+    #     selected = "Group1"
+    #   )
+    # })
+    # BPMetabolite <- reactive({
+    #   as.character(input$BPMetabolite)
+    # })
+    # observeEvent(input$viewStat,{
+    #   updateVarSelectizeInput(
+    #     server = TRUE,
+    #     inputId = "BPMetabolite",
+    #     data = dataGlobal3()
+    #   )
+    # })
+    # BPTransform <- reactive({
+    #   as.character(input$BPTransform)
+    # })
+    # BPPlotType <- reactive({
+    #   as.character(input$BPPlotType)
+    # })
+    # BPPlotColor <- reactive({
+    #   as.character(input$BPPlotColor)
+    # })
+    # BPType <- reactive({
+    #   as.character(input$BPType)
+    # })
+    # BPRatio <- reactive({
+    #   if(input$BPRatio <=0){return(1)}
+    #   input$BPRatio
+    # })
+    # dataGlobal3Transform <- reactive({
+    #   switch(BPTransform(),
+    #          none = dataGlobal3(),
+    #          log2 = log2(dataGlobal3()),
+    #          log10 = log10(dataGlobal3())
+    #          )
+    # })
+    # yLegend <- reactive({
+    #   switch(BPTransform(),
+    #          none = "Peak Area",
+    #          log2 = "Log2 Transformed Peak Area",
+    #          log10 = "Log10 Transformed Peak Area"
+    #          )
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    #
+    # BPPlot <- reactive({
+    #   p <- dataGlobal3Transform() %>%
+    #     dplyr::mutate(Group = sfData$group[, BPGroup()]) %>%
+    #     dplyr::select(Group, Metabolite = BPMetabolite()) %>%
+    #     dplyr::filter(Group != "QC") %>%
+    #     dplyr::group_by(Group) %>%
+    #     dplyr::mutate(MEAN = mean(Metabolite), SD = sd(Metabolite)) %>%
+    #     ggplot2::ggplot(aes(x = Group, fill = Group)) +
+    #     ggplot2::ylab(yLegend()) +
+    #     ggplot2::theme_bw() +
+    #     ggplot2::ggtitle(paste0("Metabolite: ", BPMetabolite())) +
+    #     ggplot2::theme(text = element_text(size = 16),
+    #                    legend.position="none"
+    #                    )
+    #   ## color palette
+    #   if(BPPlotColor() == "Default") {
+    #     p <- p
+    #     } else {
+    #       p <- p + scale_fill_brewer(palette = BPPlotColor())
+    #     }
+    #
+    #   ## plot type
+    #   p2 <- switch(BPPlotType(),
+    #                "Box plot" = p +
+    #                  ggplot2::geom_boxplot(aes(y = Metabolite), outlier.shape = 24, outlier.fill = "red", outlier.size = 3, alpha = 0.8) +
+    #                  ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
+    #                "Violin plot" = p +
+    #                  ggplot2::geom_violin(aes(y = Metabolite), alpha = 0.8) +
+    #                  ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
+    #                "Bar plot" = p +
+    #                  ggplot2::geom_bar(aes(y = MEAN), alpha = 0.8, stat = "identity", width = 0.5, color = "black", position = position_dodge()) +
+    #                  ggplot2::geom_errorbar(aes(ymin = MEAN, ymax = MEAN + SD), width = 0.2, position = position_dodge(0.9)) +
+    #                  ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black")
+    #                )
+    #   return(p2)
+    # })
+    #
+    # ##(3) Show and download plot----------------------------------------------------
+    # output$BPPlot <- shiny::renderPlot({
+    #   shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+    #   BPPlot()
+    # })
+    #
+    # output$downloadBP <- downloadHandler(
+    #   filename = function(){paste("Box_plot", BPType(), sep = ".")},
+    #   content = function(file){
+    #     ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = BPType())
+    #   }
+    # )
+    #
+    # # #6. Correlation Network ----------------------------------------------------
+    # ##(1) parameters------------------------------------------------------------
+    # CNMetabolite <- reactive({
+    #   as.character(input$CNMetabolite)
+    # })
+    # observeEvent(input$viewStat,{
+    #   updateVarSelectizeInput(
+    #     server = TRUE,
+    #     inputId = "CNMetabolite",
+    #     data = dataGlobal3()
+    #   )
+    # })
+    # CNName <- reactive({
+    #   as.character(input$CNName)
+    # })
+    # CNThreshold <- reactive({
+    #   if(input$CNThreshold <= 0 | input$CNThreshold >1) {return(1)}
+    #   input$CNThreshold
+    # })
+    # CNType <- reactive({
+    #   as.character(input$CNType)
+    # })
+    # CNRatio <- reactive({
+    #   if(input$CNRatio <=0) {return(1)}
+    #   input$CNRatio
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    # CNCor <- reactive({
+    #   cor(dataGlobal3())
+    # })
+    #
+    # CNPlot <- reactive({
+    #   if(CNThreshold() <= 0) {return(NULL)}
+    #   tem <- CNCor() %>%
+    #     as.data.frame() %>%
+    #     dplyr::select(Metabolite = CNMetabolite()) %>%
+    #     dplyr::filter(Metabolite >= CNThreshold() | Metabolite <= -CNThreshold()) %>%
+    #     as.matrix()
+    #
+    #   selectedName <- CNMetabolite()
+    #   if(CNName() == "IDNO"){
+    #     colnames(tem) <- sub("_.*", "", colnames(tem))
+    #     rownames(tem) <- sub("_.*", "", rownames(tem))
+    #     selectedName <- sub("_.*", "", selectedName)
+    #   }
+    #
+    #   links <- cbind.data.frame(from = rep(selectedName, dim(tem)[1]),
+    #                             to = rownames(tem),
+    #                             weight = tem[, 1] ,
+    #                             mycolor = ifelse(tem[, 1] > 0, "Pos", "Neg")
+    #                             )
+    #
+    #   p <- ggraph::ggraph(links, layout = "star") +
+    #     ggraph::geom_edge_link(aes(width = abs(links$weight)), alpha = 0.5) +
+    #     ggraph::scale_edge_width_continuous(name = "Absolute Correlation Coefficient") +
+    #     ggraph::geom_node_point(aes(fill = links$mycolor), shape = 21, size = 15, stroke = 1) +
+    #     ggplot2::scale_fill_manual(name = "Positive/Negative Correlation", values = c("#e78ac3", "#8da0cb")) +
+    #     ggraph::geom_node_text(aes(label = name), size = 5, repel = FALSE) +
+    #     ggplot2::theme_void()
+    #
+    #   return(p)
+    # })
+    #
+    # output$CNPlot <- shiny::renderPlot({
+    #   shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+    #   CNPlot()
+    # })
+    #
+    # ##(3) Download plot-------------------------------------------------------------
+    # output$downloadCN <- downloadHandler(
+    #   filename = function(){paste("Correlation_Network", CNType(), sep = ".")},
+    #   content = function(file){
+    #     ggplot2::ggsave(file, plot = CNPlot(), dpi = 600, width = 20, height = 20 / CNRatio(), units = "cm", device = CNType())
+    #   })
+    #
+    # #7. Correlation Analysis ===================================================
+    # ##(1) parameters------------------------------------------------------------
+    # CASize <- reactive({
+    #   input$CASize
+    # })
+    # CAThreshold <- reactive({
+    #   input$CAThreshold
+    # })
+    # CAType <- reactive({
+    #   as.character(input$CAType)
+    # })
+    # CARatio <- reactive({
+    #   if(input$CNRatio <=0) {return(1)}
+    #   input$CNRatio
+    # })
+    #
+    # ##(2) Prepare plot----------------------------------------------------------
+    # CAPlot <- eventReactive(input$RunCA, {
+    #   CACor <- CNCor()
+    #   colnames(CACor) <- sub("_.*", "", colnames(CACor))
+    #   rownames(CACor) <- sub("_.*", "", rownames(CACor))
+    #   p <- qgraph::qgraph(-CACor,
+    #                       posCol = "#d01c8b",
+    #                       negCol = "#4dac26",
+    #                       layout = "spring",
+    #                       vsize = CASize(),
+    #                       minimum = CAThreshold(),
+    #                       labels = colnames(CACor)
+    #                       )
+    #   return(p)
+    # })
+    #
+    # observeEvent(input$RunCA, {
+    #   output$CAPlot <- shiny::renderPlot({
+    #     shiny::validate(need(!is.null(sfData$data), message = "Input data not found"),
+    #                     need(!is.null(sfData$group), message = "Meta data not found"),
+    #                     need(CAThreshold() >=0 & CAThreshold() < 1, message = "Absolute correlation threshold value should between 0 and 1.")
+    #                     )
+    #     CAPlot()
+    #   })
+    # })
+    #
+    # ##(3) Download plot---------------------------------------------------------
+    # output$downloadCA <- downloadHandler(
+    #   filename = function(){paste("Correlation_Analysis", CAType(), sep = ".")},
+    #   content = function(file){
+    #     if(CAType() == "pdf"){
+    #       pdf(file, width = 20, height = 20 / CNRatio())
+    #       plot(CAPlot())
+    #       dev.off()
+    #     } else if(CAType() == "png"){
+    #       png(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
+    #       plot(CAPlot())
+    #       dev.off()
+    #     } else{
+    #       tiff(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
+    #       plot(CAPlot())
+    #       dev.off()
+    #     }
+    # })
+    # resultList <- list(
+    #   dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
+    #   OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
+    #   statTable = statTable, # data matrix for volcano plot
+    #   VCGroup = StatGroup, # group information for volcano plot
+    #   combinedTable = combinedTable,
+    #   PCAPlot = PCAPlot,
+    #   HMPlot = HMPlot,
+    #   dataGlobal3Transform = dataGlobal3Transform, # data for boxplot
+    #   BPGroup = BPGroup, # group information for boxplot
+    #   BPTransform = BPTransform, # data transformation for boxplot
+    #   KMTrendPlot = KMTrendPlot,
+    #   KMTable = KMTable
+    #   )
+    # return(resultList)
   })
 }
 

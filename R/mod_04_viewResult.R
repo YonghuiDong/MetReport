@@ -884,6 +884,7 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
       shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
       shiny::req(OPLSDAPlot())
       OPLSDAPlot()
     })
@@ -892,6 +893,7 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
       shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
       shiny::req(SPlot())
       SPlot2 <- SPlot() +
         ggplot2::geom_point(size = 1) +
@@ -906,94 +908,95 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    # #(3) Heat Map===============================================================
-    # ##(1) Heatmap parameters----------------------------------------------------
-    # HMGroup <- reactive({
-    #   as.character(input$HMGroup)
-    # })
-    # observeEvent(sfData$group, {
-    #   updateVarSelectInput(
-    #     inputId = "HMGroup",
-    #     data = sfData$group,
-    #     selected = "Group1"
-    #   )
-    # })
-    # HMQCFilter <- reactive({
-    #   as.logical(as.numeric(input$HMQCFilter))
-    # })
-    # HMRatio <- reactive({
-    #   if(input$HMRatio <=0){return(1)}
-    #   input$HMRatio
-    # })
-    #
-    # ##(2) Prepare plot----------------------------------------------------------
-    # ### Non-transformed data: sfData$filter and p-values are needed
-    # heatmapDF <- reactive({
-    #   shiny::req(combinedTable())
-    #   tem1 <- combinedTable() %>%
-    #     dplyr::select(ID, starts_with("rawArea_")) %>%
-    #     dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-    #   tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
-    #   write.csv(tem2, "hm.csv", row.names = F)
-    #   return(tem2)
-    # })
-    #
-    # ## this will be removed
-    # dataGlobal3 <- reactive({
-    #   shiny::req(combinedTable())
-    #   tem1 <- combinedTable() %>%
-    #     dplyr::select(ID, starts_with("rawArea_")) %>%
-    #     dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-    #   tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
-    #   return(tem2)
-    # })
-    #
-    #
-    # HMPlot <- reactive({
-    #   shiny::req(heatmapDF())
-    #   shiny::req(sfData$group)
-    #   HMData <- heatmapDF() %>%
-    #     dplyr::mutate(Group = sfData$group[, HMGroup()])
-    #   ## Should QC be filtered?
-    #   if(!HMQCFilter()){
-    #     HMData <- HMData[HMData$Group != "QC", ]
-    #   }
-    #   annoRow <- dplyr::select(HMData, Group)
-    #   rownames(annoRow) <- rownames(HMData)
-    #   set.seed(1998)
-    #   ComplexHeatmap::pheatmap(scale(dplyr::select(HMData, -Group), center = T, scale = T),
-    #                            name = "ColorBar",
-    #                            cluster_cols = as.logical(as.numeric(input$HMColCluster)),
-    #                            cluster_rows = as.logical(as.numeric(input$HMRowCluster)),
-    #                            annotation_row = annoRow,
-    #                            show_rownames = as.logical(as.numeric(input$HMRowName)),
-    #                            show_colnames = as.logical(as.numeric(input$HMColName)),
-    #                            column_km = input$HMSplitCol,
-    #                            row_km = input$HMSplitRow
-    #                            )
-    # })
-    #
-    # ##(3) Show and download plot -----------------------------------------------
-    # output$HMPlot <- shiny::renderPlot({
-    #   shiny::validate(
-    #     need(!is.null(sfData$filter), message = "Input data not found"),
-    #     need(!is.null(sfData$group), message = "Meta data not found")
-    #   )
-    #   HMPlot()
-    # })
-    #
-    # output$downloadHM <- downloadHandler(
-    #   filename = function(){paste("Heatmap", input$HMType, sep = ".")},
-    #   content = function(file){
-    #     switch(input$HMType,
-    #            "png" = png(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600),
-    #            "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
-    #            "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
-    #            )
-    #     ComplexHeatmap::draw(HMPlot())
-    #     dev.off()
-    # })
-    #
+    #(4) Heat Map===============================================================
+    ##(1) Heatmap parameters----------------------------------------------------
+    HMGroup <- reactive({
+      as.character(input$HMGroup)
+    })
+    observeEvent(sfData$group, {
+      updateVarSelectInput(
+        inputId = "HMGroup",
+        data = sfData$group,
+        selected = "Group1"
+      )
+    })
+    HMQCFilter <- reactive({
+      as.logical(as.numeric(input$HMQCFilter))
+    })
+    HMRatio <- reactive({
+      if(input$HMRatio <=0){return(1)}
+      input$HMRatio
+    })
+
+    ##(2) Prepare plot----------------------------------------------------------
+    ### Non-transformed data: sfData$filter and p-values are needed
+    heatmapDF <- reactive({
+      shiny::req(combinedTable())
+      tem1 <- combinedTable() %>%
+        dplyr::select(ID, starts_with("rawArea_")) %>%
+        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
+      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      return(tem2)
+    })
+
+    ## this will be removed
+    dataGlobal3 <- reactive({
+      shiny::req(combinedTable())
+      tem1 <- combinedTable() %>%
+        dplyr::select(ID, starts_with("rawArea_")) %>%
+        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
+      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      return(tem2)
+    })
+
+
+    HMPlot <- reactive({
+      shiny::req(heatmapDF())
+      shiny::req(sfData$group)
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      HMData <- heatmapDF() %>%
+        dplyr::mutate(Group = sfData$group[, HMGroup()])
+      ## Should QC be filtered?
+      if(!HMQCFilter()){
+        HMData <- HMData[HMData$Group != "QC", ]
+      }
+      annoRow <- dplyr::select(HMData, Group)
+      rownames(annoRow) <- rownames(HMData)
+      set.seed(1998)
+      ComplexHeatmap::pheatmap(scale(dplyr::select(HMData, -Group), center = T, scale = T),
+                               name = "ColorBar",
+                               cluster_cols = as.logical(as.numeric(input$HMColCluster)),
+                               cluster_rows = as.logical(as.numeric(input$HMRowCluster)),
+                               annotation_row = annoRow,
+                               show_rownames = as.logical(as.numeric(input$HMRowName)),
+                               show_colnames = as.logical(as.numeric(input$HMColName)),
+                               column_km = input$HMSplitCol,
+                               row_km = input$HMSplitRow
+                               )
+    })
+
+    ##(3) Show and download plot -----------------------------------------------
+    output$HMPlot <- shiny::renderPlot({
+      shiny::validate(
+        need(!is.null(sfData$filter), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found")
+      )
+      shiny::req(nrow(heatmapDF()) == nrow(sfData$group))
+      HMPlot()
+    })
+
+    output$downloadHM <- downloadHandler(
+      filename = function(){paste("Heatmap", input$HMType, sep = ".")},
+      content = function(file){
+        switch(input$HMType,
+               "png" = png(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600),
+               "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
+               "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
+               )
+        ComplexHeatmap::draw(HMPlot())
+        dev.off()
+    })
+
     # #(3) Volcano Plot ==========================================================
     # ##(1) Volcano plot parameters ----------------------------------------------
     # observeEvent(StatGroup(), {

@@ -656,18 +656,12 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     ##(2) Perform statistics----------------------------------------------------
-    # tDataGlobal <- reactive({
-    #   shiny::req(sfData$clean)
-    #   transformDF(sfData$clean)
-    # })
-
     statTable <- reactive({
       shiny::req(sfData$filter)
       shiny::req(sfData$filterNormTransform)
       shiny::req(sfData$clean)
       shiny::req(sfData$group)
-      ## Transform the data for statistics, QCs are excluded.
-      tFilter <- transformDF(sfData$filter, Group = sfData$group[, StatGroup()]) # filtered DF
+      tFilter <- transformDF(sfData$filter, Group = sfData$group[, StatGroup()]) # filtered
       tFilterNormTransform <- transformDF(sfData$filterNormTransform, Group = sfData$group[, StatGroup()]) # filtered, normalized and transformed
       tClean <- transformDF(sfData$clean, Group = sfData$group[, StatGroup()]) # filtered, normalized, transformed and scaled data
       Group <- sfData$group[, StatGroup()]
@@ -691,28 +685,28 @@ mod_04_viewResult_server <- function(id, sfData){
           return(statTable)
           })
     }) %>%
-      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, input$statMethod, StatGroup(), input$pAdjMethod) %>%
+      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, sfData$group, input$statMethod, StatGroup(), input$pAdjMethod) %>%
       shiny::bindEvent(input$viewStat)
 
-    ### On click, both only QC-filtered (raw area) and QC-filtered & transformed peak areas (processed area) are included
-    combinedTable <- eventReactive(input$viewStat, {
+    ## Combine QC-filtered (raw area) & transformed peak areas (processed area) with Stat result
+    combinedTable <- reactive({
       shiny::req(sfData$filter)
       shiny::req(sfData$clean)
       shiny::req(statTable())
-      tem1 <- subset(sfData$filter, select = -ID)
-      names(tem1) <- paste0("rawArea_", names(tem1))
-      tem2 <- subset(sfData$clean, select = -ID)
-      names(tem2) <- paste0("processedAREA_", names(tem2))
-      tem3 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1, tem2)
-
+      filterDF <- subset(sfData$filter, select = -ID)
+      names(filterDF) <- paste0("rawArea_", names(filterDF))
+      cleanDF <- subset(sfData$clean, select = -ID)
+      names(cleanDF) <- paste0("processedAREA_", names(cleanDF))
+      combinedDF <- cbind.data.frame(ID = sfData$clean$ID, statTable(), filterDF, cleanDF)
       ## filter rows based on defined p-value
       if(isTRUE(as.logical(as.numeric(input$SigFilter)))){
-        tem3 <- tem3 %>%
+        combinedDF <- combinedDF %>%
           dplyr::filter(if_any(contains("Pvalue"), ~ . < input$SigP))
         }
-      rownames(tem3) <- NULL
-      return(tem3)
-    })
+      rownames(combinedDF) <- NULL
+      return(combinedDF)
+    }) |>
+      bindEvent(input$viewStat)
 
 
     ##(2) Show statistical result ==============================================

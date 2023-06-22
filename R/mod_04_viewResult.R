@@ -808,103 +808,104 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    # #(3) OPLSDA=================================================================
-    # ##(1) OPLSDA parameters-----------------------------------------------------
-    # OPLSDAGroup <- reactive({
-    #   as.character(input$OPLSDAGroup)
-    # })
-    # observeEvent(sfData$group, {
-    #   updateVarSelectInput(
-    #     inputId = "OPLSDAGroup",
-    #     data = sfData$group,
-    #     selected = "Group1"
-    #   )
-    # })
-    # observeEvent(OPLSDAGroup(),{
-    #   OPLSDALevels <- sfData$group[, OPLSDAGroup()]
-    #   updateSelectInput(inputId = "OPLSDALevel1",
-    #                     choices = levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")])),
-    #                     selected = NULL
-    #                     )
-    #   updateSelectInput(inputId = "OPLSDALevel2",
-    #                     choices = rev(levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")]))),
-    #                     selected = NULL
-    #                     )
-    # })
-    # OPLSDARatio <- reactive({
-    #   if(input$PCARatio <= 0){return(1)}
-    #   input$OPLSDARatio
-    # })
-    #
-    # ##(2) Prepare plot----------------------------------------------------------
-    # OPLSDA <- reactiveValues(feature = NULL, group = NULL)
-    # observe({
-    #   shiny::req(dataGlobal3PCA())
-    #   shiny::req(sfData$group)
-    #   shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-    #   shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "SAME"))
-    #   dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
-    #   dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
-    #   OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
-    #   OPLSDA$group <- as.factor(dfOPLSDA$Group)
-    # })
-    #
-    # resultOPLSDA <- reactive({
-    #   shiny::req(OPLSDA$feature)
-    #   shiny::req(OPLSDA$group)
-    #   getOPLSDA(Feature = OPLSDA$feature, Group = OPLSDA$group)
-    # })
-    #
-    # OPLSDAPlot <- reactive({
-    #   shiny::req(resultOPLSDA())
-    #   shiny::req(OPLSDA$group)
-    #   p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
-    #     ggplot2::theme(text = element_text(size = 16))
-    #
-    #   if(input$OPLSDAColor == "Default") {
-    #     p <- p
-    #     } else {
-    #     p <- p +
-    #       scale_color_brewer(palette = input$OPLSDAColor) +
-    #       scale_fill_brewer(palette = input$OPLSDAColor)
-    #     }
-    #   return(p)
-    # })
-    #
-    # SPlot <- reactive({
-    #   shiny::req(resultOPLSDA())
-    #   shiny::req(OPLSDA$feature)
-    #   showSplot(OPLSDA$feature, resultOPLSDA()) +
-    #     ggplot2::theme(text = element_text(size = 16))
-    # })
-    #
-    # ##(3) Show OPLSDA Result ---------------------------------------------------
-    # output$OPLSDAPlot <- shiny::renderPlot({
-    #   shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
-    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-    #   shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-    #   shiny::req(OPLSDAPlot())
-    #   OPLSDAPlot()
-    # })
-    #
-    # output$SPlot <- plotly::renderPlotly({
-    #   shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
-    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-    #   shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-    #   shiny::req(SPlot())
-    #   SPlot2 <- SPlot() +
-    #     ggplot2::geom_point(size = 1) +
-    #     ggplot2::theme(text = element_text(size = 12))
-    #   plotly::ggplotly(SPlot2, tooltip = "text")
-    # })
-    #
-    # output$downloadOPLSDA <- downloadHandler(
-    #   filename = function(){paste("OPLSDA_ScorePlot", input$OPLSDAType, sep = ".")},
-    #   content = function(file){
-    #     ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = input$OPLSDAType)
-    #   }
-    # )
-    #
+    ##(3) OPLSDA================================================================
+    ##(1) OPLSDA parameters-----------------------------------------------------
+    OPLSDAGroup <- reactive({
+      as.character(input$OPLSDAGroup)
+    })
+    observeEvent(sfData$group, {
+      updateVarSelectInput(
+        inputId = "OPLSDAGroup",
+        data = sfData$group,
+        selected = "Group1"
+      )
+    })
+    observeEvent(OPLSDAGroup(),{
+      OPLSDALevels <- sfData$group[, OPLSDAGroup()]
+      updateSelectInput(inputId = "OPLSDALevel1",
+                        choices = levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")])),
+                        selected = NULL
+                        )
+      updateSelectInput(inputId = "OPLSDALevel2",
+                        choices = rev(levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")]))),
+                        selected = NULL
+                        )
+    })
+    OPLSDARatio <- reactive({
+      if(input$PCARatio <= 0){return(1)}
+      input$OPLSDARatio
+    })
+
+    ##(2) Prepare plot----------------------------------------------------------
+    OPLSDA <- reactiveValues(feature = NULL, group = NULL)
+    observe({
+      shiny::req(dataGlobal3PCA())
+      shiny::req(sfData$group)
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
+      dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
+      OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
+      OPLSDA$group <- as.factor(dfOPLSDA$Group)
+    })
+
+    resultOPLSDA <- reactive({
+      shiny::req(OPLSDA$feature)
+      shiny::req(OPLSDA$group)
+      getOPLSDA(Feature = OPLSDA$feature, Group = OPLSDA$group)
+    })
+
+    OPLSDAPlot <- reactive({
+      shiny::req(resultOPLSDA())
+      shiny::req(OPLSDA$group)
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
+        ggplot2::theme(text = element_text(size = 16))
+      if(input$OPLSDAColor == "Default") {
+        p <- p
+        } else {
+        p <- p +
+          scale_color_brewer(palette = input$OPLSDAColor) +
+          scale_fill_brewer(palette = input$OPLSDAColor)
+        }
+      return(p)
+    })
+
+    SPlot <- reactive({
+      shiny::req(resultOPLSDA())
+      shiny::req(OPLSDA$feature)
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
+      showSplot(OPLSDA$feature, resultOPLSDA()) +
+        ggplot2::theme(text = element_text(size = 16))
+    })
+
+    ##(3) Show OPLSDA Result ---------------------------------------------------
+    output$OPLSDAPlot <- shiny::renderPlot({
+      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
+      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(OPLSDAPlot())
+      OPLSDAPlot()
+    })
+
+    output$SPlot <- plotly::renderPlotly({
+      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
+      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(SPlot())
+      SPlot2 <- SPlot() +
+        ggplot2::geom_point(size = 1) +
+        ggplot2::theme(text = element_text(size = 12))
+      plotly::ggplotly(SPlot2, tooltip = "text")
+    })
+
+    output$downloadOPLSDA <- downloadHandler(
+      filename = function(){paste("OPLSDA_ScorePlot", input$OPLSDAType, sep = ".")},
+      content = function(file){
+        ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = input$OPLSDAType)
+      }
+    )
+
     # #(3) Heat Map===============================================================
     # ##(1) Heatmap parameters----------------------------------------------------
     # HMGroup <- reactive({

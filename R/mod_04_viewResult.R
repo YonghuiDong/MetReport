@@ -820,7 +820,9 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    observeEvent(OPLSDAGroup(),{
+
+    ## need to use input$viewStat to update group levels when deleting or recovering samples.
+    observeEvent(c(OPLSDAGroup(), input$viewStat),{
       OPLSDALevels <- sfData$group[, OPLSDAGroup()]
       updateSelectInput(inputId = "OPLSDALevel1",
                         choices = levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")])),
@@ -1000,7 +1002,7 @@ mod_04_viewResult_server <- function(id, sfData){
     #(3) Volcano Plot ==========================================================
     ##(1) Volcano plot parameters ----------------------------------------------
 
-    ## here need to observe both statGroup() and viewStat action.
+    ## need to use input$viewStat to update group levels when deleting or recovering samples.
     observeEvent(c(StatGroup(), input$viewStat), {
       VCLevels <- sfData$group[, StatGroup()]
       updateSelectInput(inputId = "VCLevel1",
@@ -1052,127 +1054,128 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    # #4. K-Means=================================================================
-    # ##(1) K-Means plot parameters-----------------------------------------------
-    # KMGroup <- reactive({
-    #   as.character(input$KMGroup)
-    # })
-    # observeEvent(sfData$group, {
-    #   updateVarSelectInput(
-    #     inputId = "KMGroup",
-    #     data = sfData$group,
-    #     selected = "Group1"
-    #   )
-    # })
-    # KMRatio <- reactive({
-    #   if(input$KMRatio <=0) {return(1)}
-    #   input$KMRatio
-    # })
-    #
-    # ##(2) Prepare plot----------------------------------------------------------
-    # ###(2.1)prepare k-means data
-    # KMdata <- reactive({
-    #   shiny::req(heatmapDF())
-    #   tem <- heatmapDF() %>%
-    #     dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
-    #     dplyr::filter(Group != "QC") %>%
-    #     tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
-    #     dplyr::group_by(Group, Metabolite) %>%
-    #     dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
-    #     tidyr::pivot_wider(names_from = Group, values_from = meanArea)
-    #   ## standardize data
-    #   RS <- rowSums(dplyr::select(tem, -Metabolite))
-    #   tem2 <- tem %>%
-    #     dplyr::mutate_if(is.numeric, function(x)(x/RS))
-    #   return(tem2)
-    # })
-    #
-    # ###(2.2) calculate k-means
-    # KMResult <- reactive({
-    #   shiny::req(KMdata())
-    #   shiny::validate(
-    #     need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-    #     need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-    #   )
-    #   kmeans(dplyr::select(KMdata(), -Metabolite), input$KMCluster)
-    # })
-    #
-    # ###(2.3) calculate k-means clusters
-    # KMResultCluster <- reactive({
-    #   shiny::req(KMdata())
-    #   shiny::validate(
-    #     need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-    #     need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-    #   )
-    #   set.seed(666)
-    #   kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
-    # })
-    #
-    # ###(2.4) KM Table
-    # KMTable <- reactive({
-    #   shiny::req(KMResultCluster())
-    #   data_with_cust_info <- KMdata() %>%
-    #     dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
-    # })
-    #
-    # ###(2.5) K-means trend plot
-    # KMTrendPlot <- reactive({
-    #   KMTable() %>%
-    #     tidyr::pivot_longer(cols = !c(Metabolite, clust), names_to = "Group", values_to = "normArea") %>%
-    #     dplyr::group_by(Group) %>%
-    #     dplyr::mutate(row_num =  1:n()) %>%
-    #     ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
-    #     ggplot2::geom_point(alpha = 0.1) +
-    #     ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
-    #     ggplot2::theme_bw() +
-    #     ggplot2::theme(text = element_text(size = 14),
-    #                    legend.position = "none",
-    #                    axis.text.x = element_text(angle = 90 , vjust = 0.4)) +
-    #     ggplot2::ylab("Standardized Peak Area") +
-    #     ggplot2::facet_wrap(~clust)
-    # })
-    #
-    # ##(3) Show and download plot -----------------------------------------------
-    # output$KMTrendPlot <- shiny::renderPlot({
-    #   shiny::validate(
-    #     need(!is.null(sfData$data), message = "Input data not found"),
-    #     need(!is.null(sfData$group), message = "Meta data not found"),
-    #     need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-    #     need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-    #   )
-    #   KMTrendPlot() + ggplot2::ggtitle("Metabolic Profile Clustering")
-    # })
-    #
-    # output$KMTable <- DT::renderDataTable({
-    #   shiny::validate(
-    #     need(!is.null(sfData$data), message = "Input data not found"),
-    #     need(!is.null(sfData$group), message = "Meta data not found")
-    #   )
-    #   shiny::req(KMTable())
-    #   DT::datatable(KMTable(),
-    #                 caption = "K-means cluster table:",
-    #                 options = list(scrollX = TRUE,
-    #                                deferRender = TRUE,
-    #                                scroller = TRUE,
-    #                                fixedColumns = FALSE
-    #                                )
-    #                 )
-    # })
-    #
-    # output$downloadKMTrend <- downloadHandler(
-    #   filename = function(){paste("KM_Lineplot", input$KMType, sep = ".")},
-    #   content = function(file){
-    #     ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = input$KMType)
-    #   }
-    # )
-    #
-    # output$downloadKMTable <- downloadHandler(
-    #   filename = "K-means_table.csv",
-    #   content = function(file){
-    #     write.csv(KMTable(), file, row.names = FALSE)
-    #   }
-    # )
-    #
+    #4. K-Means=================================================================
+    ##(1) K-Means plot parameters-----------------------------------------------
+    KMGroup <- reactive({
+      as.character(input$KMGroup)
+    })
+    observeEvent(sfData$group, {
+      updateVarSelectInput(
+        inputId = "KMGroup",
+        data = sfData$group,
+        selected = "Group1"
+      )
+    })
+    KMRatio <- reactive({
+      if(input$KMRatio <=0) {return(1)}
+      input$KMRatio
+    })
+
+    ##(2) Prepare plot----------------------------------------------------------
+    ###(2.1)prepare k-means data
+    KMdata <- reactive({
+      shiny::req(heatmapDF())
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      tem <- heatmapDF() %>%
+        dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
+        dplyr::filter(Group != "QC") %>%
+        tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
+        dplyr::group_by(Group, Metabolite) %>%
+        dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
+        tidyr::pivot_wider(names_from = Group, values_from = meanArea)
+      ## standardize data
+      RS <- rowSums(dplyr::select(tem, -Metabolite))
+      tem2 <- tem %>%
+        dplyr::mutate_if(is.numeric, function(x)(x/RS))
+      return(tem2)
+    })
+
+    ###(2.2) calculate k-means
+    KMResult <- reactive({
+      shiny::req(KMdata())
+      shiny::validate(
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
+      kmeans(dplyr::select(KMdata(), -Metabolite), input$KMCluster)
+    })
+
+    ###(2.3) calculate k-means clusters
+    KMResultCluster <- reactive({
+      shiny::req(KMdata())
+      shiny::validate(
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
+      set.seed(666)
+      kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
+    })
+
+    ###(2.4) KM Table
+    KMTable <- reactive({
+      shiny::req(KMResultCluster())
+      data_with_cust_info <- KMdata() %>%
+        dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
+    })
+
+    ###(2.5) K-means trend plot
+    KMTrendPlot <- reactive({
+      KMTable() %>%
+        tidyr::pivot_longer(cols = !c(Metabolite, clust), names_to = "Group", values_to = "normArea") %>%
+        dplyr::group_by(Group) %>%
+        dplyr::mutate(row_num =  1:n()) %>%
+        ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
+        ggplot2::geom_point(alpha = 0.1) +
+        ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
+        ggplot2::theme_bw() +
+        ggplot2::theme(text = element_text(size = 14),
+                       legend.position = "none",
+                       axis.text.x = element_text(angle = 90 , vjust = 0.4)) +
+        ggplot2::ylab("Standardized Peak Area") +
+        ggplot2::facet_wrap(~clust)
+    })
+
+    ##(3) Show and download plot -----------------------------------------------
+    output$KMTrendPlot <- shiny::renderPlot({
+      shiny::validate(
+        need(!is.null(sfData$data), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found"),
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
+      KMTrendPlot() + ggplot2::ggtitle("Metabolic Profile Clustering")
+    })
+
+    output$KMTable <- DT::renderDataTable({
+      shiny::validate(
+        need(!is.null(sfData$data), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found")
+      )
+      shiny::req(KMTable())
+      DT::datatable(KMTable(),
+                    caption = "K-means cluster table:",
+                    options = list(scrollX = TRUE,
+                                   deferRender = TRUE,
+                                   scroller = TRUE,
+                                   fixedColumns = FALSE
+                                   )
+                    )
+    })
+
+    output$downloadKMTrend <- downloadHandler(
+      filename = function(){paste("KM_Lineplot", input$KMType, sep = ".")},
+      content = function(file){
+        ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = input$KMType)
+      }
+    )
+
+    output$downloadKMTable <- downloadHandler(
+      filename = "K-means_table.csv",
+      content = function(file){
+        write.csv(KMTable(), file, row.names = FALSE)
+      }
+    )
+
     # #5. Box Plot ===============================================================
     # ##(1) Parameters -----------------------------------------------------------
     #

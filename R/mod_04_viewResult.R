@@ -661,6 +661,7 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::req(sfData$filterNormTransform)
       shiny::req(sfData$clean)
       shiny::req(sfData$group)
+      shiny::validate(need((ncol(sfData$clean) - 1) == nrow(sfData$group), message = "Please wait for data preprocessing to finish before clicking Start button."))
       tFilter <- transformDF(sfData$filter, Group = sfData$group[, StatGroup()]) # filtered
       tFilterNormTransform <- transformDF(sfData$filterNormTransform, Group = sfData$group[, StatGroup()]) # filtered, normalized and transformed
       tClean <- transformDF(sfData$clean, Group = sfData$group[, StatGroup()]) # filtered, normalized, transformed and scaled data
@@ -1170,6 +1171,9 @@ mod_04_viewResult_server <- function(id, sfData){
 
 ##(2) Prepare plot--------------------------------------------------------------
 BPPlot <- reactive({
+  shiny::req(heatmapDF())
+  shiny::req(sfData$group)
+  shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
   showBoxplot(DF = heatmapDF(), Transform = input$BPTransform, Group = sfData$group[, BPGroup()],
               Metabolite = input$BPMetabolite, colorPalette = input$BPPlotColor, BPPlotType = input$BPPlotType
               )

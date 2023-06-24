@@ -29,7 +29,7 @@ showBoxplot <- function(DF, Transform = "none", Group, Metabolite, colorPalette 
                     )
   p <- DF %>%
     dplyr::mutate(Group = Group) %>%
-    dplyr::select(Group, Metabolite = Metabolite) %>%
+    dplyr::select(Group, Metabolite = all_of(Metabolite)) %>%
     dplyr::filter(Group != "QC") %>%
     dplyr::group_by(Group) %>%
     dplyr::mutate(MEAN = mean(Metabolite), SD = sd(Metabolite)) %>%

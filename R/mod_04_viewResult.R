@@ -1076,18 +1076,8 @@ mod_04_viewResult_server <- function(id, sfData){
     KMdata <- reactive({
       shiny::req(heatmapDF())
       shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
-      tem <- heatmapDF() %>%
-        dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
-        dplyr::filter(Group != "QC") %>%
-        tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
-        dplyr::group_by(Group, Metabolite) %>%
-        dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
-        tidyr::pivot_wider(names_from = Group, values_from = meanArea)
-      ## standardize data
-      RS <- rowSums(dplyr::select(tem, -Metabolite))
-      tem2 <- tem %>%
-        dplyr::mutate_if(is.numeric, function(x)(x/RS))
-      return(tem2)
+      tem <- prepareKMData(DF = heatmapDF(), Group = sfData$group[, KMGroup()])
+      return(tem)
     })
 
     ###(2.2) calculate k-means

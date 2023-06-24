@@ -461,7 +461,7 @@ mod_04_viewResult_ui <- function(id){
                                selectInput(inputId = ns("BPTransform"),
                                            label = "3. How to transform the data?",
                                            choices = list("none", "log2", "log10"),
-                                           selected = "log10"
+                                           selected = "none"
                                            )
                                ),
                         column(width = 6,
@@ -500,7 +500,7 @@ mod_04_viewResult_ui <- function(id){
                                               )
                                )
                         ),
-               shiny::plotOutput(ns("BPPlot"))
+               shinycssloaders::withSpinner(shiny::plotOutput(ns("BPPlot")), type = 5)
                ),
 
              ##(7) Correlation Analysis Panel ----------------------------------
@@ -943,12 +943,13 @@ mod_04_viewResult_server <- function(id, sfData){
 
     ## this will be removed
     dataGlobal3 <- reactive({
-      shiny::req(combinedTable())
-      tem1 <- combinedTable() %>%
-        dplyr::select(ID, starts_with("rawArea_")) %>%
-        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
-      return(tem2)
+      # shiny::req(combinedTable())
+      # tem1 <- combinedTable() %>%
+      #   dplyr::select(ID, starts_with("rawArea_")) %>%
+      #   dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
+      # tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      # return(tem2)
+      heatmapDF()
     })
 
 
@@ -1144,113 +1145,51 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    # #5. Box Plot ===============================================================
-    # ##(1) Parameters -----------------------------------------------------------
-    #
-    # BPGroup <- reactive({
-    #   as.character(input$BPGroup)
-    # })
-    # observeEvent(sfData$group, {
-    #   updateVarSelectInput(
-    #     inputId = "BPGroup",
-    #     data = sfData$group,
-    #     selected = "Group1"
-    #   )
-    # })
-    # BPMetabolite <- reactive({
-    #   as.character(input$BPMetabolite)
-    # })
-    # observeEvent(input$viewStat,{
-    #   updateVarSelectizeInput(
-    #     server = TRUE,
-    #     inputId = "BPMetabolite",
-    #     data = dataGlobal3()
-    #   )
-    # })
-    # BPTransform <- reactive({
-    #   as.character(input$BPTransform)
-    # })
-    # BPPlotType <- reactive({
-    #   as.character(input$BPPlotType)
-    # })
-    # BPPlotColor <- reactive({
-    #   as.character(input$BPPlotColor)
-    # })
-    # BPType <- reactive({
-    #   as.character(input$BPType)
-    # })
-    # BPRatio <- reactive({
-    #   if(input$BPRatio <=0){return(1)}
-    #   input$BPRatio
-    # })
-    # dataGlobal3Transform <- reactive({
-    #   switch(BPTransform(),
-    #          none = dataGlobal3(),
-    #          log2 = log2(dataGlobal3()),
-    #          log10 = log10(dataGlobal3())
-    #          )
-    # })
-    # yLegend <- reactive({
-    #   switch(BPTransform(),
-    #          none = "Peak Area",
-    #          log2 = "Log2 Transformed Peak Area",
-    #          log10 = "Log10 Transformed Peak Area"
-    #          )
-    # })
-    #
-    # ##(2) Prepare plot----------------------------------------------------------
-    #
-    # BPPlot <- reactive({
-    #   p <- dataGlobal3Transform() %>%
-    #     dplyr::mutate(Group = sfData$group[, BPGroup()]) %>%
-    #     dplyr::select(Group, Metabolite = BPMetabolite()) %>%
-    #     dplyr::filter(Group != "QC") %>%
-    #     dplyr::group_by(Group) %>%
-    #     dplyr::mutate(MEAN = mean(Metabolite), SD = sd(Metabolite)) %>%
-    #     ggplot2::ggplot(aes(x = Group, fill = Group)) +
-    #     ggplot2::ylab(yLegend()) +
-    #     ggplot2::theme_bw() +
-    #     ggplot2::ggtitle(paste0("Metabolite: ", BPMetabolite())) +
-    #     ggplot2::theme(text = element_text(size = 16),
-    #                    legend.position="none"
-    #                    )
-    #   ## color palette
-    #   if(BPPlotColor() == "Default") {
-    #     p <- p
-    #     } else {
-    #       p <- p + scale_fill_brewer(palette = BPPlotColor())
-    #     }
-    #
-    #   ## plot type
-    #   p2 <- switch(BPPlotType(),
-    #                "Box plot" = p +
-    #                  ggplot2::geom_boxplot(aes(y = Metabolite), outlier.shape = 24, outlier.fill = "red", outlier.size = 3, alpha = 0.8) +
-    #                  ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
-    #                "Violin plot" = p +
-    #                  ggplot2::geom_violin(aes(y = Metabolite), alpha = 0.8) +
-    #                  ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
-    #                "Bar plot" = p +
-    #                  ggplot2::geom_bar(aes(y = MEAN), alpha = 0.8, stat = "identity", width = 0.5, color = "black", position = position_dodge()) +
-    #                  ggplot2::geom_errorbar(aes(ymin = MEAN, ymax = MEAN + SD), width = 0.2, position = position_dodge(0.9)) +
-    #                  ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black")
-    #                )
-    #   return(p2)
-    # })
-    #
-    # ##(3) Show and download plot----------------------------------------------------
-    # output$BPPlot <- shiny::renderPlot({
-    #   shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-    #   BPPlot()
-    # })
-    #
-    # output$downloadBP <- downloadHandler(
-    #   filename = function(){paste("Box_plot", BPType(), sep = ".")},
-    #   content = function(file){
-    #     ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = BPType())
-    #   }
-    # )
-    #
+#5. Box Plot ===================================================================
+##(1) Parameters ---------------------------------------------------------------
+    BPGroup <- reactive({
+      as.character(input$BPGroup)
+    })
+    observeEvent(sfData$group, {
+      updateVarSelectInput(
+        inputId = "BPGroup",
+        data = sfData$group,
+        selected = "Group1"
+      )
+    })
+    observeEvent(input$viewStat, {
+      updateVarSelectizeInput(
+        server = TRUE,
+        inputId = "BPMetabolite",
+        data = heatmapDF()
+      )
+    })
+    BPRatio <- reactive({
+      if(input$BPRatio <=0){return(1)}
+      input$BPRatio
+    })
+
+##(2) Prepare plot--------------------------------------------------------------
+BPPlot <- reactive({
+  showBoxplot(DF = heatmapDF(), Transform = input$BPTransform, Group = sfData$group[, BPGroup()],
+              Metabolite = input$BPMetabolite, colorPalette = input$BPPlotColor, BPPlotType = input$BPPlotType
+              )
+})
+
+##(3) Show and download plot----------------------------------------------------
+output$BPPlot <- shiny::renderPlot({
+  shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+  shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+  BPPlot()
+})
+
+output$downloadBP <- downloadHandler(
+  filename = function(){paste("Box_plot", input$BPType, sep = ".")},
+  content = function(file){
+    ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = input$BPType)
+  }
+)
+
     # # #6. Correlation Network ----------------------------------------------------
     # ##(1) parameters------------------------------------------------------------
     # CNMetabolite <- reactive({

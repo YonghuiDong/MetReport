@@ -6,12 +6,13 @@
 #' @examples
 #' library(dplyr)
 #' library(tidyr)
+#' library(ggplot2)
 #' heatmapDF <- read.csv("rawData/heatmapDF.csv", header = TRUE)
 #' Group <- c(rep("Lung", 18), rep("Blood", 6), rep("QC", 6), rep("Blood", 6))
 #' KMdata <- prepareKMData(heatmapDF, Group)
 #' KMResultCluster <- kmeans(dplyr::select(KMdata, -Metabolite), centers = 2)$cluster
 #' KMTable <- KMdata %>% dplyr::mutate(clust = paste0("cluster", KMResultCluster))
-#'
+#' showKM(KMTable)
 
 showKM <- function(KMTable){
   p <- KMTable %>%

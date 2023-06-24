@@ -1080,17 +1080,7 @@ mod_04_viewResult_server <- function(id, sfData){
       return(tem)
     })
 
-    ###(2.2) calculate k-means
-    KMResult <- reactive({
-      shiny::req(KMdata())
-      shiny::validate(
-        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
-        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
-      )
-      kmeans(dplyr::select(KMdata(), -Metabolite), input$KMCluster)
-    })
-
-    ###(2.3) calculate k-means clusters
+    ###(2.2) calculate k-means clusters
     KMResultCluster <- reactive({
       shiny::req(KMdata())
       shiny::validate(
@@ -1101,28 +1091,16 @@ mod_04_viewResult_server <- function(id, sfData){
       kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
     })
 
-    ###(2.4) KM Table
+    ###(2.3) KM Table
     KMTable <- reactive({
       shiny::req(KMResultCluster())
       data_with_cust_info <- KMdata() %>%
         dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
     })
 
-    ###(2.5) K-means trend plot
+    ###(2.4) K-means trend plot
     KMTrendPlot <- reactive({
-      KMTable() %>%
-        tidyr::pivot_longer(cols = !c(Metabolite, clust), names_to = "Group", values_to = "normArea") %>%
-        dplyr::group_by(Group) %>%
-        dplyr::mutate(row_num =  1:n()) %>%
-        ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
-        ggplot2::geom_point(alpha = 0.1) +
-        ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(text = element_text(size = 14),
-                       legend.position = "none",
-                       axis.text.x = element_text(angle = 90 , vjust = 0.4)) +
-        ggplot2::ylab("Standardized Peak Area") +
-        ggplot2::facet_wrap(~clust)
+      showKM(KMTable())
     })
 
     ##(3) Show and download plot -----------------------------------------------

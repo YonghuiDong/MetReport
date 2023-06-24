@@ -952,7 +952,6 @@ mod_04_viewResult_server <- function(id, sfData){
       heatmapDF()
     })
 
-
     HMPlot <- reactive({
       shiny::req(heatmapDF())
       shiny::req(sfData$group)
@@ -1157,7 +1156,7 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    observeEvent(input$viewStat, {
+    observeEvent(c(heatmapDF(), input$viewStat), {
       updateVarSelectizeInput(
         server = TRUE,
         inputId = "BPMetabolite",

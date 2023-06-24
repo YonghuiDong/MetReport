@@ -7,11 +7,10 @@
 #' library(dplyr)
 #' library(tidyr)
 #' heatmapDF <- read.csv("rawData/heatmapDF.csv", header = TRUE)
-#' load("data/cancerCell.rda")
-#' feature <- formatData(cancerCell)
-#' meta <- getMeta(feature)
-#' Group <- meta[, 2]
-#' KMData <- prepareKMData(heatmapDF, Group)
+#' Group <- c(rep("Lung", 18), rep("Blood", 6), rep("QC", 6), rep("Blood", 6))
+#' KMdata <- prepareKMData(heatmapDF, Group)
+#' KMResultCluster <- kmeans(dplyr::select(KMdata, -Metabolite), centers = 2)$cluster
+#' KMTable <- KMdata %>% dplyr::mutate(clust = paste0("cluster", KMResultCluster))
 #'
 
 showKM <- function(KMTable){

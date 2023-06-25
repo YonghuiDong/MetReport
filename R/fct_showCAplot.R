@@ -4,7 +4,7 @@
 #' @param Metabolite which metabolite?
 #' @param Threshold the correlation coefficient threshold.
 #' @param LabelSize label size.
-#' @importFrom igraph layout
+#' @import igraph
 #' @return network Plot.
 #' @noRd
 #' @examples
@@ -26,8 +26,7 @@ showCAplot <- function(PCC, Metabolite, Threshold = 0.9, FullName = TRUE, LabelS
 
   nodes <- data.frame(id = edges$to) %>%
     dplyr::mutate(label = edges$to) %>%
-    dplyr::mutate(color.background = ifelse(edges$correlation > 0, "#e9a3c9", "#a1d76a")) %>%
-    dplyr::mutate(group = ifelse(edges$correlation > 0, "Pos", "Neg"))
+    dplyr::mutate(color.background = ifelse(edges$correlation > 0, "#e9a3c9", "#a1d76a"))
 
   edges$value <- edges$correlation
 
@@ -35,9 +34,6 @@ showCAplot <- function(PCC, Metabolite, Threshold = 0.9, FullName = TRUE, LabelS
   visNetwork::visNetwork(nodes = nodes, edges[edges$from != edges$to, ], width = "100%") %>%
     visNetwork::visNodes(font = list(size = LabelSize)) %>%
     visNetwork::visOptions(highlightNearest = TRUE) %>%
-    visNetwork::visGroups(groupname = "Pos", color = "#e9a3c9") %>%
-    visNetwork::visGroups(groupname = "Neg", color = "#a1d76a") %>%
-    visNetwork::visLegend(position = "right", main = "Correlation") %>%
     visNetwork::visInteraction(navigationButtons = TRUE) %>%
     visNetwork::visIgraphLayout(randomSeed = 123)
 }

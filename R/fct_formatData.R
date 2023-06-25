@@ -127,7 +127,7 @@ formatData <- function(DF, metaGroup = NULL, format = "CD"){
     dfName <- do.call(paste, c(metaGroup, sep = '_'))
     dfName <- paste0(dfName, "_", 1:length(dfName))
     if (length(dfName) != (ncol(processedData) - 1)) {stop("Sample number and meta number are not equal")}
-    setnames(processedData, c("ID", dfName))
+    data.table::setnames(processedData, c("ID", dfName))
   }
   return(processedData)
 }

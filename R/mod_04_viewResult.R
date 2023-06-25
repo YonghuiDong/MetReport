@@ -659,17 +659,6 @@ mod_04_viewResult_server <- function(id, sfData){
 
     ##(2) Prepare plot----------------------------------------------------------
     ### sfData$clean (QC filtered data) is used for PCA
-    ## Note: combinedTablePCA could be removed.
-    # combinedTablePCA <- eventReactive(input$viewStat, {
-    #   shiny::req(sfData$clean)
-    #   shiny::req(statTable())
-    #   tem1 <- subset(sfData$clean, select = -ID)
-    #   names(tem1) <- paste0("rawArea_", names(tem1))
-    #   tem2 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1)
-    #   rownames(tem2) <- NULL
-    #   return(tem2)
-    # })
-
     dataGlobal3PCA <- reactive({
       shiny::req(sfData$clean)
       tem <- transformDF(sfData$clean, Group = NULL, rowName = TRUE)
@@ -1069,6 +1058,9 @@ mod_04_viewResult_server <- function(id, sfData){
         data = heatmapDF()
       )
     })
+    BPTransform <- reactive({
+      input$BPTransform
+    })
     BPRatio <- reactive({
       if(input$BPRatio <=0){return(1)}
       input$BPRatio
@@ -1122,22 +1114,21 @@ mod_04_viewResult_server <- function(id, sfData){
       showCAplot(PCC = PCC(), Metabolite = as.character(input$CAMetabolite), Threshold = input$CAThreshold)
     })
 
-
-    # resultList <- list(
-    #   dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
-    #   OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
-    #   statTable = statTable, # data matrix for volcano plot
-    #   VCGroup = StatGroup, # group information for volcano plot
-    #   combinedTable = combinedTable,
-    #   PCAPlot = PCAPlot,
-    #   HMPlot = HMPlot,
-    #   dataGlobal3Transform = dataGlobal3Transform, # data for boxplot
-    #   BPGroup = BPGroup, # group information for boxplot
-    #   BPTransform = BPTransform, # data transformation for boxplot
-    #   KMTrendPlot = KMTrendPlot,
-    #   KMTable = KMTable
-    #   )
-    # return(resultList)
+    resultList <- list(
+      PCAPlot = PCAPlot,
+      HMPlot = HMPlot,
+      dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
+      OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
+      statTable = statTable, # data for volcano plot
+      VCGroup = StatGroup, # group information for volcano plot
+      combinedTable = combinedTable,
+      dataGlobal3Transform = heatmapDF, # data for boxplot
+      BPGroup = BPGroup, # group information for boxplot
+      BPTransform = BPTransform, # data transformation for boxplot
+      KMTrendPlot = KMTrendPlot,
+      KMTable = KMTable
+      )
+    return(resultList)
   })
 }
 

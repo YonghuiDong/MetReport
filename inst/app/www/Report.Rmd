@@ -3,6 +3,7 @@ title: '`r paste("Report for Project:", params$projectName, sep = " ")`'
 date: '`r format(Sys.Date(),  "%d, %B, %Y")`'
 author: '`r params$authorName`'
 output: 
+  html_document:
     theme: flatly
     toc: true
     toc_float: true

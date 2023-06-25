@@ -5,7 +5,7 @@ author: '`r params$authorName`'
 output: 
   html_document:
     pandoc_args: [
-      "+RTS", "-M2g",
+      "+RTS", "-M8g",
       "-RTS"
     ]
     theme: flatly

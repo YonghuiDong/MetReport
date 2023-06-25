@@ -14,12 +14,10 @@ Imports:
     dplyr,
     DT,
     ggplot2,
-    ggraph,
     golem (>= 0.3.5),
     grDevices,
     MSbox,
     plotly,
-    qgraph,
     readxl,
     rmarkdown,
     ropls,
@@ -31,7 +29,8 @@ Imports:
     tidyr,
     tools,
     utils,
-    VIM
+    VIM,
+    visNetwork
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

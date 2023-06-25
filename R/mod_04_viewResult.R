@@ -503,78 +503,11 @@ mod_04_viewResult_ui <- function(id){
                shinycssloaders::withSpinner(shiny::plotOutput(ns("BPPlot")), type = 5)
                ),
 
-             ##(7) Correlation Analysis Panel ----------------------------------
-             # box(
-             #   width = 12,
-             #   inputId = "viewCN",
-             #   title = strong("Correlation Analysis"),
-             #   status = "success",
-             #   solidHeader = FALSE,
-             #   collapsible = TRUE,
-             #   collapsed = TRUE,
-             #   closable = FALSE,
-             #   fluidRow(width = 12,
-             #            column(width = 12,
-             #                   p(style = "color:#C70039;", strong("Attention:")),
-             #                   p("(1) Intensive computation is requied in this section.
-             #                 Don't run this section if you have over 150 features.
-             #                 Don't worry, you'll not miss any important information."),
-             #                 p("(2) ", code("Correlation Network "), "Panel offers you similar result."),
-             #                 p("(3) You can check the the number of features in above ", code("Statistics "), "Panel"),
-             #                 ),
-             #            column(width = 6,
-             #                   numericInput(inputId = ns("CAThreshold"),
-             #                                label = "Select correlation threshold (absolute value)",
-             #                                value = 0,
-             #                                min = 0,
-             #                                max = 1
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   numericInput(inputId = ns("CASize"),
-             #                                label = "Set Metabolite ID size",
-             #                                value = 3,
-             #                                min = 1,
-             #                                max = NA
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   radioButtons(inputId = ns("CAType"),
-             #                                label = "Select plot type to download",
-             #                                choices = list("pdf", "tiff", "png"),
-             #                                selected = "pdf"
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   numericInput(inputId = ns("CARatio"),
-             #                                label = "Aspect ratio of the plot (width:height)",
-             #                                value = 1,
-             #                                min = NA,
-             #                                max = NA
-             #                                )
-             #                   ),
-             #            column(width = 12,
-             #                   actionButton(inputId = ns("RunCA"),
-             #                                label = "Run Analysis",
-             #                                icon = icon("paper-plane"),
-             #                                style = "color: #fff; background-color: #7570b3; border-color: #7570b3"
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   br(),
-             #                   downloadButton(outputId = ns("downloadCA"),
-             #                                  label = "Download"
-             #                                  )
-             #                   )
-             #            ),
-             #   shiny::plotOutput(ns("CAPlot"))
-             #   ),
-
-             ##(8) Correlation analysis Panel ----------------------------------
+             ##(7) Correlation analysis Panel ----------------------------------
              box(
                width = 12,
-               inputId = "viewCN",
-               title = strong("Correlation Network"),
+               inputId = "viewCA",
+               title = strong("Correlation Analysis"),
                status = "success",
                solidHeader = FALSE,
                collapsible = TRUE,
@@ -582,56 +515,28 @@ mod_04_viewResult_ui <- function(id){
                closable = FALSE,
                fluidRow(width = 12,
                         column(width = 12,
-                               varSelectizeInput(inputId = ns("CNMetabolite"),
+                               varSelectizeInput(inputId = ns("CAMetabolite"),
                                                  label = "1. Select Metabolites",
                                                  data = ""
                                                  )
                                ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CNThreshold"),
-                                            label = "Select correlation threshold (absolute value)",
-                                            value = 0.8,
-                                            min = 0,
-                                            max = 1
-                                            )
+                        column(width = 12,
+                               sliderInput(inputId = ns("CAThreshold"), label = "Select correlation threshold (absolute value)",
+                                           min = 0.8,
+                                           max = 1,
+                                           value = 0.9,
+                                           step = 0.001
+                                           )
                                ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("CNName"),
-                                            label = "How to display metabolite name?",
-                                            choices = c("By Name" = "Name",
-                                                        "By ID" = "IDNO"
-                                                        ),
-                                            selected = "Name"
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("CNType"),
-                                            label = "Select plot type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CNRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadCN"),
-                                              label = "Download Plot"
-                                              )
+                        column(width = 12,
+                               downloadButton(outputId = ns("downloadCA"), label = "Download Plot")
                                )
                         ),
-               shiny::plotOutput(ns("CNPlot"))
+               shinycssloaders::withSpinner(visNetwork::visNetworkOutput(ns("CAPlot")), type = 5)
                )
              )
-      )
-  )
-}
+
+))}
 
 
 #' 04_viewResult Server Functions
@@ -1055,7 +960,7 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #4. K-Means=================================================================
+    #(4) K-Means================================================================
     ##(1) K-Means plot parameters-----------------------------------------------
     KMGroup <- reactive({
       as.character(input$KMGroup)
@@ -1145,7 +1050,7 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-#5. Box Plot ===================================================================
+#(5) Box Plot ==================================================================
 ##(1) Parameters ---------------------------------------------------------------
     BPGroup <- reactive({
       as.character(input$BPGroup)
@@ -1170,166 +1075,54 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
 ##(2) Prepare plot--------------------------------------------------------------
-BPPlot <- reactive({
-  shiny::req(heatmapDF())
-  shiny::req(sfData$group)
-  shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
-  showBoxplot(DF = heatmapDF(), Transform = input$BPTransform, Group = sfData$group[, BPGroup()],
-              Metabolite = input$BPMetabolite, colorPalette = input$BPPlotColor, BPPlotType = input$BPPlotType
-              )
-})
+    BPPlot <- reactive({
+      shiny::req(heatmapDF())
+      shiny::req(sfData$group)
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      showBoxplot(DF = heatmapDF(), Transform = input$BPTransform, Group = sfData$group[, BPGroup()],
+                  Metabolite = input$BPMetabolite, colorPalette = input$BPPlotColor, BPPlotType = input$BPPlotType
+                  )
+    })
 
 ##(3) Show and download plot----------------------------------------------------
-output$BPPlot <- shiny::renderPlot({
-  shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-  shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-  BPPlot()
-})
+    output$BPPlot <- shiny::renderPlot({
+      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
+      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+      BPPlot()
+    })
 
-output$downloadBP <- downloadHandler(
-  filename = function(){paste("Box_plot", input$BPType, sep = ".")},
-  content = function(file){
-    ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = input$BPType)
-  }
-)
+    output$downloadBP <- downloadHandler(
+      filename = function(){paste("Box_plot", input$BPType, sep = ".")},
+      content = function(file){
+        ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = input$BPType)
+    })
 
-    # # #6. Correlation Network ----------------------------------------------------
-    # ##(1) parameters------------------------------------------------------------
-    # CNMetabolite <- reactive({
-    #   as.character(input$CNMetabolite)
-    # })
-    # observeEvent(input$viewStat,{
-    #   updateVarSelectizeInput(
-    #     server = TRUE,
-    #     inputId = "CNMetabolite",
-    #     data = dataGlobal3()
-    #   )
-    # })
-    # CNName <- reactive({
-    #   as.character(input$CNName)
-    # })
-    # CNThreshold <- reactive({
-    #   if(input$CNThreshold <= 0 | input$CNThreshold >1) {return(1)}
-    #   input$CNThreshold
-    # })
-    # CNType <- reactive({
-    #   as.character(input$CNType)
-    # })
-    # CNRatio <- reactive({
-    #   if(input$CNRatio <=0) {return(1)}
-    #   input$CNRatio
-    # })
-    #
-    # ##(2) Prepare plot----------------------------------------------------------
-    # CNCor <- reactive({
-    #   cor(dataGlobal3())
-    # })
-    #
-    # CNPlot <- reactive({
-    #   if(CNThreshold() <= 0) {return(NULL)}
-    #   tem <- CNCor() %>%
-    #     as.data.frame() %>%
-    #     dplyr::select(Metabolite = CNMetabolite()) %>%
-    #     dplyr::filter(Metabolite >= CNThreshold() | Metabolite <= -CNThreshold()) %>%
-    #     as.matrix()
-    #
-    #   selectedName <- CNMetabolite()
-    #   if(CNName() == "IDNO"){
-    #     colnames(tem) <- sub("_.*", "", colnames(tem))
-    #     rownames(tem) <- sub("_.*", "", rownames(tem))
-    #     selectedName <- sub("_.*", "", selectedName)
-    #   }
-    #
-    #   links <- cbind.data.frame(from = rep(selectedName, dim(tem)[1]),
-    #                             to = rownames(tem),
-    #                             weight = tem[, 1] ,
-    #                             mycolor = ifelse(tem[, 1] > 0, "Pos", "Neg")
-    #                             )
-    #
-    #   p <- ggraph::ggraph(links, layout = "star") +
-    #     ggraph::geom_edge_link(aes(width = abs(links$weight)), alpha = 0.5) +
-    #     ggraph::scale_edge_width_continuous(name = "Absolute Correlation Coefficient") +
-    #     ggraph::geom_node_point(aes(fill = links$mycolor), shape = 21, size = 15, stroke = 1) +
-    #     ggplot2::scale_fill_manual(name = "Positive/Negative Correlation", values = c("#e78ac3", "#8da0cb")) +
-    #     ggraph::geom_node_text(aes(label = name), size = 5, repel = FALSE) +
-    #     ggplot2::theme_void()
-    #
-    #   return(p)
-    # })
-    #
-    # output$CNPlot <- shiny::renderPlot({
-    #   shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-    #   shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-    #   CNPlot()
-    # })
-    #
-    # ##(3) Download plot-------------------------------------------------------------
-    # output$downloadCN <- downloadHandler(
-    #   filename = function(){paste("Correlation_Network", CNType(), sep = ".")},
-    #   content = function(file){
-    #     ggplot2::ggsave(file, plot = CNPlot(), dpi = 600, width = 20, height = 20 / CNRatio(), units = "cm", device = CNType())
-    #   })
-    #
-    # #7. Correlation Analysis ===================================================
-    # ##(1) parameters------------------------------------------------------------
-    # CASize <- reactive({
-    #   input$CASize
-    # })
-    # CAThreshold <- reactive({
-    #   input$CAThreshold
-    # })
-    # CAType <- reactive({
-    #   as.character(input$CAType)
-    # })
-    # CARatio <- reactive({
-    #   if(input$CNRatio <=0) {return(1)}
-    #   input$CNRatio
-    # })
-    #
-    # ##(2) Prepare plot----------------------------------------------------------
-    # CAPlot <- eventReactive(input$RunCA, {
-    #   CACor <- CNCor()
-    #   colnames(CACor) <- sub("_.*", "", colnames(CACor))
-    #   rownames(CACor) <- sub("_.*", "", rownames(CACor))
-    #   p <- qgraph::qgraph(-CACor,
-    #                       posCol = "#d01c8b",
-    #                       negCol = "#4dac26",
-    #                       layout = "spring",
-    #                       vsize = CASize(),
-    #                       minimum = CAThreshold(),
-    #                       labels = colnames(CACor)
-    #                       )
-    #   return(p)
-    # })
-    #
-    # observeEvent(input$RunCA, {
-    #   output$CAPlot <- shiny::renderPlot({
-    #     shiny::validate(need(!is.null(sfData$data), message = "Input data not found"),
-    #                     need(!is.null(sfData$group), message = "Meta data not found"),
-    #                     need(CAThreshold() >=0 & CAThreshold() < 1, message = "Absolute correlation threshold value should between 0 and 1.")
-    #                     )
-    #     CAPlot()
-    #   })
-    # })
-    #
-    # ##(3) Download plot---------------------------------------------------------
-    # output$downloadCA <- downloadHandler(
-    #   filename = function(){paste("Correlation_Analysis", CAType(), sep = ".")},
-    #   content = function(file){
-    #     if(CAType() == "pdf"){
-    #       pdf(file, width = 20, height = 20 / CNRatio())
-    #       plot(CAPlot())
-    #       dev.off()
-    #     } else if(CAType() == "png"){
-    #       png(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
-    #       plot(CAPlot())
-    #       dev.off()
-    #     } else{
-    #       tiff(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
-    #       plot(CAPlot())
-    #       dev.off()
-    #     }
-    # })
+
+    #(6) Correlation Analysis ==================================================
+    ##(1) parameters------------------------------------------------------------
+    observeEvent(input$viewStat,{
+      updateVarSelectizeInput(
+        server = TRUE,
+        inputId = "CAMetabolite",
+        data = heatmapDF()
+      )
+    })
+
+    ##(2) Prepare plot----------------------------------------------------------
+    PCC <- reactive({
+      shiny::req(heatmapDF())
+      shiny::req(sfData$group)
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      cor(heatmapDF())
+    })
+
+    output$CAPlot <- visNetwork::renderVisNetwork({
+      shiny::req(PCC())
+      shiny::validate(need(input$CAThreshold >=0 & input$CAThreshold < 1, message = "Absolute correlation threshold value should between 0 and 1."))
+      showCAplot(PCC = PCC(), Metabolite = as.character(input$CAMetabolite), Threshold = input$CAThreshold)
+    })
+
+
     # resultList <- list(
     #   dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
     #   OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot

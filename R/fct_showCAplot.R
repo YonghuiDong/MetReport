@@ -4,6 +4,7 @@
 #' @param Metabolite which metabolite?
 #' @param Threshold the correlation coefficient threshold.
 #' @param LabelSize label size.
+#' @importFrom igraph layout
 #' @return network Plot.
 #' @noRd
 #' @examples

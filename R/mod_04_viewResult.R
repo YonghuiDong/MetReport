@@ -532,7 +532,10 @@ mod_04_viewResult_ui <- function(id){
                                downloadButton(outputId = ns("downloadCA"), label = "Download Plot")
                                )
                         ),
-               shinycssloaders::withSpinner(visNetwork::visNetworkOutput(ns("CAPlot")), type = 5)
+               br(),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
+               p(style = "color:#C70039;", "Red indicates positively correlated, and greed indicates negatively correlated."),
+               shinycssloaders::withSpinner(visNetwork::visNetworkOutput(ns("CAPlot"), height = "800px"), type = 5)
                )
              )
 
@@ -614,7 +617,6 @@ mod_04_viewResult_server <- function(id, sfData){
     }) |>
       bindEvent(input$viewStat)
 
-
     ##(2) Show statistical result ==============================================
     output$StatResult <- DT::renderDataTable({
       shiny::validate(
@@ -669,7 +671,7 @@ mod_04_viewResult_server <- function(id, sfData){
     PCAPlot <- reactive({
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
-      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
       p <- showPCA(dataGlobal3PCA(),
                    Group = sfData$group[, PCAGroup()],
                    inx = as.numeric(input$PCAX),
@@ -755,7 +757,6 @@ mod_04_viewResult_server <- function(id, sfData){
     OPLSDAPlot <- reactive({
       shiny::req(resultOPLSDA())
       shiny::req(OPLSDA$group)
-      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples."))
       p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
         ggplot2::theme(text = element_text(size = 16))
       if(input$OPLSDAColor == "Default") {
@@ -781,7 +782,7 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
       shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
-      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
       shiny::req(OPLSDAPlot())
       OPLSDAPlot()
     })
@@ -836,21 +837,10 @@ mod_04_viewResult_server <- function(id, sfData){
       return(tem2)
     })
 
-    ## this will be removed
-    dataGlobal3 <- reactive({
-      # shiny::req(combinedTable())
-      # tem1 <- combinedTable() %>%
-      #   dplyr::select(ID, starts_with("rawArea_")) %>%
-      #   dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      # tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
-      # return(tem2)
-      heatmapDF()
-    })
-
     HMPlot <- reactive({
       shiny::req(heatmapDF())
       shiny::req(sfData$group)
-      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      shiny::req(nrow(heatmapDF()) == nrow(sfData$group))
       HMData <- heatmapDF() %>%
         dplyr::mutate(Group = sfData$group[, HMGroup()])
       ## Should QC be filtered?
@@ -876,9 +866,9 @@ mod_04_viewResult_server <- function(id, sfData){
     output$HMPlot <- shiny::renderPlot({
       shiny::validate(
         need(!is.null(sfData$filter), message = "Input data not found"),
-        need(!is.null(sfData$group), message = "Meta data not found")
+        need(!is.null(sfData$group), message = "Meta data not found"),
+        need(nrow(heatmapDF()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples.")
       )
-      shiny::req(nrow(heatmapDF()) == nrow(sfData$group))
       HMPlot()
     })
 
@@ -937,7 +927,8 @@ mod_04_viewResult_server <- function(id, sfData){
         need(!is.null(sfData$clean), message = "Input data not found"),
         need(!is.null(sfData$group), message = "Meta data not found"),
         need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
-        need(input$VCFC > 0, message = "Fold change should be positive value.")
+        need(input$VCFC > 0, message = "Fold change should be positive value."),
+        need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples.")
       )
       plotly::ggplotly(VCPlot(), tooltip = c("text"))
     })
@@ -1039,8 +1030,8 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-#(5) Box Plot ==================================================================
-##(1) Parameters ---------------------------------------------------------------
+    #(5) Box Plot ==============================================================
+    ##(1) Parameters -----------------------------------------------------------
     BPGroup <- reactive({
       as.character(input$BPGroup)
     })
@@ -1066,7 +1057,7 @@ mod_04_viewResult_server <- function(id, sfData){
       input$BPRatio
     })
 
-##(2) Prepare plot--------------------------------------------------------------
+    ##(2) Prepare plot----------------------------------------------------------
     BPPlot <- reactive({
       shiny::req(heatmapDF())
       shiny::req(sfData$group)
@@ -1076,7 +1067,7 @@ mod_04_viewResult_server <- function(id, sfData){
                   )
     })
 
-##(3) Show and download plot----------------------------------------------------
+    ##(3) Show and download plot------------------------------------------------
     output$BPPlot <- shiny::renderPlot({
       shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
@@ -1108,11 +1099,25 @@ mod_04_viewResult_server <- function(id, sfData){
       cor(heatmapDF())
     })
 
-    output$CAPlot <- visNetwork::renderVisNetwork({
+    CAPlot <- reactive({
       shiny::req(PCC())
       shiny::validate(need(input$CAThreshold >=0 & input$CAThreshold < 1, message = "Absolute correlation threshold value should between 0 and 1."))
       showCAplot(PCC = PCC(), Metabolite = as.character(input$CAMetabolite), Threshold = input$CAThreshold)
     })
+
+    output$CAPlot <- visNetwork::renderVisNetwork({
+      shiny::req(CAPlot())
+      CAPlot()
+    })
+
+    output$downloadCA <- downloadHandler(
+      filename = function(){
+        paste0("Network_", as.character(input$CAMetabolite), ".html")
+      },
+      content = function(file){
+        visNetwork::visSave(graph = CAPlot(), file = file)
+      }
+    )
 
     resultList <- list(
       PCAPlot = PCAPlot,

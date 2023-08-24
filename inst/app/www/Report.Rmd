@@ -24,7 +24,6 @@ params:
   dataGlobal3Transform: NA
   BPGroup: NA
   BPTransform: NA,
-  KMDG: NA,
   KMTrendPlot: NA,
   KMTable: NA,
   projectName: NA,
@@ -138,7 +137,8 @@ As long as the QCs cluster tightly, relative to the observed dispersion of biolo
 #| out.width = "100%"
 #(1) show PCA plot--------------------------------------------------------------
 
-plotly::ggplotly(params$myPCAPlot, tooltip = "text")
+plotly::ggplotly(params$myPCAPlot, tooltip = "text") %>%
+  plotly::config(toImageButtonOptions = list(format = "svg", filename = "PCA"))
 ```
 
 ### Comprehensive QC Report
@@ -171,7 +171,8 @@ The PCA scores represent the new location of the samples in each principal compo
 #| out.width = "100%"
 #(2) show PCA plot--------------------------------------------------------------
 
-plotly::ggplotly(params$myPCAPlot, tooltip = "text")
+plotly::ggplotly(params$myPCAPlot, tooltip = "text") %>%
+  plotly::config(toImageButtonOptions = list(format = "svg", filename = "PCA"))
 ```
 > <span style = "color : #FF8300">**Note:**</span>
 > 
@@ -204,61 +205,61 @@ params$myHMPlot
 
 ### Data Overview
 
-**Table 1** presents an overview of the metabolomics result. If you want to perform statistical analysis from scratch by yourself, you can use Table 1. You can click the **Download** button to download the data in excel or csv format. 
+<!-- **Table 1** presents an overview of the metabolomics result. If you want to perform statistical analysis from scratch by yourself, you can use Table 1. You can click the **Download** button to download the data in excel or csv format.  -->
 
-**Table 1**: Raw data feature table.
+<!-- **Table 1**: Raw data feature table. -->
 
-```{r}
-#| label = rawData, 
-#| echo = FALSE, 
-#| warning = FALSE, 
-#| message = FALSE,
-#| out.width = "100%"
+<!-- ```{r} -->
+<!-- #| label = rawData,  -->
+<!-- #| echo = FALSE,  -->
+<!-- #| warning = FALSE,  -->
+<!-- #| message = FALSE, -->
+<!-- #| out.width = "100%" -->
 
-#(2) show raw data table--------------------------------------------------------
-myRawData <- myRawData %>%
-  dplyr::mutate(ID = paste0("ID", row.names(.))) %>%
-  dplyr::relocate(ID)
-DT::datatable(myRawData,
-              extensions = 'Buttons',
-              options = list(scrollX = TRUE,
-                             deferRender = TRUE,
-                             scroller = TRUE,
-                             fixedColumns = FALSE,
-                             ## add download options
-                             dom = 'Bfrtip',
-                             buttons = list('print', 
-                                             list(extend = 'collection', 
-                                                  buttons = c('csv', 'excel'), 
-                                                  text = 'Download')
-                                             ),
-                             ## customize header
-                             initComplete = JS(
-                                 "function(settings, json) {",
-                                 "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});",
-                                "}")
-                              )
-               ) %>%
-   DT::formatStyle(names(myRawData),
-                   fontSize = "90%"
-                   )
-```
+<!-- #(2) show raw data table-------------------------------------------------------- -->
+<!-- myRawData <- myRawData %>% -->
+<!--   dplyr::mutate(ID = paste0("ID", row.names(.))) %>% -->
+<!--   dplyr::relocate(ID) -->
+<!-- DT::datatable(myRawData, -->
+<!--               extensions = 'Buttons', -->
+<!--               options = list(scrollX = TRUE, -->
+<!--                              deferRender = TRUE, -->
+<!--                              scroller = TRUE, -->
+<!--                              fixedColumns = FALSE, -->
+<!--                              ## add download options -->
+<!--                              dom = 'Bfrtip', -->
+<!--                              buttons = list('print',  -->
+<!--                                              list(extend = 'collection',  -->
+<!--                                                   buttons = c('csv', 'excel'),  -->
+<!--                                                   text = 'Download' -->
+<!--                                                   ) -->
+<!--                                              ), -->
+<!--                              ## customize header -->
+<!--                              initComplete = JS( -->
+<!--                                  "function(settings, json) {", -->
+<!--                                  "$(this.api().table().header()).css({'background-color': '#98be98', 'color': '#fff'});", -->
+<!--                                 "}") -->
+<!--                               ) -->
+<!--                ) %>% -->
+<!--    DT::formatStyle(names(myRawData), -->
+<!--                    fontSize = "90%" -->
+<!--                    ) -->
+<!-- ``` -->
+
+<!-- > <span style = "color : #FF8300">**How to interpret Table 1?**</span> -->
+<!-- > -->
+<!-- > Because metabolomics data can be acquired from various platforms and/or pre-processed with different software tools, the resulting peak table can be very different from one another. Here we highlight few common terms that may appear in the table. -->
+<!-- > -->
+<!-- > `m/z`: Mass-to-charge ratio. It is the number obtained by dividing the mass of the ion (m) by the number of electrical charges (z). It is closely related to the identity of a metabolite. Note that m/z is different from molecular weight. -->
+<!-- > -->
+<!-- > `RT`: Retention time. It is the amount of time a metabolite spends on the column after it has been injected. It is a parameters that related to metabilite identity. -->
+<!-- > -->
+<!-- > `Peak Area`: The area under a peak. It is a measure of the concentration/abundance of the metabolite it represents. -->
+
+<!-- -------------------------------------------------------------------------------- -->
 
 
-> <span style = "color : #FF8300">**How to interpret Table 1?**</span>
->
-> Because metabolomics data can be acquired from various platforms and/or pre-processed with different software tools, the resulting peak table can be very different from one another. Here we highlight few common terms that may appear in the table.
->
-> `m/z`: Mass-to-charge ratio. It is the number obtained by dividing the mass of the ion (m) by the number of electrical charges (z). It is closely related to the identity of a metabolite. Note that m/z is different from molecular weight.
->
-> `RT`: Retention time. It is the amount of time a metabolite spends on the column after it has been injected. It is a parameters that related to metabilite identity.
->
-> `Peak Area`: The area under a peak. It is a measure of the concentration/abundance of the metabolite it represents.
-
---------------------------------------------------------------------------------
-
-
-**Table 2. Data table with statistical information**
+**Table 1. Data table with statistical information**
 
 ```{r}
 #| label = statistics, 
@@ -293,9 +294,9 @@ DT::datatable(myStat,
                    )
 ```
 
-> <span style = "color : #FF8300">**How to interpret Table 2?**</span>
+> <span style = "color : #FF8300">**How to interpret Table 1?**</span>
 >
-> **(1) Parameters in Table 2 **
+> **(1) Parameters in Table 1 **
 >
 > `Fold_X_vs_Y`: Fold change (FC) between Group X and Y. FC is a measure describing how much a metabolite (or mass feature) changes between Group X and Y. It is defined as the ratio between X and Y, i.e., X/Y.
 >
@@ -309,13 +310,13 @@ DT::datatable(myStat,
 > 
 > You can use a multi-factor approach (i.e., `FC`, `adjusted p-value`, and `VIP`) to select potential biomarkers in your study based on the statistical results in Table 2. 
 > 
-> Our suggested values are: mass features with adjusted p-value < 0.05 and VIP > 1 are considered as statistically significantly different, and FC >= 2 as increase and FC <= 0.05 as decrease. See **Table 3** below.
+> Our suggested values are: mass features with adjusted p-value < 0.05 and VIP > 1 are considered as statistically significantly different, and FC >= 2 as increase and FC <= 0.05 as decrease. See **Table 2** below.
 
 --------------------------------------------------------------------------------
 
 ### Differential Features
 
-**Table 3. Summary of Statistical Result**
+**Table 2. Summary of Statistical Result**
 
 The following criteria are used to select statistically significantly different mass features (or metabolites):
 
@@ -327,7 +328,7 @@ The mass features with adjusted **p-value < 0.05** and **VIP > 1** are considere
 #| warning = FALSE, 
 #| message = FALSE,
 #| out.width = "100%"
-library(dplyr)
+
 ## extract group information
 GroupInfo <- myStat %>%
   dplyr::select(starts_with("AdjPvalue")) %>%
@@ -369,7 +370,8 @@ DT::datatable(statSummary,
                              buttons = list('print', 
                                             list(extend = 'collection', 
                                                  buttons = c('csv', 'excel'), 
-                                                 text = 'Download')
+                                                 text = 'Download'
+                                                 )
                                              ),
                              ## customize header
                                initComplete = JS(
@@ -416,7 +418,9 @@ for(i in 1: length(GroupInfo)){
                                                       buttons = list('print', 
                                                                      list(extend = 'collection', 
                                                                           buttons = c('csv', 'excel'), 
-                                                                          text = 'Download')),
+                                                                          text = 'Download'
+                                                                          )
+                                                                     ),
                                                       ## customize header
                                                       initComplete = JS(
                                                         "function(settings, json) {",
@@ -496,7 +500,8 @@ for (i in seq_along(listnames)){
 
   p1 <- showOPLSDA(resultOPLSDA, Group = groupOPLSDA, size = 1, interactive = TRUE)
   p2 <- showSplot(matrixOPLSDA, resultOPLSDA, size = 1, interactive = TRUE)
-  OPLSDAList[[i]] <- plotly::subplot(p1, p2, nrows = 1, margin = 0.05, which_layout = 1)
+  OPLSDAList[[i]] <- plotly::subplot(p1, p2, nrows = 1, margin = 0.05, which_layout = 1) %>% 
+    plotly::config(toImageButtonOptions = list(format = "svg", filename = "PLSDA"))
 }
 
 OPLSDAList
@@ -519,9 +524,8 @@ n <- levels(as.factor(VCGroupLevel$Group))
 listnames <- combn(n, 2, simplify = FALSE)
 volcanoList <- htmltools::tagList()
 for (i in seq_along(listnames)){
-    volcanoList[[i]] <- plotly::as_widget(
-      showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, pValue = 0.05)
-    )
+    volcanoList[[i]] <- plotly::as_widget(showVolcano(result = statTable, compare_group = listnames[[i]], FC = 2, pValue = 0.05)) %>% 
+    plotly::config(toImageButtonOptions = list(format = "svg", filename = "volcanoPlot"))
 }
 
 volcanoList
@@ -531,24 +535,9 @@ volcanoList
 
 K-Means Cluster Analysis can be used to reveal the main subsets of mass features that displayed differential profiles across different sample groups.
 
-The `Circular Dendrogram` gives an overview of the number of mass features in each subset (subgroup).
-
 The `Cluster Plot` shows the trend of the metabolic profiles in each subset (subgroup)
 
 The `Table` provides more details information of each metabolite, such as metabolite name (if exit), standardized peak area and the group information.
-
-**Circular Dendrogram** 
-
-```{r}
-#| label = KMDG,
-#| echo = FALSE,
-#| warning = FALSE, 
-#| message = FALSE,
-#| out.width = '100%'
-#(8.1) show K-Means result------------------------------------------------------
-
-params$KMDG
-```
 
 **Metabolic Profile Clustering**
 ```{r}
@@ -603,7 +592,7 @@ The bar plot shows the quantitative information of each metabolite in different 
 ```{r}
 #| label = BoxPlot,
 #| echo = FALSE,
-#| warning = FALSE, 
+#| warning = FALSE,
 #| message = FALSE,
 #| out.width = '100%'
 #(8) show box plot result-------------------------------------------------------
@@ -619,9 +608,9 @@ BPData <- dataGlobal3Transform %>%
 ## See issue 15
 BPData <- BPData[order(BPData$Group), ]
 BPData <- crosstalk::SharedData$new(BPData)
-metaboliteFilter <- crosstalk::filter_select(id = "Metabolite", 
-                                             label = "Select a metabolite", 
-                                             sharedData = BPData, 
+metaboliteFilter <- crosstalk::filter_select(id = "Metabolite",
+                                             label = "Select a metabolite",
+                                             sharedData = BPData,
                                              group = ~ Metabolite,
                                              multiple = F
                                              )
@@ -643,7 +632,7 @@ BPPlot <- plotly::plot_ly(data = BPData,
   plotly::config(toImageButtonOptions = list(format = "svg", filename = "plot"))
 
 filter <- crosstalk::bscols(
-  metaboliteFilter, 
+  metaboliteFilter,
   BPPlot,
   widths = 12
   )
@@ -656,7 +645,7 @@ crosstalk::bscols(filter)
 ```{r}
 #| label = BarPlotTable,
 #| echo = FALSE,
-#| warning = FALSE, 
+#| warning = FALSE,
 #| message = FALSE,
 #| out.width = '100%'
 #(8) show box plot table -------------------------------------------------------

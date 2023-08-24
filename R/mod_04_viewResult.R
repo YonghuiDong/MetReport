@@ -13,445 +13,425 @@ mod_04_viewResult_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
-      #1. User Guide ===========================================================
+      #(1) User Guide **********************************************************
       column(width = 12,
-             box(
-               width = 12,
-               title = strong("User Guide"),
-               status = "warning",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               p("1. Statistical analyses are perfromed in this panel. Tables and most figures are interactive so that you can better inspect your data and results."),
-               p("2. You can customize the figures by changing the color, aspect ratio before downloading them with preferred format.")
-               )
+             box(width = 12,
+                 title = strong("User Guide"),
+                 status = "warning",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 p("1. Statistical analyses are perfromed in this panel. Tables and most figures are interactive so that you can better inspect your data and results."),
+                 p("2. You can customize the figures by changing the color, aspect ratio before downloading them with preferred format.")
+                 )
              ),
 
-      #2. View Statistics Panel ================================================
+      #(2) View Statistics Panel ***********************************************
       column(width = 4,
-             box(
-               width = 12,
-               inputId = ns("input_card"),
-               title = strong("Perform Statistics"),
-               status = "primary",
-               solidHeader = TRUE,
-               collapsible = FALSE,
-               collapsed = FALSE,
-               closable = FALSE,
-               selectInput(inputId = ns("statMethod"),
-                           label = "1. What do you want to do?",
-                           choices = c("Compare two unpaired groups" = "tTest",
-                                       "Compare two paired groups" = "ptTest",
-                                       "Compare more than two unmatched groups" = "anovaHSD",
-                                       "Compare more than two matched groups" = "anovaRM"
-                                       ),
-                           selected = "anovaHSD",
-                           multiple = FALSE
-                           ),
-               selectInput(inputId = ns("pAdjMethod"),
-                           label = "2. Adjust p-value by:",
-                           choices = c("Don't adjust" = "none",
-                                       "False Discovery Rate" = "fdr",
-                                       "Bonferroni" = "bonferroni"
-                                       ),
-                           selected = "fdr",
-                           multiple = FALSE
-                           ),
-               radioButtons(inputId = ns("SigFilter"),
-                            label = "3. Only consider statistically significant mass features?",
-                            choices = c("Yes" = 1, "No" = 0),
-                            selected = 0
-                            ),
-               p(style = "color:#C70039;", shiny::icon("bell"), strong("Notes:")),
-               p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
-               p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
-               sliderInput(inputId = ns("SigP"),
-                           label = "If [Yes]: enter p-value threshold",
-                           value = 0.05,
-                           min = 0,
-                           max = 0.1
-                           ),
-               actionButton(inputId = ns("viewStat"),
-                            label = "Start",
-                            icon = icon("eye"),
-                            style = "color: #fff; background-color: #4daf4a; border-color: #4daf4a"
-                            )
-               )
+             box(width = 12,
+                 inputId = ns("input_card"),
+                 title = strong("Perform Statistics"),
+                 status = "primary",
+                 solidHeader = TRUE,
+                 collapsible = FALSE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 selectInput(inputId = ns("statMethod"),
+                             label = "1. What do you want to do?",
+                             choices = c("Compare two unpaired groups" = "tTest",
+                                         "Compare two paired groups" = "ptTest",
+                                         "Compare more than two unmatched groups" = "anovaHSD",
+                                         "Compare more than two matched groups" = "anovaRM"
+                                         ),
+                             selected = "anovaHSD",
+                             multiple = FALSE
+                             ),
+                 selectInput(inputId = ns("pAdjMethod"),
+                             label = "2. Adjust p-value by:",
+                             choices = c("Don't adjust" = "none",
+                                         "False Discovery Rate" = "fdr",
+                                         "Bonferroni" = "bonferroni"
+                                         ),
+                             selected = "fdr",
+                             multiple = FALSE
+                             ),
+                 radioButtons(inputId = ns("SigFilter"),
+                              label = "3. Only consider statistically significant mass features?",
+                              choices = c("Yes" = 1, "No" = 0),
+                              selected = 0
+                              ),
+                 p(style = "color:#C70039;", shiny::icon("bell"), strong("Notes:")),
+                 p(style = "color:#C70039;", "1. Features with p-values < the threshold in all the sample groups will be removed"),
+                 p(style = "color:#C70039;", "2. This step is not applied to PCA, OPLS-DA or Volcano plot"),
+                 sliderInput(inputId = ns("SigP"),
+                             label = "If [Yes]: enter p-value threshold",
+                             value = 0.05,
+                             min = 0,
+                             max = 0.1
+                             ),
+                 actionButton(inputId = ns("viewStat"),
+                              label = "Start",
+                              icon = icon("eye"),
+                              style = "color: #fff; background-color: #4daf4a; border-color: #4daf4a"
+                              )
+                 )
              ),
 
-      #3. Statistics Panel =====================================================
+      #(3) Result Panel ********************************************************
       column(width = 8,
              ##(1) Statistics Panel --------------------------------------------
-             box(
-               width = 12,
-               inputId = "Stat_card",
-               title = strong("Statistics Panel"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = FALSE,
-               closable = FALSE,
-               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
-               p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value-filled and QC-filtered data."),
-               p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
-               p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
-               fluidRow(width = 12,
-                        column(width = 12,
-                               varSelectInput(inputId = ns("StatGroup"),
-                                              label = "Select MetaData (Sample Groups) for statistics",
-                                              data = ""
-                                              )
-                               ),
-                        column(width = 12,
-                               downloadButton(outputId = ns("downloadStatTable"))
-                               )
-                        ),
-               br(),
-               DT::dataTableOutput(ns("StatResult"))
-               ),
+             box(width = 12,
+                 inputId = "Stat_card",
+                 title = strong("Statistics Panel"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = FALSE,
+                 closable = FALSE,
+                 p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
+                 p(style = "color:#C70039;", "1. Fold change (FC) analysis is performed on missing value-filled and QC-filtered data."),
+                 p(style = "color:#C70039;", "2. Univariate analysis is performed on filled, filtered, normalized and transformed data."),
+                 p(style = "color:#C70039;", "3. VIP values are calculated based on filled, filtered, normalized, transformed and scaled data."),
+                 fluidRow(width = 12,
+                          column(width = 12,
+                                 varSelectInput(inputId = ns("StatGroup"),
+                                                label = "Select MetaData (Sample Groups) for statistics",
+                                                data = ""
+                                                )
+                                 ),
+                          column(width = 12, downloadButton(outputId = ns("downloadStatTable")))
+                          ),
+                 br(),
+                 shinycssloaders::withSpinner(DT::dataTableOutput(ns("StatResult")), type = 5)
+                ),
 
              ##(2) PCA Panel ---------------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewPCA",
-               title = strong("PCA Plot"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               varSelectInput(inputId = ns("PCAGroup"),
-                              label = "1. Select MetaData (Sample Groups) for Sample Coloring",
-                              data = ""
-                              ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               selectInput(inputId = ns("PCAX"),
-                                           label = "Which PC in X-axis?",
-                                           choices = list(1, 2, 3, 4),
-                                           selected = 1,
-                                           multiple = FALSE
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("PCAY"),
-                                           label = "Which PC in Y-axis?",
-                                           choices = list(1, 2, 3, 4),
-                                           selected = 2,
-                                           multiple = FALSE
-                                           )
-                               ),
-                        column(width = 12,
-                               radioButtons(inputId = ns("PCAFrame"),
-                                            label = "Add frame for group?",
-                                            choices = list("none", "polygon", "norm"),
-                                            selected = "none"
-                                            )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("PCAColor"),
-                                           label = "Color palette?",
-                                           choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
-                                           selected = "Default"
-                                           )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("PCAType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("PCARatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadPCA"))
-                               )
-                        ),
-
-               plotly::plotlyOutput(ns("PCAPlot"))
+             box(width = 12,
+                 inputId = "viewPCA",
+                 title = strong("PCA Plot"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 varSelectInput(inputId = ns("PCAGroup"),
+                                label = "1. Select MetaData (Sample Groups) for Sample Coloring",
+                                data = ""
+                                ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 selectInput(inputId = ns("PCAX"),
+                                             label = "Which PC in X-axis?",
+                                             choices = list(1, 2, 3, 4),
+                                             selected = 1,
+                                             multiple = FALSE
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("PCAY"),
+                                             label = "Which PC in Y-axis?",
+                                             choices = list(1, 2, 3, 4),
+                                             selected = 2,
+                                             multiple = FALSE
+                                             )
+                                 ),
+                          column(width = 12,
+                                 radioButtons(inputId = ns("PCAFrame"),
+                                              label = "Add frame for group?",
+                                              choices = list("none", "polygon", "norm"),
+                                              selected = "none"
+                                              )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("PCAColor"),
+                                             label = "Color palette?",
+                                             choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
+                                             selected = "Default"
+                                             )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("PCAType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf"
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("PCARatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6,
+                                 br(),
+                                 downloadButton(outputId = ns("downloadPCA"))
+                                 )
+                          ),
+                 shinycssloaders::withSpinner(plotly::plotlyOutput(ns("PCAPlot")), type = 5)
                ),
 
              ##(3) OPLSDA Plot Panel -------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewOPLSDA",
-               title = strong("OPLS-DA Plot"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               varSelectInput(inputId = ns("OPLSDAGroup"),
-                              label = "1. Select MetaData (Sample Groups)",
-                              data = ""
-                              ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               selectInput(inputId = ns("OPLSDALevel1"),
-                                           label = "2. Select the first sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("OPLSDALevel2"),
-                                           label = "2. Select the second sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("OPLSDAColor"),
-                                           label = "Color palette?",
-                                           choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
-                                           selected = "Default"
-                                           )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("OPLSDAType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("OPLSDARatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadOPLSDA"))
-                               )
-                        ),
-               shiny::plotOutput(ns("OPLSDAPlot")),
-               plotly::plotlyOutput(ns("SPlot"))
+             box(width = 12,
+                 inputId = "viewOPLSDA",
+                 title = strong("OPLS-DA Plot"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 varSelectInput(inputId = ns("OPLSDAGroup"),
+                                label = "1. Select MetaData (Sample Groups)",
+                                data = ""
+                                ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 selectInput(inputId = ns("OPLSDALevel1"),
+                                             label = "2. Select the first sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("OPLSDALevel2"),
+                                             label = "2. Select the second sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("OPLSDAColor"),
+                                             label = "Color palette?",
+                                             choices = list("Default", "Accent", "Dark2", "Paired", "Pastel2", "Pastel1", "Set1", "Set2", "Set3"),
+                                             selected = "Default"
+                                             )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("OPLSDAType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf"
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("OPLSDARatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6, downloadButton(outputId = ns("downloadOPLSDA"))),
+                          br()
+                          ),
+                 shinycssloaders::withSpinner(shiny::plotOutput(ns("OPLSDAPlot")), type = 5),
+                 plotly::plotlyOutput(ns("SPlot"))
                ),
 
              ##(4) Heatmap Panel -----------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewHeatmap",
-               title = strong("Heatmap"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               varSelectInput(inputId = ns("HMGroup"),
-                              label = "1. Select MetaData (Sample Groups) for Sample Coloring",
-                              data = ""
-                              ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMColCluster"),
-                                            label = "Cluster columns (mass features) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMRowCluster"),
-                                            label = "Cluster rows (samples) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMColName"),
-                                            label = "Show column names (mass feature names) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 0
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMRowName"),
-                                            label = "Show row names (sample names) in heatmap?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("HMSplitCol"),
-                                            label = "Number of column groups (features) you want to split",
-                                            value = 1,
-                                            min = 1,
-                                            step = 1,
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("HMSplitRow"),
-                                            label = "Number of row groups (samples) you want to split",
-                                            value = 1,
-                                            min = 1,
-                                            step = 1,
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMQCFilter"),
-                                            label = "Do you want to include QC samples (if exist)?",
-                                            choices = c("Yes" = 1, "No" = 0),
-                                            selected = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("HMType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf", inline = T
-                                            )
-                               ),
-                        column(width = 12,
-                               numericInput(inputId = ns("HMRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadHM"))
-                               )
-                        ),
-               shiny::plotOutput(outputId = ns("HMPlot"))
+             box(width = 12,
+                 inputId = "viewHeatmap",
+                 title = strong("Heatmap"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 varSelectInput(inputId = ns("HMGroup"),
+                                label = "1. Select MetaData (Sample Groups) for Sample Coloring",
+                                data = ""
+                                ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMColCluster"),
+                                              label = "Cluster columns (mass features) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMRowCluster"),
+                                              label = "Cluster rows (samples) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMColName"),
+                                              label = "Show column names (mass feature names) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 0
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMRowName"),
+                                              label = "Show row names (sample names) in heatmap?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("HMSplitCol"),
+                                              label = "Number of column groups (features) you want to split",
+                                              value = 1,
+                                              min = 1,
+                                              step = 1,
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("HMSplitRow"),
+                                              label = "Number of row groups (samples) you want to split",
+                                              value = 1,
+                                              min = 1,
+                                              step = 1,
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMQCFilter"),
+                                              label = "Do you want to include QC samples (if exist)?",
+                                              choices = c("Yes" = 1, "No" = 0),
+                                              selected = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("HMType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf", inline = T
+                                              )
+                                 ),
+                          column(width = 12,
+                                 numericInput(inputId = ns("HMRatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6,
+                                 br(),
+                                 downloadButton(outputId = ns("downloadHM"))
+                                 )
+                          ),
+                 shinycssloaders::withSpinner(shiny::plotOutput(outputId = ns("HMPlot")), type = 5)
                ),
 
              ##(4) Volcano Plot Panel ------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewVolcano",
-               title = strong("Volcano Plot"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               fluidRow(width = 12,
-                        column(width = 6,
-                               selectInput(inputId = ns("VCLevel1"),
-                                           label = "1. Select the first sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               selectInput(inputId = ns("VCLevel2"),
-                                           label = "1. Select the second sample group level",
-                                           choices = ""
-                                           )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("VCFC"),
-                                            label = "2. Input fold change threshold",
-                                            value = 2,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("VCPvalue"),
-                                            label = "3. Input p-value threshold",
-                                            value = 0.05,
-                                            min = 0,
-                                            max = 1
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("VCType"),
-                                            label = "Select file type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf",
-                                            inline = T
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("VCRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 4,
-                               downloadButton(outputId = ns("downloadVCPlot"))
-                               )
-                        ),
-               plotly::plotlyOutput(ns("VCPlot"))
+             box(width = 12,
+                 inputId = "viewVolcano",
+                 title = strong("Volcano Plot"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 selectInput(inputId = ns("VCLevel1"),
+                                             label = "1. Select the first sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 selectInput(inputId = ns("VCLevel2"),
+                                             label = "1. Select the second sample group level",
+                                             choices = ""
+                                             )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("VCFC"),
+                                              label = "2. Input fold change threshold",
+                                              value = 2,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("VCPvalue"),
+                                              label = "3. Input p-value threshold",
+                                              value = 0.05,
+                                              min = 0,
+                                              max = 1
+                                              )
+                                 ),
+                          column(width = 6,
+                                 radioButtons(inputId = ns("VCType"),
+                                              label = "Select file type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf",
+                                              inline = T
+                                              )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("VCRatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
+                                              )
+                                 ),
+                          column(width = 4, downloadButton(outputId = ns("downloadVCPlot")))
+                          ),
+                 shinycssloaders::withSpinner(plotly::plotlyOutput(ns("VCPlot")), type = 5)
                ),
 
              ##(5) K-Means Panel -----------------------------------------------
-             box(
-               width = 12,
-               inputId = "viewKMeans",
-               title = strong("K-means Cluster Analysis"),
-               status = "success",
-               solidHeader = FALSE,
-               collapsible = TRUE,
-               collapsed = TRUE,
-               closable = FALSE,
-               fluidRow(width = 12,
-                        column(width = 6,
-                               varSelectInput(inputId = ns("KMGroup"),
-                                              label = "1. Select MetaData (Sample Groups)",
-                                              data = ""
+             box(width = 12,
+                 inputId = "viewKMeans",
+                 title = strong("K-means Cluster Analysis"),
+                 status = "success",
+                 solidHeader = FALSE,
+                 collapsible = TRUE,
+                 collapsed = TRUE,
+                 closable = FALSE,
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 varSelectInput(inputId = ns("KMGroup"),
+                                                label = "1. Select MetaData (Sample Groups)",
+                                                data = ""
+                                                )
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("KMCluster"),
+                                              label = "2. Input number of clusters",
+                                              value = 1,
+                                              min = 1,
+                                              max = NA
                                               )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("KMCluster"),
-                                            label = "2. Input number of clusters",
-                                            value = 1,
-                                            min = 1,
-                                            max = NA)
-                               )
-                        ),
-               fluidRow(width = 12,
-                        column(width = 6,
-                               radioButtons(inputId = ns("KMType"),
-                                            label = "Select plot type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("KMRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               )
-                        ),
-               fluidRow(width = 12,
-                        column(width = 4,
-                               downloadButton(outputId = ns("downloadKMDG"),
-                                              label = "Download Dendrogram"
+                                 )
+                          ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 radioButtons(inputId = ns("KMType"),
+                                              label = "Select plot type to download",
+                                              choices = list("pdf", "tiff", "png"),
+                                              selected = "pdf"
                                               )
-                               ),
-                        column(width = 4,
-                               downloadButton(outputId = ns("downloadKMTrend"),
-                                              label = "Download Line Plot"
+                                 ),
+                          column(width = 6,
+                                 numericInput(inputId = ns("KMRatio"),
+                                              label = "Aspect ratio of the plot (width:height)",
+                                              value = 1,
+                                              min = NA,
+                                              max = NA
                                               )
-                               ),
-                        column(width = 4,
-                               downloadButton(outputId = ns("downloadKMTable"),
-                                              label = "Download Table"
-                                              )
-                               )
-                        ),
-               br(),
-               shiny::plotOutput(ns("KMDG")),
-               shiny::plotOutput(ns("KMTrendPlot")),
-               DT::dataTableOutput(ns("KMTable"))
+                                 )
+                          ),
+                 fluidRow(width = 12,
+                          column(width = 6,
+                                 downloadButton(outputId = ns("downloadKMTrend"),
+                                                label = "Download Line Plot"
+                                                )
+                                 ),
+                          column(width = 6,
+                                 downloadButton(outputId = ns("downloadKMTable"),
+                                                label = "Download Table"
+                                                )
+                                 )
+                          ),
+                 br(),
+                 shinycssloaders::withSpinner(shiny::plotOutput(ns("KMTrendPlot")), type = 5),
+                 DT::dataTableOutput(ns("KMTable"))
                ),
 
              ##(6) Box Plot Panel ----------------------------------------------
@@ -481,7 +461,7 @@ mod_04_viewResult_ui <- function(id){
                                selectInput(inputId = ns("BPTransform"),
                                            label = "3. How to transform the data?",
                                            choices = list("none", "log2", "log10"),
-                                           selected = "log10"
+                                           selected = "none"
                                            )
                                ),
                         column(width = 6,
@@ -520,81 +500,14 @@ mod_04_viewResult_ui <- function(id){
                                               )
                                )
                         ),
-               shiny::plotOutput(ns("BPPlot"))
+               shinycssloaders::withSpinner(shiny::plotOutput(ns("BPPlot")), type = 5)
                ),
 
-             ##(7) Correlation Analysis Panel ----------------------------------
-             # box(
-             #   width = 12,
-             #   inputId = "viewCN",
-             #   title = strong("Correlation Analysis"),
-             #   status = "success",
-             #   solidHeader = FALSE,
-             #   collapsible = TRUE,
-             #   collapsed = TRUE,
-             #   closable = FALSE,
-             #   fluidRow(width = 12,
-             #            column(width = 12,
-             #                   p(style = "color:#C70039;", strong("Attention:")),
-             #                   p("(1) Intensive computation is requied in this section.
-             #                 Don't run this section if you have over 150 features.
-             #                 Don't worry, you'll not miss any important information."),
-             #                 p("(2) ", code("Correlation Network "), "Panel offers you similar result."),
-             #                 p("(3) You can check the the number of features in above ", code("Statistics "), "Panel"),
-             #                 ),
-             #            column(width = 6,
-             #                   numericInput(inputId = ns("CAThreshold"),
-             #                                label = "Select correlation threshold (absolute value)",
-             #                                value = 0,
-             #                                min = 0,
-             #                                max = 1
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   numericInput(inputId = ns("CASize"),
-             #                                label = "Set Metabolite ID size",
-             #                                value = 3,
-             #                                min = 1,
-             #                                max = NA
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   radioButtons(inputId = ns("CAType"),
-             #                                label = "Select plot type to download",
-             #                                choices = list("pdf", "tiff", "png"),
-             #                                selected = "pdf"
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   numericInput(inputId = ns("CARatio"),
-             #                                label = "Aspect ratio of the plot (width:height)",
-             #                                value = 1,
-             #                                min = NA,
-             #                                max = NA
-             #                                )
-             #                   ),
-             #            column(width = 12,
-             #                   actionButton(inputId = ns("RunCA"),
-             #                                label = "Run Analysis",
-             #                                icon = icon("paper-plane"),
-             #                                style = "color: #fff; background-color: #7570b3; border-color: #7570b3"
-             #                                )
-             #                   ),
-             #            column(width = 6,
-             #                   br(),
-             #                   downloadButton(outputId = ns("downloadCA"),
-             #                                  label = "Download"
-             #                                  )
-             #                   )
-             #            ),
-             #   shiny::plotOutput(ns("CAPlot"))
-             #   ),
-
-             ##(8) Correlation analysis Panel ----------------------------------
+             ##(7) Correlation analysis Panel ----------------------------------
              box(
                width = 12,
-               inputId = "viewCN",
-               title = strong("Correlation Network"),
+               inputId = "viewCA",
+               title = strong("Correlation Analysis"),
                status = "success",
                solidHeader = FALSE,
                collapsible = TRUE,
@@ -602,56 +515,31 @@ mod_04_viewResult_ui <- function(id){
                closable = FALSE,
                fluidRow(width = 12,
                         column(width = 12,
-                               varSelectizeInput(inputId = ns("CNMetabolite"),
+                               varSelectizeInput(inputId = ns("CAMetabolite"),
                                                  label = "1. Select Metabolites",
                                                  data = ""
                                                  )
                                ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CNThreshold"),
-                                            label = "Select correlation threshold (absolute value)",
-                                            value = 0.8,
-                                            min = 0,
-                                            max = 1
-                                            )
+                        column(width = 12,
+                               sliderInput(inputId = ns("CAThreshold"), label = "Select correlation threshold (absolute value)",
+                                           min = 0.8,
+                                           max = 1,
+                                           value = 0.9,
+                                           step = 0.001
+                                           )
                                ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("CNName"),
-                                            label = "How to display metabolite name?",
-                                            choices = c("By Name" = "Name",
-                                                        "By ID" = "IDNO"
-                                                        ),
-                                            selected = "Name"
-                                            )
-                               ),
-                        column(width = 6,
-                               radioButtons(inputId = ns("CNType"),
-                                            label = "Select plot type to download",
-                                            choices = list("pdf", "tiff", "png"),
-                                            selected = "pdf"
-                                            )
-                               ),
-                        column(width = 6,
-                               numericInput(inputId = ns("CNRatio"),
-                                            label = "Aspect ratio of the plot (width:height)",
-                                            value = 1,
-                                            min = NA,
-                                            max = NA
-                                            )
-                               ),
-                        column(width = 6,
-                               br(),
-                               downloadButton(outputId = ns("downloadCN"),
-                                              label = "Download Plot"
-                                              )
+                        column(width = 12,
+                               downloadButton(outputId = ns("downloadCA"), label = "Download Plot")
                                )
                         ),
-               shiny::plotOutput(ns("CNPlot"))
+               br(),
+               p(style = "color:#C70039;", shiny::icon("bell"), strong("Note: ")),
+               p(style = "color:#C70039;", "Red indicates positively correlated, and greed indicates negatively correlated."),
+               shinycssloaders::withSpinner(visNetwork::visNetworkOutput(ns("CAPlot"), height = "800px"), type = 5)
                )
              )
-      )
-  )
-}
+
+))}
 
 
 #' 04_viewResult Server Functions
@@ -659,14 +547,11 @@ mod_04_viewResult_ui <- function(id){
 #' @noRd
 #' @importFrom ggplot2 aes scale_color_brewer scale_fill_brewer position_dodge
 mod_04_viewResult_server <- function(id, sfData){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    #1. General Statistics Panel================================================
+    #(1) Statistics Panel=======================================================
     ##(1) Stat parameters-------------------------------------------------------
-    statMethod <- reactive({
-      as.character(input$statMethod)
-    })
     StatGroup <- reactive({
       as.character(input$StatGroup)
     })
@@ -677,103 +562,60 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    pAdjMethod <- reactive({
-      as.character(input$pAdjMethod)
-    })
-    SigFilter <- reactive({
-      as.logical(as.numeric(input$SigFilter))
-    })
-    SigP <- reactive({
-      input$SigP
-    })
 
     ##(2) Perform statistics----------------------------------------------------
-    tDataGlobal <- reactive({
-      shiny::req(sfData$clean)
-      tem <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tem) <- sfData$clean$ID
-      return(tem)
-    })
-
     statTable <- reactive({
       shiny::req(sfData$filter)
       shiny::req(sfData$filterNormTransform)
       shiny::req(sfData$clean)
       shiny::req(sfData$group)
-      ###(1) transpose filtered data
-      tFilter <- sfData$filter %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tFilter) <- sfData$filter$ID
-      ###(2) transpose filtered, normalized and transformed data
-      tFilterNormTransform <- sfData$filterNormTransform %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tFilterNormTransform) <- sfData$filterNormTransform$ID
-      ###(3) transpose filtered, normalized, transformed and scaled data
-      tClean <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tClean) <- sfData$clean$ID
-
-      ## Statistics not performed on QC; also to allow t-test possible when there are only two groups with QC
-      tFilterTem <- cbind.data.frame(tFilter, Group = sfData$group[, StatGroup()]) %>%
-        dplyr::filter(Group != "QC")
-      tFilter <- tFilterTem %>% dplyr::select(-Group)
-      Group <- tFilterTem %>% dplyr::select(Group) %>% dplyr::pull()
+      shiny::validate(need((ncol(sfData$clean) - 1) == nrow(sfData$group), message = "Please wait for data preprocessing to finish before clicking Start button."))
+      tFilter <- transformDF(sfData$filter, Group = sfData$group[, StatGroup()]) # filtered
+      tFilterNormTransform <- transformDF(sfData$filterNormTransform, Group = sfData$group[, StatGroup()]) # filtered, normalized and transformed
+      tClean <- transformDF(sfData$clean, Group = sfData$group[, StatGroup()]) # filtered, normalized, transformed and scaled data
+      Group <- sfData$group[, StatGroup()]
+      Group <- Group[Group != "QC"]
       checkPair <- as.data.frame(table(Group)) # to valid paired test
-
-      tFilterNormTransformTem <- cbind.data.frame(tFilterNormTransform, Group = sfData$group[, StatGroup()]) %>%
-        dplyr::filter(Group != "QC")
-      tFilterNormTransform <- tFilterNormTransformTem %>% dplyr::select(-Group)
-
-      tCleanTem <- cbind.data.frame(tClean, Group = sfData$group[, StatGroup()]) %>%
-        dplyr::filter(Group != "QC")
-      tClean <- tCleanTem %>% dplyr::select(-Group)
-
       shiny::withProgress(
         message = "Performing statistics; Be patient",
         detail = "This may take a while...",
         value = 0.4,
         {
-          if(statMethod() == "tTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
-          if(statMethod() == "ptTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
-          if(statMethod() == "ptTest" & var(checkPair$Freq) != 0) {return(NULL)}
-          if(statMethod() == "anovaRM" & var(checkPair$Freq) != 0) {return(NULL)}
+          if(input$statMethod == "tTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
+          if(input$statMethod == "ptTest" & length(levels(as.factor(Group))) != 2) {return(NULL)}
+          if(input$statMethod == "ptTest" & var(checkPair$Freq) != 0) {return(NULL)}
+          if(input$statMethod == "anovaRM" & var(checkPair$Freq) != 0) {return(NULL)}
           statFC <- getFC(tFilter, Group = Group)
-          statP <- getP(tFilterNormTransform, Group = Group, Method = statMethod())
-          statP <- statP %>% dplyr::mutate_all(~ p.adjust(., method = pAdjMethod(), n = length(.)))
+          statP <- getP(tFilterNormTransform, Group = Group, Method = input$statMethod)
+          statP <- statP %>% dplyr::mutate_all(~ p.adjust(., method = input$pAdjMethod, n = length(.)))
           statVIP <- getVIP(tClean, Group = Group)
           statTable <- cbind.data.frame(statFC, statP, statVIP)
           rownames(statTable) <- sfData$clean$ID
           return(statTable)
           })
     }) %>%
-      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, statMethod(), StatGroup(), pAdjMethod()) %>%
+      shiny::bindCache(sfData$filter, sfData$filterNormTransform, sfData$clean, sfData$group, input$statMethod, StatGroup(), input$pAdjMethod) %>%
       shiny::bindEvent(input$viewStat)
 
-    ### On click, both only QC-filtered (rawArea) and QC-filtered & transformed peak areas (processedAREA) are included
-    combinedTable <- eventReactive(input$viewStat, {
+    ## Combine QC-filtered (raw area) & transformed peak areas (processed area) with Stat result
+    combinedTable <- reactive({
       shiny::req(sfData$filter)
       shiny::req(sfData$clean)
       shiny::req(statTable())
-      tem1 <- sfData$filter %>%
-        dplyr::select(-ID) %>%
-        setNames(paste0("rawArea_", names(.)))
-      tem2 <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        setNames(paste0("processedAREA_", names(.)))
-      tem3 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1, tem2)
-      ## p-value filtering
-      if(isTRUE(SigFilter())){
-        tem3 <- tem3 %>%
-          dplyr::filter(if_any(contains("Pvalue"), ~ . < SigP()))
+      filterDF <- subset(sfData$filter, select = -ID)
+      names(filterDF) <- paste0("rawArea_", names(filterDF))
+      cleanDF <- subset(sfData$clean, select = -ID)
+      names(cleanDF) <- paste0("processedAREA_", names(cleanDF))
+      combinedDF <- cbind.data.frame(ID = sfData$clean$ID, statTable(), filterDF, cleanDF)
+      ## filter rows based on defined p-value
+      if(isTRUE(as.logical(as.numeric(input$SigFilter)))){
+        combinedDF <- combinedDF %>%
+          dplyr::filter(if_any(contains("Pvalue"), ~ . < input$SigP))
         }
-      rownames(tem3) <- NULL
-      return(tem3)
-    })
+      rownames(combinedDF) <- NULL
+      return(combinedDF)
+    }) |>
+      bindEvent(input$viewStat)
 
     ##(2) Show statistical result ==============================================
     output$StatResult <- DT::renderDataTable({
@@ -800,7 +642,7 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #2. PCA=====================================================================
+    #(2) PCA====================================================================
     ##(1) PCA parameters--------------------------------------------------------
     PCAGroup <- reactive({
       as.character(input$PCAGroup)
@@ -812,94 +654,58 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    PCAX <- reactive({
-      as.numeric(input$PCAX)
-    })
-    PCAY <- reactive({
-      as.numeric(input$PCAY)
-    })
-    PCALabel <- reactive({
-      as.logical(as.numeric(input$PCALabel))
-    })
-    PCAFrame <- reactive({
-      as.character(input$PCAFrame)
-    })
-    PCAColor <- reactive({
-      as.character(input$PCAColor)
-    })
-    PCAType <- reactive({
-      as.character(input$PCAType)
-    })
     PCARatio <- reactive({
       if(input$PCARatio <=0){return(1)}
       input$PCARatio
     })
 
     ##(2) Prepare plot----------------------------------------------------------
-    ## On click (For PCA, only filter by QC)
-    combinedTablePCA <- eventReactive(input$viewStat, {
-      shiny::req(sfData$clean)
-      shiny::req(statTable())
-      tem1 <- sfData$clean %>%
-        dplyr::select(-ID) %>%
-        setNames(paste0("rawArea_", names(.)))
-      tem2 <- cbind.data.frame(ID = sfData$clean$ID, statTable(), tem1)
-      rownames(tem2) <- NULL
-      return(tem2)
-    })
-
+    ### sfData$clean (QC filtered data) is used for PCA
     dataGlobal3PCA <- reactive({
-      shiny::req(combinedTablePCA())
-      tem1 <- combinedTablePCA() %>%
-        dplyr::select(ID, starts_with("rawArea_")) %>%
-        dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- tem1 %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tem2) <- tem1$ID
-      tem3 <- tem2 %>%
-        as.data.frame() %>%
-        dplyr::rename_with(make.names)
-      return(tem3)
-    })
+      shiny::req(sfData$clean)
+      tem <- transformDF(sfData$clean, Group = NULL, rowName = TRUE)
+      return(tem)
+    }) |>
+      bindEvent(input$viewStat)
 
     PCAPlot <- reactive({
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
       p <- showPCA(dataGlobal3PCA(),
                    Group = sfData$group[, PCAGroup()],
-                   inx = PCAX(),
-                   iny = PCAY(),
-                   showFrame = PCAFrame(),
+                   inx = as.numeric(input$PCAX),
+                   iny = as.numeric(input$PCAY),
+                   showFrame = input$PCAFrame,
                    interactive = FALSE
                    ) +
         ggplot2::theme(text = element_text(size = 16))
 
-      if(PCAColor() == "Default") {
+      if(input$PCAColor == "Default") {
         p <- p
         } else {
           p <- p +
-            scale_color_brewer(palette = PCAColor()) +
-            scale_fill_brewer(palette = PCAColor())
+            scale_color_brewer(palette = input$PCAColor) +
+            scale_fill_brewer(palette = input$PCAColor)
         }
       return(p)
     })
 
     ##(3) Show PCA Result ------------------------------------------------------
     output$PCAPlot <- plotly::renderPlotly({
-      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
+      shiny::validate(need(!is.null(sfData$clean), message = "Input data not found."))
+      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found."))
       plotly::ggplotly(PCAPlot(), tooltip = "text")
     })
 
     output$downloadPCA <- downloadHandler(
-      filename = function(){paste("PCA", PCAType(), sep = ".")},
+      filename = function(){paste("PCA", input$PCAType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = PCAPlot(), dpi = 600, width = 20, height = 20 / PCARatio(), units = "cm", device = PCAType())
+        ggplot2::ggsave(file, plot = PCAPlot(), dpi = 600, width = 20, height = 20 / PCARatio(), units = "cm", device = input$PCAType)
       }
     )
 
-    #3. OPLSDA==================================================================
+    ##(3) OPLSDA================================================================
     ##(1) OPLSDA parameters-----------------------------------------------------
     OPLSDAGroup <- reactive({
       as.character(input$OPLSDAGroup)
@@ -911,13 +717,9 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    OPLSDALevel1 <- reactive({
-      as.character(input$OPLSDALevel1)
-    })
-    OPLSDALevel2 <- reactive({
-      as.character(input$OPLSDALevel2)
-    })
-    observeEvent(OPLSDAGroup(),{
+
+    ## need to use input$viewStat to update group levels when deleting or recovering samples.
+    observeEvent(c(OPLSDAGroup(), input$viewStat),{
       OPLSDALevels <- sfData$group[, OPLSDAGroup()]
       updateSelectInput(inputId = "OPLSDALevel1",
                         choices = levels(as.factor(OPLSDALevels[!(OPLSDALevels %in% "QC")])),
@@ -928,93 +730,50 @@ mod_04_viewResult_server <- function(id, sfData){
                         selected = NULL
                         )
     })
-    OPLSDAColor <- reactive({
-      as.character(input$OPLSDAColor)
-    })
-    OPLSDAType <- reactive({
-      as.character(input$OPLSDAType)
-    })
     OPLSDARatio <- reactive({
       if(input$PCARatio <= 0){return(1)}
       input$OPLSDARatio
     })
 
     ##(2) Prepare plot----------------------------------------------------------
-    matrixOPLSDA <- reactive({
+    OPLSDA <- reactiveValues(feature = NULL, group = NULL)
+    observe({
       shiny::req(dataGlobal3PCA())
       shiny::req(sfData$group)
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
-      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()]) %>%
-        dplyr::filter(Group %in% c(OPLSDALevel1(), OPLSDALevel2()))
-      matrixOPLSDA <- dplyr::select(dfOPLSDA, -Group)
-      return(matrixOPLSDA)
-    })
-
-    groupOPLSDA <- reactive({
-      shiny::req(dataGlobal3PCA())
-      shiny::req(sfData$group)
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
-      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()]) %>%
-        dplyr::filter(Group %in% c(OPLSDALevel1(), OPLSDALevel2()))
-      groupOPLSDA <- as.factor(dfOPLSDA$Group)
-      return(groupOPLSDA)
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      dfOPLSDA <- cbind.data.frame(dataGlobal3PCA(), Group = sfData$group[, OPLSDAGroup()])
+      dfOPLSDA <- dfOPLSDA[dfOPLSDA$Group %in% c(input$OPLSDALevel1, input$OPLSDALevel2), ]
+      OPLSDA$feature <- subset(dfOPLSDA, select = -Group)
+      OPLSDA$group <- as.factor(dfOPLSDA$Group)
     })
 
     resultOPLSDA <- reactive({
-      shiny::req(matrixOPLSDA())
-      shiny::req(groupOPLSDA())
-      resultOPLSDA <- tryCatch({
-        ropls::opls(matrixOPLSDA(),
-                    groupOPLSDA(),
-                    log10L = FALSE,
-                    scaleC = "none",
-                    predI = 1,
-                    permI = 20,
-                    orthoI = 1, # see bug #25
-                    crossvalI = min(length(groupOPLSDA()), 7),
-                    fig.pdfC = "none",
-                    info.txtC = "none"
-                    )
-      },
-      # For the following error:
-      # Error: No model was built because the first predictive component was already not significant;
-      # Select a number of predictive components of 1 if you want the algorithm to compute a model despite this.
-      error = function(e){
-        ropls::opls(matrixOPLSDA(),
-                    groupOPLSDA(),
-                    log10L = FALSE,
-                    scaleC = "none",
-                    predI = 1,
-                    permI = 20,
-                    orthoI = 1,
-                    crossvalI = min(length(groupOPLSDA()), 7),
-                    fig.pdfC = "none",
-                    info.txtC = "none"
-                    )
-      })
-      return(resultOPLSDA)
+      shiny::req(OPLSDA$feature)
+      shiny::req(OPLSDA$group)
+      getOPLSDA(Feature = OPLSDA$feature, Group = OPLSDA$group)
     })
 
     OPLSDAPlot <- reactive({
       shiny::req(resultOPLSDA())
-      shiny::req(groupOPLSDA())
-      p <- showOPLSDA(resultOPLSDA(), Group = groupOPLSDA()) +
+      shiny::req(OPLSDA$group)
+      p <- showOPLSDA(resultOPLSDA(), Group = OPLSDA$group) +
         ggplot2::theme(text = element_text(size = 16))
-
-      if(OPLSDAColor() == "Default") {
+      if(input$OPLSDAColor == "Default") {
         p <- p
         } else {
         p <- p +
-          scale_color_brewer(palette = OPLSDAColor()) +
-          scale_fill_brewer(palette = OPLSDAColor())
+          scale_color_brewer(palette = input$OPLSDAColor) +
+          scale_fill_brewer(palette = input$OPLSDAColor)
         }
       return(p)
     })
 
     SPlot <- reactive({
       shiny::req(resultOPLSDA())
-      shiny::req(matrixOPLSDA())
-      showSplot(matrixOPLSDA(), resultOPLSDA()) +
+      shiny::req(OPLSDA$feature)
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
+      showSplot(OPLSDA$feature, resultOPLSDA()) +
         ggplot2::theme(text = element_text(size = 16))
     })
 
@@ -1022,14 +781,18 @@ mod_04_viewResult_server <- function(id, sfData){
     output$OPLSDAPlot <- shiny::renderPlot({
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::validate(need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      shiny::req(OPLSDAPlot())
       OPLSDAPlot()
     })
 
     output$SPlot <- plotly::renderPlotly({
       shiny::validate(need(!is.null(sfData$clean), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(OPLSDALevel1() != OPLSDALevel2(), message = "Please select two different groups"))
+      shiny::validate(need(input$OPLSDALevel1 != input$OPLSDALevel2, message = "Please select two different groups"))
+      shiny::req(nrow(dataGlobal3PCA()) == nrow(sfData$group))
+      shiny::req(SPlot())
       SPlot2 <- SPlot() +
         ggplot2::geom_point(size = 1) +
         ggplot2::theme(text = element_text(size = 12))
@@ -1037,13 +800,13 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     output$downloadOPLSDA <- downloadHandler(
-      filename = function(){paste("OPLSDA_ScorePlot", OPLSDAType(), sep = ".")},
+      filename = function(){paste("OPLSDA_ScorePlot", input$OPLSDAType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = OPLSDAType())
+        ggplot2::ggsave(file, plot = OPLSDAPlot(), dpi = 600, width = 20, height = 20 / OPLSDARatio(), units = "cm", device = input$OPLSDAType)
       }
     )
 
-    #3. Heat Map================================================================
+    #(4) Heat Map===============================================================
     ##(1) Heatmap parameters----------------------------------------------------
     HMGroup <- reactive({
       as.character(input$HMGroup)
@@ -1055,29 +818,8 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    HMColCluster <- reactive({
-      as.logical(as.numeric(input$HMColCluster))
-    })
-    HMRowCluster <- reactive({
-      as.logical(as.numeric(input$HMRowCluster))
-    })
-    HMColName <- reactive({
-      as.logical(as.numeric(input$HMColName))
-    })
-    HMRowName <- reactive({
-      as.logical(as.numeric(input$HMRowName))
-    })
-    HMSplitCol <- reactive({
-      input$HMSplitCol
-    })
-    HMSplitRow <- reactive({
-      input$HMSplitRow
-    })
     HMQCFilter <- reactive({
       as.logical(as.numeric(input$HMQCFilter))
-    })
-    HMType <- reactive({
-      as.character(input$HMType)
     })
     HMRatio <- reactive({
       if(input$HMRatio <=0){return(1)}
@@ -1085,94 +827,77 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     ##(2) Prepare plot----------------------------------------------------------
-    ### Data for Figures that need non-transformed data: from sfData$filter
-    dataGlobal3 <- reactive({
+    ### Non-transformed data: sfData$filter and p-values are needed
+    heatmapDF <- reactive({
       shiny::req(combinedTable())
       tem1 <- combinedTable() %>%
         dplyr::select(ID, starts_with("rawArea_")) %>%
         dplyr::rename_with(~ gsub("rawArea_", "", .x, fixed = TRUE))
-      tem2 <- tem1 %>%
-        dplyr::select(-ID) %>%
-        t()
-      colnames(tem2) <- tem1$ID
-      tem3 <- tem2 %>%
-        as.data.frame() %>%
-        dplyr::rename_with(make.names)
-      return(tem3)
+      tem2 <- transformDF(tem1, Group = NULL, rowName = TRUE)
+      return(tem2)
     })
 
     HMPlot <- reactive({
-      shiny::req(dataGlobal3())
+      shiny::req(heatmapDF())
       shiny::req(sfData$group)
-      HMData <- dataGlobal3() %>%
+      shiny::req(nrow(heatmapDF()) == nrow(sfData$group))
+      HMData <- heatmapDF() %>%
         dplyr::mutate(Group = sfData$group[, HMGroup()])
       ## Should QC be filtered?
       if(!HMQCFilter()){
-        HMData <- HMData %>%
-          dplyr::filter(Group != "QC")
+        HMData <- HMData[HMData$Group != "QC", ]
       }
       annoRow <- dplyr::select(HMData, Group)
       rownames(annoRow) <- rownames(HMData)
       set.seed(1998)
       ComplexHeatmap::pheatmap(scale(dplyr::select(HMData, -Group), center = T, scale = T),
                                name = "ColorBar",
-                               cluster_cols = HMColCluster(),
-                               cluster_rows = HMRowCluster(),
+                               cluster_cols = as.logical(as.numeric(input$HMColCluster)),
+                               cluster_rows = as.logical(as.numeric(input$HMRowCluster)),
                                annotation_row = annoRow,
-                               show_rownames = HMRowName(),
-                               show_colnames = HMColName(),
-                               column_km = HMSplitCol(),
-                               row_km = HMSplitRow()
+                               show_rownames = as.logical(as.numeric(input$HMRowName)),
+                               show_colnames = as.logical(as.numeric(input$HMColName)),
+                               column_km = input$HMSplitCol,
+                               row_km = input$HMSplitRow
                                )
     })
 
     ##(3) Show and download plot -----------------------------------------------
     output$HMPlot <- shiny::renderPlot({
       shiny::validate(
-        need(!is.null(sfData$clean), message = "Input data not found"),
-        need(!is.null(sfData$group), message = "Meta data not found")
+        need(!is.null(sfData$filter), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found"),
+        need(nrow(heatmapDF()) == nrow(sfData$group),message = "Please click Start button to reperform statistics after deleting or recovering samples.")
       )
       HMPlot()
     })
 
     output$downloadHM <- downloadHandler(
-      filename = function(){paste("Heatmap", HMType(), sep = ".")},
+      filename = function(){paste("Heatmap", input$HMType, sep = ".")},
       content = function(file){
-        switch(HMType(),
+        switch(input$HMType,
                "png" = png(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600),
                "pdf" = pdf(file, width = 20, height = 20 / HMRatio()),
                "tiff" = tiff(file, width = 20, height = 20 / HMRatio(), units = "cm", res = 600)
                )
         ComplexHeatmap::draw(HMPlot())
         dev.off()
-      })
+    })
 
-    #3. Volcano Plot------------------------------------------------------------
-    VCLevel1 <- reactive({
-      as.character(input$VCLevel1)
-    })
-    VCLevel2 <- reactive({
-      as.character(input$VCLevel2)
-    })
-    observeEvent(StatGroup(), {
+    #(3) Volcano Plot ==========================================================
+    ##(1) Volcano plot parameters ----------------------------------------------
+
+    ## need to use input$viewStat to update group levels when deleting or recovering samples.
+    observeEvent(c(StatGroup(), input$viewStat), {
       VCLevels <- sfData$group[, StatGroup()]
       updateSelectInput(inputId = "VCLevel1",
                         choices = levels(as.factor(VCLevels[!(VCLevels %in% "QC")])),
                         selected = NULL
-                        )
+      )
       updateSelectInput(inputId = "VCLevel2",
                         choices = rev(levels(as.factor(VCLevels[!(VCLevels %in% "QC")]))),
                         selected = NULL
-                        )
-    })
-    VCFC <- reactive({
-      input$VCFC
-    })
-    VCPvalue <- reactive({
-      input$VCPvalue
-    })
-    VCType <- reactive({
-      as.character(input$VCType)
+      )
     })
     VCRatio <- reactive({
       if(input$VCRatio <=0){return(1)}
@@ -1182,13 +907,15 @@ mod_04_viewResult_server <- function(id, sfData){
     ##(2) Prepare plot----------------------------------------------------------
     VCPlot <- reactive({
       shiny::req(statTable())
-      if(VCLevel1() == VCLevel2()) {return(NULL)}
-      if(VCPvalue() > 1 | VCPvalue() < 0) {return(NULL)}
-      if(VCFC() <=0) {return(NULL)}
+      shiny::validate(
+        need(input$VCLevel1 != input$VCLevel2, message = "Please select two different groups."),
+        need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
+        need(input$VCFC > 0, message = "Fold change should be positive value.")
+      )
       p <- showVolcano(result = statTable(),
-                       FC = VCFC(),
-                       pValue = VCPvalue(),
-                       compare_group = c(VCLevel1(), VCLevel2()),
+                       FC = input$VCFC,
+                       pValue = input$VCPvalue,
+                       compare_group = c(input$VCLevel1, input$VCLevel2),
                        interactive = FALSE
                        )
       return(p)
@@ -1199,21 +926,22 @@ mod_04_viewResult_server <- function(id, sfData){
       shiny::validate(
         need(!is.null(sfData$clean), message = "Input data not found"),
         need(!is.null(sfData$group), message = "Meta data not found"),
-        need(VCLevel1() != VCLevel2(), message = "Please select two different groups"),
-        need(VCFC() > 0, message = "Fold change value should be higher than 0"),
+        need(input$VCPvalue <= 1 & input$VCPvalue > 0, message = "P-value should between 0 and 1."),
+        need(input$VCFC > 0, message = "Fold change should be positive value."),
+        need(nrow(dataGlobal3PCA()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples.")
       )
       plotly::ggplotly(VCPlot(), tooltip = c("text"))
     })
 
     output$downloadVCPlot <- downloadHandler(
-      filename = function(){paste("VolcanoPlot", VCType(), sep = ".")},
+      filename = function(){paste("VolcanoPlot", input$VCType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = VCPlot(), dpi = 600, width = 20, height = 20 / VCRatio(), units = "cm", device = VCType())
+        ggplot2::ggsave(file, plot = VCPlot(), dpi = 600, width = 20, height = 20 / VCRatio(), units = "cm", device = input$VCType)
       }
     )
 
-    #4. K-Means=================================================================
-    ## (1) K-Means plot parameters----------------------------------------------
+    #(4) K-Means================================================================
+    ##(1) K-Means plot parameters-----------------------------------------------
     KMGroup <- reactive({
       as.character(input$KMGroup)
     })
@@ -1224,12 +952,6 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    KMCluster <- reactive({
-      input$KMCluster
-    })
-    KMType <- reactive({
-      as.character(input$KMType)
-    })
     KMRatio <- reactive({
       if(input$KMRatio <=0) {return(1)}
       input$KMRatio
@@ -1238,113 +960,52 @@ mod_04_viewResult_server <- function(id, sfData){
     ##(2) Prepare plot----------------------------------------------------------
     ###(2.1)prepare k-means data
     KMdata <- reactive({
-      shiny::req(dataGlobal3())
-      tem <- dataGlobal3() %>%
-        dplyr::mutate(Group = sfData$group[, KMGroup()]) %>%
-        dplyr::filter(Group != "QC") %>%
-        tidyr::pivot_longer(cols = !Group, names_to = "Metabolite", values_to = "Area") %>%
-        dplyr::group_by(Group, Metabolite) %>%
-        dplyr::summarize(meanArea = mean(Area), .groups = 'drop') %>%
-        tidyr::pivot_wider(names_from = Group, values_from = meanArea)
-
-      ## standardize data
-      RS <- rowSums(dplyr::select(tem, -Metabolite))
-      tem2 <- tem %>%
-        dplyr::mutate_if(is.numeric, function(x)(x/RS))
-      return(tem2)
+      shiny::req(heatmapDF())
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      tem <- prepareKMData(DF = heatmapDF(), Group = sfData$group[, KMGroup()])
+      return(tem)
     })
 
-    ###(2.2) calculate k-means
-    KMResult <- reactive({
-      shiny::req(KMdata())
-      if(KMCluster() <= 0) {return(NULL)}
-      if(KMCluster() >= dim(KMdata())[1]) {return(NULL)}
-      kmeans(dplyr::select(KMdata(), -Metabolite), KMCluster())
-    })
-
-    ###(2.3) calculate k-means clusters
+    ###(2.2) calculate k-means clusters
     KMResultCluster <- reactive({
       shiny::req(KMdata())
-      if(KMCluster() <= 0) {return(NULL)}
-      if(KMCluster() >= dim(KMdata())[1]) {return(NULL)}
+      shiny::validate(
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
       set.seed(666)
-      kmeans(dplyr::select(KMdata(), -Metabolite), centers = KMCluster())$cluster
+      kmeans(dplyr::select(KMdata(), -Metabolite), centers = input$KMCluster)$cluster
     })
 
-    ###(2.4) KM Table
+    ###(2.3) KM Table
     KMTable <- reactive({
       shiny::req(KMResultCluster())
       data_with_cust_info <- KMdata() %>%
         dplyr::mutate(clust = paste0("cluster", KMResultCluster()))
     })
 
-    ###(2.5) K-means trend plot
+    ###(2.4) K-means trend plot
     KMTrendPlot <- reactive({
-      KMTable() %>%
-        tidyr::pivot_longer(cols = !c(Metabolite, clust), names_to = "Group", values_to = "normArea") %>%
-        dplyr::group_by(Group) %>%
-        dplyr::mutate(row_num =  1:n()) %>%
-        ggplot2::ggplot(aes(x =  Group , y = normArea , group = row_num)) +
-        ggplot2::geom_point(alpha = 0.1) +
-        ggplot2::geom_line(alpha = 0.5 , aes(col = as.character(clust))) +
-        ggplot2::scale_colour_manual(values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(text = element_text(size = 14),
-                       legend.position = "none",
-                       axis.text.x = element_text(angle = 90 , vjust = 0.4)) +
-        ggplot2::ylab("Standardized Peak Area") +
-        ggplot2::facet_wrap(~clust)
+      showKM(KMTable())
     })
 
-    ###(2.6) KM dendrogram
-    KMDG <- reactive({
-      d1 <- data.frame(from = "origin", to = levels(as.factor(KMTable()$clust)))
-      d2 <- data.frame(from = KMTable()$clust, to = KMTable()$Metabolite)
-      edges <- rbind(d1, d2)
-      vertices <- data.frame(
-        name = unique(c(as.character(edges$from), as.character(edges$to))) ,
-        value = 1
-      )
-      vertices$group <- edges$from[match(vertices$name, edges$to)]
-      vertices$id <- NA
-      myleaves <- which(is.na( match(vertices$name, edges$from) ))
-      nleaves <- length(myleaves)
-      vertices$id[myleaves] <- seq(1:nleaves)
-      vertices$angle <- 90 - 360 * vertices$id / nleaves
-      vertices$hjust <- ifelse(vertices$angle < -90, 1, 0)
-      vertices$angle <- ifelse(vertices$angle < -90, vertices$angle+180, vertices$angle)
-      mygraph <- igraph::graph_from_data_frame(edges, vertices = vertices )
-      p <- ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
-        ggraph::geom_edge_diagonal(colour="grey") +
-        ##ggraph::scale_edge_colour_distiller(palette = "RdPu") +
-        ggraph::geom_node_point(aes(filter = leaf, x = x * 1.07, y = y*1.07, colour = group), size = 4) +
-        ggplot2::scale_colour_manual(name = "Cluster", values= rep(RColorBrewer::brewer.pal(9, "Paired") , 30)) +
-        ggplot2::scale_size_continuous(range = c(0.1,10) ) +
-        ggplot2::theme_void() +
-        ggplot2::theme(text = element_text(size = 14)) +
-        ggplot2::expand_limits(x = c(-1.3, 1.3), y = c(-1.3, 1.3))
-      return(p)
-    })
-
-    ##(3) Show and download plot----------------------------------------------------
-    output$KMDG <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      KMDG() + ggplot2::ggtitle("Circular Dendrogram")
-    })
-
+    ##(3) Show and download plot -----------------------------------------------
     output$KMTrendPlot <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(KMCluster() > 0, message = "Number of clusters should be higher than 0"))
-      shiny::validate(need(KMCluster() < dim(KMdata())[1], message = "Input a smaller cluster group"))
+      shiny::validate(
+        need(!is.null(sfData$data), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found"),
+        need(input$KMCluster > 0, message = "Cluster number should be positive value."),
+        need(input$KMCluster <= dim(KMdata())[1], message = "Cluster number should be less than the number of mass features.")
+      )
       KMTrendPlot() + ggplot2::ggtitle("Metabolic Profile Clustering")
     })
 
     output$KMTable <- DT::renderDataTable({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      shiny::validate(need(!is.null(KMTable()), message = "K-means cluster table not found"))
+      shiny::validate(
+        need(!is.null(sfData$data), message = "Input data not found"),
+        need(!is.null(sfData$group), message = "Meta data not found")
+      )
+      shiny::req(KMTable())
       DT::datatable(KMTable(),
                     caption = "K-means cluster table:",
                     options = list(scrollX = TRUE,
@@ -1355,17 +1016,10 @@ mod_04_viewResult_server <- function(id, sfData){
                     )
     })
 
-    output$downloadKMDG <- downloadHandler(
-      filename = function(){paste("KM_Dendrogram", KMType(), sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = KMDG(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = KMType())
-      }
-    )
-
     output$downloadKMTrend <- downloadHandler(
-      filename = function(){paste("KM_Lineplot", KMType(), sep = ".")},
+      filename = function(){paste("KM_Lineplot", input$KMType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = KMType())
+        ggplot2::ggsave(file, plot = KMTrendPlot(), dpi = 600, width = 20, height = 20 / KMRatio(), units = "cm", device = input$KMType)
       }
     )
 
@@ -1376,9 +1030,8 @@ mod_04_viewResult_server <- function(id, sfData){
       }
     )
 
-    #5. Box Plot ===============================================================
+    #(5) Box Plot ==============================================================
     ##(1) Parameters -----------------------------------------------------------
-
     BPGroup <- reactive({
       as.character(input$BPGroup)
     })
@@ -1389,87 +1042,32 @@ mod_04_viewResult_server <- function(id, sfData){
         selected = "Group1"
       )
     })
-    BPMetabolite <- reactive({
-      as.character(input$BPMetabolite)
-    })
-    observeEvent(input$viewStat,{
+    observeEvent(c(heatmapDF(), input$viewStat), {
       updateVarSelectizeInput(
         server = TRUE,
         inputId = "BPMetabolite",
-        data = dataGlobal3()
+        data = heatmapDF()
       )
     })
     BPTransform <- reactive({
-      as.character(input$BPTransform)
-    })
-    BPPlotType <- reactive({
-      as.character(input$BPPlotType)
-    })
-    BPPlotColor <- reactive({
-      as.character(input$BPPlotColor)
-    })
-    BPType <- reactive({
-      as.character(input$BPType)
+      input$BPTransform
     })
     BPRatio <- reactive({
       if(input$BPRatio <=0){return(1)}
       input$BPRatio
     })
-    dataGlobal3Transform <- reactive({
-      switch(BPTransform(),
-             none = dataGlobal3(),
-             log2 = log2(dataGlobal3()),
-             log10 = log10(dataGlobal3())
-             )
-    })
-    yLegend <- reactive({
-      switch(BPTransform(),
-             none = "Peak Area",
-             log2 = "Log2 Transformed Peak Area",
-             log10 = "Log10 Transformed Peak Area"
-             )
-    })
 
     ##(2) Prepare plot----------------------------------------------------------
-
     BPPlot <- reactive({
-      p <- dataGlobal3Transform() %>%
-        dplyr::mutate(Group = sfData$group[, BPGroup()]) %>%
-        dplyr::select(Group, Metabolite = BPMetabolite()) %>%
-        dplyr::filter(Group != "QC") %>%
-        dplyr::group_by(Group) %>%
-        dplyr::mutate(MEAN = mean(Metabolite), SD = sd(Metabolite)) %>%
-        ggplot2::ggplot(aes(x = Group, fill = Group)) +
-        ggplot2::ylab(yLegend()) +
-        ggplot2::theme_bw() +
-        ggplot2::ggtitle(paste0("Metabolite: ", BPMetabolite())) +
-        ggplot2::theme(text = element_text(size = 16),
-                       legend.position="none"
-                       )
-      ## color palette
-      if(BPPlotColor() == "Default") {
-        p <- p
-        } else {
-          p <- p + scale_fill_brewer(palette = BPPlotColor())
-        }
-
-      ## plot type
-      p2 <- switch(BPPlotType(),
-                   "Box plot" = p +
-                     ggplot2::geom_boxplot(aes(y = Metabolite), outlier.shape = 24, outlier.fill = "red", outlier.size = 3, alpha = 0.8) +
-                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
-                   "Violin plot" = p +
-                     ggplot2::geom_violin(aes(y = Metabolite), alpha = 0.8) +
-                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black"),
-                   "Bar plot" = p +
-                     ggplot2::geom_bar(aes(y = MEAN), alpha = 0.8, stat = "identity", width = 0.5, color = "black", position = position_dodge()) +
-                     ggplot2::geom_errorbar(aes(ymin = MEAN, ymax = MEAN + SD), width = 0.2, position = position_dodge(0.9)) +
-                     ggplot2::geom_jitter(aes(y = Metabolite), shape = 16, position = position_jitter(0.2), color = "black")
-                   )
-      return(p2)
+      shiny::req(heatmapDF())
+      shiny::req(sfData$group)
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      showBoxplot(DF = heatmapDF(), Transform = input$BPTransform, Group = sfData$group[, BPGroup()],
+                  Metabolite = input$BPMetabolite, colorPalette = input$BPPlotColor, BPPlotType = input$BPPlotType
+                  )
     })
 
-    ##(3) Show and download plot----------------------------------------------------
+    ##(3) Show and download plot------------------------------------------------
     output$BPPlot <- shiny::renderPlot({
       shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
       shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
@@ -1477,161 +1075,61 @@ mod_04_viewResult_server <- function(id, sfData){
     })
 
     output$downloadBP <- downloadHandler(
-      filename = function(){paste("Box_plot", BPType(), sep = ".")},
+      filename = function(){paste("Box_plot", input$BPType, sep = ".")},
       content = function(file){
-        ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = BPType())
-      }
-    )
-
-    # #6. Correlation Network ----------------------------------------------------
-    ##(1) parameters------------------------------------------------------------
-    CNMetabolite <- reactive({
-      as.character(input$CNMetabolite)
+        ggplot2::ggsave(file, plot = BPPlot(), dpi = 600, width = 20, height = 20 / BPRatio(), units = "cm", device = input$BPType)
     })
+
+
+    #(6) Correlation Analysis ==================================================
+    ##(1) parameters------------------------------------------------------------
     observeEvent(input$viewStat,{
       updateVarSelectizeInput(
         server = TRUE,
-        inputId = "CNMetabolite",
-        data = dataGlobal3()
+        inputId = "CAMetabolite",
+        data = heatmapDF()
       )
     })
-    CNName <- reactive({
-      as.character(input$CNName)
-    })
-    CNThreshold <- reactive({
-      if(input$CNThreshold <= 0 | input$CNThreshold >1) {return(1)}
-      input$CNThreshold
-    })
-    CNType <- reactive({
-      as.character(input$CNType)
-    })
-    CNRatio <- reactive({
-      if(input$CNRatio <=0) {return(1)}
-      input$CNRatio
-    })
 
     ##(2) Prepare plot----------------------------------------------------------
-    CNCor <- reactive({
-      cor(dataGlobal3())
+    PCC <- reactive({
+      shiny::req(heatmapDF())
+      shiny::req(sfData$group)
+      shiny::validate(need(nrow(heatmapDF()) == nrow(sfData$group), message = "Please click Start button to reperform statistics after deleting or recovering samples."))
+      cor(heatmapDF())
     })
 
-    CNPlot <- reactive({
-      if(CNThreshold() <= 0) {return(NULL)}
-      tem <- CNCor() %>%
-        as.data.frame() %>%
-        dplyr::select(Metabolite = CNMetabolite()) %>%
-        dplyr::filter(Metabolite >= CNThreshold() | Metabolite <= -CNThreshold()) %>%
-        as.matrix()
-
-      selectedName <- CNMetabolite()
-      if(CNName() == "IDNO"){
-        colnames(tem) <- sub("_.*", "", colnames(tem))
-        rownames(tem) <- sub("_.*", "", rownames(tem))
-        selectedName <- sub("_.*", "", selectedName)
-      }
-
-      links <- cbind.data.frame(from = rep(selectedName, dim(tem)[1]),
-                                to = rownames(tem),
-                                weight = tem[, 1] ,
-                                mycolor = ifelse(tem[, 1] > 0, "Pos", "Neg")
-                                )
-
-      p <- ggraph::ggraph(links, layout = "star") +
-        ggraph::geom_edge_link(aes(width = abs(links$weight)), alpha = 0.5) +
-        ggraph::scale_edge_width_continuous(name = "Absolute Correlation Coefficient") +
-        ggraph::geom_node_point(aes(fill = links$mycolor), shape = 21, size = 15, stroke = 1) +
-        ggplot2::scale_fill_manual(name = "Positive/Negative Correlation", values = c("#e78ac3", "#8da0cb")) +
-        ggraph::geom_node_text(aes(label = name), size = 5, repel = FALSE) +
-        ggplot2::theme_void()
-
-      return(p)
+    CAPlot <- reactive({
+      shiny::req(PCC())
+      shiny::validate(need(input$CAThreshold >=0 & input$CAThreshold < 1, message = "Absolute correlation threshold value should between 0 and 1."))
+      showCAplot(PCC = PCC(), Metabolite = as.character(input$CAMetabolite), Threshold = input$CAThreshold)
     })
 
-    output$CNPlot <- shiny::renderPlot({
-      shiny::validate(need(!is.null(sfData$data), message = "Input data not found"))
-      shiny::validate(need(!is.null(sfData$group), message = "Meta data not found"))
-      CNPlot()
+    output$CAPlot <- visNetwork::renderVisNetwork({
+      shiny::req(CAPlot())
+      CAPlot()
     })
 
-    ##(3) Download plot-------------------------------------------------------------
-    output$downloadCN <- downloadHandler(
-      filename = function(){paste("Correlation_Network", CNType(), sep = ".")},
-      content = function(file){
-        ggplot2::ggsave(file, plot = CNPlot(), dpi = 600, width = 20, height = 20 / CNRatio(), units = "cm", device = CNType())
-      })
-
-    #7. Correlation Analysis ===================================================
-    ##(1) parameters------------------------------------------------------------
-    CASize <- reactive({
-      input$CASize
-    })
-    CAThreshold <- reactive({
-      input$CAThreshold
-    })
-    CAType <- reactive({
-      as.character(input$CAType)
-    })
-    CARatio <- reactive({
-      if(input$CNRatio <=0) {return(1)}
-      input$CNRatio
-    })
-
-    ##(2) Prepare plot----------------------------------------------------------
-    CAPlot <- eventReactive(input$RunCA, {
-      CACor <- CNCor()
-      colnames(CACor) <- sub("_.*", "", colnames(CACor))
-      rownames(CACor) <- sub("_.*", "", rownames(CACor))
-      p <- qgraph::qgraph(-CACor,
-                          posCol = "#d01c8b",
-                          negCol = "#4dac26",
-                          layout = "spring",
-                          vsize = CASize(),
-                          minimum = CAThreshold(),
-                          labels = colnames(CACor)
-                          )
-      return(p)
-    })
-
-    observeEvent(input$RunCA, {
-      output$CAPlot <- shiny::renderPlot({
-        shiny::validate(need(!is.null(sfData$data), message = "Input data not found"),
-                        need(!is.null(sfData$group), message = "Meta data not found"),
-                        need(CAThreshold() >=0 & CAThreshold() < 1, message = "Absolute correlation threshold value should between 0 and 1.")
-                        )
-        CAPlot()
-      })
-    })
-
-    ##(3) Download plot---------------------------------------------------------
     output$downloadCA <- downloadHandler(
-      filename = function(){paste("Correlation_Analysis", CAType(), sep = ".")},
+      filename = function(){
+        paste0("Network_", as.character(input$CAMetabolite), ".html")
+      },
       content = function(file){
-        if(CAType() == "pdf"){
-          pdf(file, width = 20, height = 20 / CNRatio())
-          plot(CAPlot())
-          dev.off()
-        } else if(CAType() == "png"){
-          png(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
-          plot(CAPlot())
-          dev.off()
-        } else{
-          tiff(file, width = 20, height = 20 / CNRatio(), units = "cm", res = 600)
-          plot(CAPlot())
-          dev.off()
-        }
-    })
+        visNetwork::visSave(graph = CAPlot(), file = file)
+      }
+    )
+
     resultList <- list(
-      dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
-      OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
-      statTable = statTable, # data matrix for volcano plot
-      VCGroup = StatGroup, # group information for volcano plot
-      combinedTable = combinedTable,
       PCAPlot = PCAPlot,
       HMPlot = HMPlot,
-      dataGlobal3Transform = dataGlobal3Transform, # data for boxplot
+      dataGlobal3PCA = dataGlobal3PCA, # data for PLSDA
+      OPLSDAGroup = OPLSDAGroup, # group information for PLSDA plot
+      statTable = statTable, # data for volcano plot
+      VCGroup = StatGroup, # group information for volcano plot
+      combinedTable = combinedTable,
+      dataGlobal3Transform = heatmapDF, # data for boxplot
       BPGroup = BPGroup, # group information for boxplot
       BPTransform = BPTransform, # data transformation for boxplot
-      KMDG = KMDG,
       KMTrendPlot = KMTrendPlot,
       KMTable = KMTable
       )

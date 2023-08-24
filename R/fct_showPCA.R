@@ -19,12 +19,7 @@
 #' Group <- iris$Species
 #' showPCA(df, Group, showFrame = "norm", interactive = T)
 
-showPCA <- function(df,
-                    Group,
-                    inx = 1,
-                    iny = 2,
-                    showFrame = "none",
-                    interactive = FALSE) {
+showPCA <- function(df, Group, inx = 1, iny = 2, showFrame = "none", interactive = FALSE) {
 
   #(1) check input
   Group <- as.factor(Group)

@@ -159,7 +159,7 @@ mod_03_preprocess_ui <- function(id){
                p(style = "color:#C70039;", "3. If only 1 internal standard is used, a random noise will be added
                  to the internal standard peak areas after normalization so as to avoid any possible errors in the
                  following multivariate analyses."),
-               DT::dataTableOutput(ns("filteredTable"))
+               shinycssloaders::withSpinner(DT::dataTableOutput(ns("filteredTable")), type = 5)
              ),
 
              ##(2) Boxplot Panel -----------------------------------------------
@@ -182,7 +182,7 @@ mod_03_preprocess_ui <- function(id){
                               label = "1. Select MetaData (Sample Groups) for Sample Coloring",
                               data = ""
                               ),
-               shiny::plotOutput(ns("TICPlot"))
+               shinycssloaders::withSpinner(shiny::plotOutput(ns("TICPlot")), type = 5)
                ),
 
              ##(3) PCA Panel ---------------------------------------------------
@@ -222,7 +222,7 @@ mod_03_preprocess_ui <- function(id){
                                             )
                                )
                         ),
-               plotly::plotlyOutput(ns("prePCAPlot"))
+               shinycssloaders::withSpinner(plotly::plotlyOutput(ns("prePCAPlot")), type = 5)
              ),
 
              ##(4) Feature Panel -----------------------------------------------
@@ -244,7 +244,7 @@ mod_03_preprocess_ui <- function(id){
                             icon = icon("paper-plane"),
                             style = "color: #fff; background-color: #7570b3; border-color: #7570b3"
                             ),
-               shiny::plotOutput(ns("featureDensityPlot")),
+               shinycssloaders::withSpinner(shiny::plotOutput(ns("featureDensityPlot")), type = 5),
                shiny::plotOutput(ns("featureBoxPlot"))
                )
              )
@@ -430,7 +430,7 @@ mod_03_preprocess_server <- function(id, sfData){
       shiny::req(treatedData())
       shiny::req(sfData$group)
       prePCAData <- treatedData() %>%
-        select(-ID) %>%
+        dplyr::select(-ID) %>%
         t()
       p <- showPCA(prePCAData,
                    Group = sfData$group[, prePCAGroup()],

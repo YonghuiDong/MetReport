@@ -17,7 +17,7 @@ To report bugs or request new features, please send an email to:
 
 If you find MetaboReport useful, kindly consider citing our manuscript in your work. Thank you. <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-2xl" aria-hidden="true"></i></span></b> <b><span style="color:#FF8B8B"><i class="fa fa-heart fa-1xl" aria-hidden="true"></i></span></b>
 
-> MetaboReport:
+> MetaboReport: From Metabolomics Data Analysis to Comprehensive Reporting
 
 ------
 

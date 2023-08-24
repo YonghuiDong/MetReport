@@ -3,6 +3,7 @@
 #' @description A shiny Module.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
+#' @import markdown
 #'
 #' @noRd
 #'
@@ -11,8 +12,8 @@ mod_01_home_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
-      #column(width = 10, includeMarkdown(app_sys("app/www/landing.md")))
-      column(width = 10, includeHTML(app_sys("app/www/landing.html")))
+      column(width = 10, includeMarkdown(app_sys("app/www/landing.md")))
+      #column(width = 10, includeHTML(app_sys("app/www/landing.html")))
 
 ))}
 

@@ -6,7 +6,7 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # global variable
-  ## sdData: sample-feature data
+  ## sfData: sample-feature data
   ##(1) data: raw data
   ##(2) group: metadata
   ##(3) filter: QC filtered data

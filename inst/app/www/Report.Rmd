@@ -61,6 +61,11 @@ sampleGroup <- params$sampleGroup
 mySamplePrep <- params$mySamplePrep
 dataGlobal3Transform <- params$dataGlobal3Transform
 BPGroup <- params$BPGroup
+
+# Format myRawData, add ID column
+myRawData <- myRawData %>% 
+  dplyr::mutate(ID = paste0("ID", row.names(.))) %>%
+  dplyr::relocate(ID)
 ```
 
 <img src = "logo.png" height = "150" style = "position: absolute; top: 90px; right: 10px;"/>
@@ -204,6 +209,7 @@ params$myHMPlot
 
 
 ### Data Overview
+
 
 <!-- **Table 1** presents an overview of the metabolomics result. If you want to perform statistical analysis from scratch by yourself, you can use Table 1. You can click the **Download** button to download the data in excel or csv format.  -->
 

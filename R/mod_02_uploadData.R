@@ -142,39 +142,31 @@ mod_02_uploadData_server <- function(id, sfData){
 
     #(1) Load Data =============================================================
     inputData <- reactive({
-      if(input$showExample == "Yes"){df <- cancerCell
-      } else{
-        shiny::validate(need(!is.null(input$rawFile), message = "Input data not found."))
-        inFile <- input$rawFile
-        extension <- tools::file_ext(inFile$name)
-        filepath <- inFile$datapath
-        df <- switch(extension,
-                     csv = data.table::fread(filepath, header = TRUE, check.names = FALSE),
-                     xls = readxl::read_xls(filepath),
-                     xlsx = readxl::read_xlsx(filepath)
-                     )
-      }
-      shiny::req(df)
-      df <- data.table::setDT(df) %>%
-        .[, ID := paste0("ID", seq_len(.N))] %>%
-        data.table::setcolorder(., neworder = "ID")
-      return(df)
-    }) |>
-      bindEvent(input$submit)
-
-    inputMeta <- reactive({
-      shiny::req(input$inputMeta)
-      inFile <- input$inputMeta
+      if(input$showExample == "Yes"){return(cancerCell)}
+      inFile <- input$rawFile
+      if(is.null(inFile)){return(NULL)}
       extension <- tools::file_ext(inFile$name)
       filepath <- inFile$datapath
       df <- switch(extension,
-                   csv = data.table::fread(filepath, header = TRUE, check.names = FALSE),
+                   csv = read.csv(filepath, header = TRUE, check.names = FALSE),
                    xls = readxl::read_xls(filepath),
                    xlsx = readxl::read_xlsx(filepath)
                    )
       return(df)
-    }) |>
-      bindEvent(input$submit)
+    })
+
+    inputMeta <- reactive({
+      inFile <- input$inputMeta
+      if(is.null(inFile)){return(NULL)}
+      extension <- tools::file_ext(inFile$name)
+      filepath <- inFile$datapath
+      df <- switch(extension,
+                   csv = read.csv(filepath, header = TRUE, check.names = FALSE),
+                   xls = readxl::read_xls(filepath),
+                   xlsx = readxl::read_xlsx(filepath)
+                   )
+      return(df)
+    })
 
     #(2) Format Data ===========================================================
     getProcessedData <- reactive({

@@ -1,5 +1,5 @@
 
-<b><span style="color:#5c5d61; font-size:30px;"> Welcome to MetaboReport</span></b>
+<b><span style="color:#5c5d61; font-size:30px;"> Welcome to MetaboReport (v0.3.1)</span></b>
 
 <img src='www/img/logo.png' align="right" height="180"/>
 
